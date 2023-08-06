@@ -10,6 +10,36 @@ const editor = monaco.editor.create(document.getElementById('container'), {
 // add a new language called ddp to the editor
 monaco.languages.register({ id: 'ddp' });
 
+// ToDo: Maybe parse the ddp.tmLanguage.json into the IMonarchLanguage object format.
+//https://raw.githubusercontent.com/DDP-Projekt/vscode-ddp/main/syntaxes/ddp.tmLanguage.json
+
+monaco.languages.setMonarchTokensProvider('ddp', {
+	tokenizer: {
+		root: [
+			// whitespace
+			{ include: '@whitespace' },
+			[/\b(([Ww]enn)|(dann)|([Ss]onst)|(aber)|([Ff](ü|(ue))r)|(jede[n]?)|(in)|([Ss]olange)|([Mm]ach(e|t))|(zur(ü|(ue))ck)|([Gg]ibt?)|([Vv]erlasse die Funktion)|(von)|(vom)|(bis)|(jede)|(jeder)|(Schrittgr(ö|(oe))(ß|(ss))e))|(Mal)|([Ww]iederhole)|((ö|(oe))ffentliche)\b/, 'keyword.control.ddp'],
+			[/\b([Dd]er)|([Dd]ie)|([Dd]as)|(de[mn])|(ist)|(an)|(Stelle)|([Ss]peichere das Ergebnis von)|([Ss]peichere)|(einer)|(eine)|(leere[n]?)|(Liste)|(aus)|(besteht)|(Funktion)|(mit)|(Parameter[n]?)|(Typ)\b/, 'keyword.other.ddp'],
+			[/\b((Zahl)|(Kommazahl)|(Boolean)|(Buchstabe[n]?)|(Text)|(Zahlen Liste)|(Kommazahlen Liste)|(Boolean Liste)|(Buchstaben Liste)|(Text Liste)|(Zahlen Referenz)|(Kommazahlen Referenz)|(Boolean Referenz)|(Buchstaben Referenz)|(Text Referenz)|(Zahlen Listen Referenz)|(Kommazahlen Listen Referenz)|(Boolean Listen Referenz)|(Buchstaben Listen Referenz)|(Text Listen Referenz))\b/, 'type.identifier'],
+			[/(wahr)|(falsch)/, 'constant'],
+			[/\b((oder)|(und)|(nicht)|(plus)|(minus)|(mal)|(durch)|(modulo)|(hoch)|(Wurzel)|(logisch)|(kontra)|(gleich)|(ungleich)|(kleiner)|(größer)|(groesser)|(als)|(Logarithmus)|(Betrag)|(Länge)|(Laenge)|(Größe)|(Groesse)|(um)|(Bit)|(verschoben)|(nach)|(links)|(rechts)|(zur)|(Basis)|(verkettet mit)|([Vv]erringere)|([Ee]rhöhe)|([Ee]rhoehe)|([Tt]eile)|([Vv]ervielfache)|([Ss]ubtrahiere)|([Aa]ddiere)|([Mm]ultipliziere)|([Dd]ividiere)|([Nn]egiere))\b/, 'keyword.operator'],
+			[/([Uu]nd\s+kann\s+so\s+benutzt\s+werden)/, 'keyword.control.ddp'],
+			[/Binde\s+(\"[\s\S]*\")\s+ein/, 'keyword.ddp']
+		],
+		comment: [
+			[/[^\[\]]+/, 'comment' ],
+			[/\[/,    'comment', '@push' ],    // nested comment
+			[/\]/,    'comment', '@pop'  ],
+			[/[\]*]/,   'comment' ]
+		],
+		whitespace: [
+			[/[ \t\r\n]+/, 'white'],
+			[/\[/,       'comment', '@comment' ],
+			[/\/\/.*$/,    'comment'],
+		],
+	}
+});
+
 // connect to a websocket on the /ls endpoint
 const socket = new WebSocket(`ws://${window.location.host}/ls`);
 const file_uri = 'file:///main.ddp';
