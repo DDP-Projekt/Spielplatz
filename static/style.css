@@ -60,6 +60,10 @@ main {
 	height: 100%;
 }
 
+main[horizontal] {
+	flex-direction: column;
+}
+
 .controls {
 	height: 2rem;
 	width: 100%;
@@ -70,14 +74,29 @@ main {
 }
 
 .controls img {
-	filter: invert()
+	filter: invert();
+	transition: ease-in-out 100ms;
+	border-radius: 30%;
+	margin: 5px;
+}
+
+.controls img:hover {
+	background-color: #969696;
+	cursor: pointer;
 }
 
 #editor-container {
 	display: flex;
 	flex-direction: column;
 	width: 70%;
-	border: .5px solid var(--editor-border-color);
+	border-right: .5px solid var(--editor-border-color);
+}
+
+#editor-container[horizontal] {
+	border-right: unset;
+	border-bottom: .5px solid var(--editor-border-color);
+	width: 100%;
+	height: 70%;
 }
 
 #editor {
@@ -90,6 +109,11 @@ main {
 	width: 30%;
 	height: auto;
 	background-color: #1a1a1a;
+}
+
+#output-container[horizontal] {
+	width: 100%;
+	height: 30%;
 }
 
 #output {
