@@ -28,22 +28,26 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 			[/Binde\s+(\"[\s\S]*\")\s+ein/, 'keyword.ddp']
 		],
 		comment: [
-			[/[^\[\]]+/, 'comment' ],
-			[/\[/,    'comment', '@push' ],    // nested comment
-			[/\]/,    'comment', '@pop'  ],
-			[/[\]*]/,   'comment' ]
+			[/[^\[\]]+/, 'comment'],
+			[/\[/, 'comment', '@push'],    // nested comment
+			[/\]/, 'comment', '@pop'],
+			[/[\]*]/, 'comment']
 		],
 		whitespace: [
 			[/[ \t\r\n]+/, 'white'],
-			[/\[/,       'comment', '@comment' ],
-			[/\/\/.*$/,    'comment'],
+			[/\[/, 'comment', '@comment'],
+			[/\/\/.*$/, 'comment'],
 		],
 	}
 });
 
 // connect to a websocket on the /ls endpoint
 const socket = new WebSocket(`ws://${window.location.host}/ls`);
-const file_uri = 'file:///main.ddp';
+socket.onerror = (error) => {
+	console.error('WebSocket error:', error);
+};
+
+const file_uri = 'file:///Spielplatz.ddp';
 let initialized = false;
 
 //a function that takes a javascript object and sends it to the language server
@@ -166,7 +170,7 @@ socket.onopen = () => {
 					// add completion capabilities with snipped support disabled
 					completion: {
 						completionItem: {
-							snippetSupport: false,
+							snippetSupport: true,
 						},
 					},
 				},
@@ -185,6 +189,28 @@ let semantic_tokens_lengend = {}
 function handleInitializeResponse(resp) {
 	initialized = true;
 	console.log('initializeResult', resp)
+
+	console.log('initialized')
+	// send a language server protocol initialized notification	
+	send({
+		method: 'initialized',
+		params: {},
+	});
+	push_response_handler().then(discard_response);
+	// send a language server protocol didOpen notification
+	send({
+		method: 'textDocument/didOpen',
+		params: {
+			textDocument: {
+				uri: file_uri,
+				languageId: 'ddp',
+				version: 1,
+				text: editor.getValue(),
+			},
+
+		},
+	});
+	push_response_handler().then(discard_response);
 
 	semantic_tokens_lengend = resp.result.capabilities.semanticTokensProvider.legend;
 	monaco.languages.registerDocumentSemanticTokensProvider('ddp', {
@@ -210,28 +236,52 @@ function handleInitializeResponse(resp) {
 		releaseDocumentSemanticTokens: (resultId) => { },
 	});
 
-	console.log('initialized')
-	// send a language server protocol initialized notification	
-	send({
-		method: 'initialized',
-		params: {},
-	});
-	push_response_handler().then(discard_response);
-	// send a language server protocol didOpen notification
-	send({
-		method: 'textDocument/didOpen',
-		params: {
-			textDocument: {
-				uri: file_uri,
-				languageId: 'ddp',
-				version: 1,
-				text: editor.getValue(),
-			},
+	// register a completion provider
+	monaco.languages.registerCompletionItemProvider('ddp', {
+		triggerCharacters: resp.result.capabilities.completionProvider.triggerCharacters,
+		provideCompletionItems: async (model, position, context, token) => {
+			// send a language server protocol completion request
+			send({
+				method: 'textDocument/completion',
+				params: {
+					textDocument: {
+						uri: file_uri,
+					},
+					position: {
+						line: position.lineNumber - 1,
+						character: position.column - 1,
+					},
+					context: {
+						triggerKind: context.triggerKind,
+						triggerCharacter: context.triggerCharacter,
+					},
+				},
+			});
+			return push_response_handler().then((resp) => {
+				console.log('completion');
+				// handle completion response
+				const completions = resp.result;
+				const suggestions = [];
+				for (const completion of completions) {
+					completion['range'] = {
+						startLineNumber: position.lineNumber,
+						startColumn: position.column,
+						endLineNumber: position.lineNumber,
+						endColumn: position.column,
+					};
+					if (!completion.insertText) {
+						completion['insertText'] = completion.label;
+					}
+					suggestions.push(completion);
+				}
+				console.log('completions', suggestions);
+				return {
+					suggestions: suggestions,
+				};
+			});
 		},
 	});
-	push_response_handler().then(discard_response);
 }
-
 
 // when the editor is changed, send a didChange notification to the language server
 editor.onDidChangeModelContent((event) => {

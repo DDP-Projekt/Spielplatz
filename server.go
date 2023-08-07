@@ -7,7 +7,7 @@ import (
 	"github.com/DDP-Projekt/DDPLS/ddpls"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/tliron/kutil/logging"
+	lslogging "github.com/tliron/kutil/logging"
 )
 
 func main() {
@@ -26,11 +26,11 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
+	// websocket endpoint to connect to the language server
 	upgrader := websocket.Upgrader{}
-	logging.Configure(1, nil)
-	// write a websocket endpoint
+	lslogging.Configure(1, nil)
 	r.GET("/ls", func(c *gin.Context) {
-		log.Println("new connection")
+		log.Printf("new connection to %s\n", c.ClientIP())
 		// upgrade the connection to a websocket connection
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -41,7 +41,7 @@ func main() {
 
 		ls := ddpls.NewDDPLS()
 		ls.Server.ServeWebSocket(ws)
-		log.Println("connection closed")
+		log.Printf("connection with %s closed\n", c.ClientIP())
 	})
 
 	// run the server
