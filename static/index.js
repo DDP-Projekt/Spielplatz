@@ -28,11 +28,27 @@ const editor = monaco.editor.create(document.getElementById('editor'), {
 	theme: 'ddp-theme',
 	'semanticHighlighting.enabled': true,
 	automaticLayout: true,
-	model: monaco.editor.createModel('Die Zahl z ist 22.\n', 'ddp', file_uri),
+	model: monaco.editor.createModel(value, 'ddp', file_uri),
 });
 
 // add a new language called ddp to the editor
 monaco.languages.register({ id: 'ddp' });
+monaco.languages.setLanguageConfiguration('ddp', {
+	comments: {
+		blockComment: ['[', ']'],
+	},
+	autoClosingPairs: [
+		{ open: '[', close: ']' },
+		{ open: '(', close: ')' },
+		{ open: '"', close: '"', notIn: ['string'] },
+		{ open: '\'', close: '\'', notIn: ['string'] },
+	],
+	surroundingPairs: [
+		{ open: '[', close: ']' },
+		{ open: '(', close: ')' },
+		{ open: '"', close: '"' },
+	]
+})
 
 // ToDo: Maybe parse the ddp.tmLanguage.json into the IMonarchLanguage object format.
 //https://raw.githubusercontent.com/DDP-Projekt/vscode-ddp/main/syntaxes/ddp.tmLanguage.json
