@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	const editorContainer = document.getElementById("editor-container");
 	const outputContainer = document.getElementById("output-container");
 
-	console.log(window.localStorage.getItem("vertical"));
 	if (window.localStorage.getItem("vertical") === "false") {
 		main.setAttribute('horizontal', 'true');
 		editorContainer.setAttribute('horizontal', 'true');
