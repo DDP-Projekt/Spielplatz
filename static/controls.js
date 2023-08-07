@@ -11,6 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		splitBtn.setAttribute('src', 'img/view-split-vertical.svg');
 		window.localStorage.setItem("vertical", "false");
 	}
+
+	if (window.localStorage.getItem("content") === null) {
+		document.getElementById("example-select").value = "HalloWelt";
+	}
 });
 
 let saveCount = 0;
@@ -48,4 +52,16 @@ function split() {
 		splitBtn.setAttribute('src', 'img/view-split-horizontal.svg');
 		window.localStorage.setItem("vertical", "true");
 	}
+}
+
+function loadExample(val) {
+	if (val === "") return;
+	if (val === "HalloWelt") {
+		editor.setValue('Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt!".');
+		return;
+	}
+
+	fetch(`https://raw.githubusercontent.com/DDP-Projekt/Kompilierer/master/examples/${val}.ddp`)
+		.then(r => r.text())
+		.then(t => editor.setValue(t))
 }

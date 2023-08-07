@@ -29,6 +29,19 @@
 				<div id="editor-controls" class="controls">
 					<img src="img/vbb.svg" alt="logo" width="32px" title="DDP Spielplatz">
 					<img src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn">
+
+					<label for="examples">Example:</label>
+					<select name="examples" id="example-select" onchange="loadExample(this.value)">
+						<option value=""></option>
+						<option value="HalloWelt">Hallo Welt</option>
+						<option value="Brainfuck">Brainfuck</option>
+						<option value="Fibonacci">Fibonacci</option>
+						<option value="Fizzbuzz">Fizzbuzz</option>
+						<option value="Mandelbrot">Mandelbrot</option>
+						<option value="Roemische_Zahlen">Roemische_Zahlen</option>
+						<option value="Tictactoe">Tictactoe</option>
+						<option value="reverse_string">reverse_string</option>
+					</select>
 				</div>
 				<div id="editor"></div>
 			</div>
