@@ -3,7 +3,7 @@ module github.com/DDP-Projekt/Spielplatz
 go 1.20
 
 require (
-	github.com/DDP-Projekt/DDPLS v0.0.0-20230806093201-628c9ff9cf8f
+	github.com/DDP-Projekt/DDPLS v0.0.0-20230807153346-ecf81d95b109
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/tliron/kutil v0.1.68

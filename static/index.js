@@ -1,11 +1,9 @@
+const file_uri = monaco.Uri.parse('inmemory://Spielplatz/Spielplatz');
 const editor = monaco.editor.create(document.getElementById('editor'), {
-	value: [
-		'Die Zahl z ist 22.',
-	].join('\n'),
-	language: 'ddp',
 	theme: 'vs-dark',
 	'semanticHighlighting.enabled': true,
 	automaticLayout: true,
+	model: monaco.editor.createModel('Die Zahl z ist 22.\n', 'ddp', file_uri),
 });
 
 // add a new language called ddp to the editor
@@ -46,8 +44,6 @@ const socket = new WebSocket(`ws://${window.location.host}/ls`);
 socket.onerror = (error) => {
 	console.error('WebSocket error:', error);
 };
-
-const file_uri = 'file:///Spielplatz.ddp';
 let initialized = false;
 
 //a function that takes a javascript object and sends it to the language server
@@ -206,7 +202,7 @@ function handleInitializeResponse(resp) {
 		method: 'textDocument/didOpen',
 		params: {
 			textDocument: {
-				uri: file_uri,
+				uri: file_uri.toString(),
 				languageId: 'ddp',
 				version: 1,
 				text: editor.getValue(),
@@ -226,12 +222,15 @@ function handleInitializeResponse(resp) {
 				method: 'textDocument/semanticTokens/full',
 				params: {
 					textDocument: {
-						uri: file_uri,
+						uri: file_uri.toString(),
 					},
 				},
 			});
 			return push_response_handler().then((resp) => {
 				console.log('semantic tokens');
+				if (!resp.result) {
+					return null;
+				}
 				// handle semantic token response
 				const tokens = resp.result;
 				return tokens;
@@ -249,7 +248,7 @@ function handleInitializeResponse(resp) {
 				method: 'textDocument/semanticTokens/range',
 				params: {
 					textDocument: {
-						uri: file_uri,
+						uri: file_uri.toString(),
 					},
 					range: {
 						start: {
@@ -265,6 +264,9 @@ function handleInitializeResponse(resp) {
 			});
 			return push_response_handler().then((resp) => {
 				console.log('semantic tokens range');
+				if (!resp.result) {
+					return null;
+				}
 				// handle semantic token response
 				const tokens = resp.result;
 				return tokens;
@@ -283,7 +285,7 @@ function handleInitializeResponse(resp) {
 				method: 'textDocument/completion',
 				params: {
 					textDocument: {
-						uri: file_uri,
+						uri: file_uri.toString(),
 					},
 					position: {
 						line: position.lineNumber - 1,
@@ -297,6 +299,10 @@ function handleInitializeResponse(resp) {
 			});
 			return push_response_handler().then((resp) => {
 				console.log('completion');
+				if (!resp.result) {
+					return null;
+				}
+
 				// handle completion response
 				const completions = resp.result;
 				const suggestions = [];
@@ -312,7 +318,6 @@ function handleInitializeResponse(resp) {
 					}
 					suggestions.push(completion);
 				}
-				console.log('completions', suggestions);
 				return {
 					suggestions: suggestions,
 				};
@@ -328,7 +333,7 @@ function handleInitializeResponse(resp) {
 				method: 'textDocument/hover',
 				params: {
 					textDocument: {
-						uri: file_uri,
+						uri: file_uri.toString(),
 					},
 					position: {
 						line: position.lineNumber - 1,
@@ -338,15 +343,51 @@ function handleInitializeResponse(resp) {
 			});
 			return push_response_handler().then((resp) => {
 				console.log('hover', resp);
-				if (resp.result) {
-					return {
-						contents: [
-							{ value: resp.result.contents.value, },
-						],
-						range: resp.result.range,
-					};
+				if (!resp.result) {
+					return null;
 				}
-				return null;
+				return {
+					contents: [
+						{ value: resp.result.contents.value, },
+					],
+					range: resp.result.range,
+				};
+			});
+		}
+	});
+
+	// register a definition provider	
+	monaco.languages.registerDefinitionProvider('ddp', {
+		provideDefinition: async (model, position, token) => {
+			// send a language server protocol definition request
+			send({
+				method: 'textDocument/definition',
+				params: {
+					textDocument: {
+						uri: file_uri.toString(),
+					},
+					position: {
+						line: position.lineNumber - 1,
+						character: position.column - 1,
+					},
+				},
+			});
+			return push_response_handler().then((resp) => {
+				console.log('definition');
+
+				// handle definition response
+				if (!resp.result) {
+					return null;
+				}
+				return {
+					uri: resp.result.uri,
+					range: {
+						startLineNumber: resp.result.range.start.line + 1,
+						startColumn: resp.result.range.start.character + 1,
+						endLineNumber: resp.result.range.end.line + 1,
+						endColumn: resp.result.range.end.character + 1,
+					}
+				};
 			});
 		}
 	});
@@ -362,7 +403,7 @@ editor.onDidChangeModelContent((event) => {
 		method: 'textDocument/didChange',
 		params: {
 			textDocument: {
-				uri: file_uri,
+				uri: file_uri.toString(),
 				version: 2,
 			},
 			contentChanges: [{
