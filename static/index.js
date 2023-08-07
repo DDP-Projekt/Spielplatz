@@ -1,32 +1,20 @@
 monaco.editor.defineTheme('ddp-theme', {
-	"base": "vs-dark",
-    "inherit": true,
-    "rules": [
-       	{
-            "token": "keyword.control",
-            "foreground": "C586C0"
-        },
-		{
-			"token": "function",
-			"foreground": "DCDCAA"
-		},
-		{
-			"token": "parameter",
-			"foreground": "9CDCFE" 
-		},
-		{
-			"token": "variable",
-			"foreground": "9CDCFE" 
-		}
-    ],
-    "colors": {
-        "editor.background": "#1E1E1E",
-        "editor.foreground": "#D4D4D4",
-        "editor.inactiveSelectionBackground": "#3A3D41",
-        "editorIndentGuide.background": "#404040",
-        "editorIndentGuide.activeBackground": "#707070",
-        "editor.selectionHighlightBackground": "#ADD6FF26"
-    }
+	base: 'vs-dark',
+	inherit: true,
+	colors: {},
+	rules: [
+		{ token: 'keyword.control', foreground: 'C586C0' },
+		{ token: 'string.escape', foreground: 'D7BA7D' },
+		{ token: 'keyword.controlFlow', foreground: 'C586C0' },
+		{ token: 'variable', foreground: '9CDCFE' },
+		{ token: 'parameter', foreground: '9CDCFE' },
+		{ token: 'property', foreground: '9CDCFE' },
+		{ token: 'support.function', foreground: 'DCDCAA' },
+		{ token: 'function', foreground: 'DCDCAA' },
+		{ token: 'member', foreground: '4FC1FF' },
+		{ token: 'variable.constant', foreground: '4FC1FF' },
+		{ token: 'typeParameter', foreground: '4EC9B0' },
+	]
 });
 
 let value = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
