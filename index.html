@@ -21,22 +21,23 @@
 		<script src="/monaco-editor/min/vs/editor/editor.main.js" defer></script>
 
 		<script src="/static/index.js" defer></script>
+		<script src="static/controls.js"></script>
 	</head>
 	<body>
-		<main>
+		<main id="main">
 			<div id="editor-container">
 				<div id="editor-controls" class="controls">
-					<img src="img/play.svg" alt="run" width="24px" height="24px">
+					<img src="img/play-outline.svg" alt="run" width="24px" height="24px">
 				</div>
 				<div id="editor"></div>
 			</div>
 			<div id="output-container">
 				<div id="output-controls" class="controls">
-					<img src="img/trash-can-outline.svg" alt="run" width="20px" height="20px">
+					<img onclick="clearOutput()" src="img/trash-can-outline.svg" alt="clear" width="20px" height="20px">
+					<img onclick="split()" src="img/view-split-horizontal.svg" alt="split-view" width="24px" height="24px" id="split-btn">
 				</div>
 				<div id="output">Output goes here</div>
 			</div>
 		</main>
-
 	</body>
 </html>
