@@ -13,6 +13,19 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 });
 
+let saveCount = 0;
+document.addEventListener("keydown", function(e) {
+	if (e.key == "s" && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+		e.preventDefault();
+		saveCount++;
+		if (saveCount > 1) {
+			alert('NOCHMAL \uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D')
+			return;
+		}
+		alert('BRUDER HAT VERSUCHT ZU SPEICHERN \uD83D\uDC80\uD83D\uDC80\uD83D\uDC80')
+	}
+  }, false);
+
 function clearOutput() {
 	document.getElementById('output').innerHTML = '';
 }
