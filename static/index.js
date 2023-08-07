@@ -52,6 +52,10 @@ let initialized = false;
 
 //a function that takes a javascript object and sends it to the language server
 function send(msg) {
+	// return if the socket is not able to send
+	if (socket.readyState !== WebSocket.OPEN) {
+		return;
+	}
 	// send the msg to the language server and add basic jsonrpc fields
 	socket.send(JSON.stringify({
 		jsonrpc: '2.0',
@@ -236,11 +240,45 @@ function handleInitializeResponse(resp) {
 		releaseDocumentSemanticTokens: (resultId) => { },
 	});
 
+	// add support for textDocument/semanticTokens/range
+	monaco.languages.registerDocumentRangeSemanticTokensProvider('ddp', {
+		getLegend: () => semantic_tokens_lengend,
+		// request semantic tokens
+		provideDocumentRangeSemanticTokens: async (model, range, token) => {
+			send({
+				method: 'textDocument/semanticTokens/range',
+				params: {
+					textDocument: {
+						uri: file_uri,
+					},
+					range: {
+						start: {
+							line: range.startLineNumber - 1,
+							character: range.startColumn - 1,
+						},
+						end: {
+							line: range.endLineNumber - 1,
+							character: range.endColumn - 1,
+						},
+					},
+				},
+			});
+			return push_response_handler().then((resp) => {
+				console.log('semantic tokens range');
+				// handle semantic token response
+				const tokens = resp.result;
+				return tokens;
+			});
+		},
+	});
+
+
 	// register a completion provider
 	monaco.languages.registerCompletionItemProvider('ddp', {
 		triggerCharacters: resp.result.capabilities.completionProvider.triggerCharacters,
 		provideCompletionItems: async (model, position, context, token) => {
 			// send a language server protocol completion request
+			console.log('requesting completion for trigger character', context.triggerCharacter);
 			send({
 				method: 'textDocument/completion',
 				params: {
@@ -280,6 +318,37 @@ function handleInitializeResponse(resp) {
 				};
 			});
 		},
+	});
+
+	// register a hover provider
+	monaco.languages.registerHoverProvider('ddp', {
+		provideHover: async (model, position, token) => {
+			// send a language server protocol hover request
+			send({
+				method: 'textDocument/hover',
+				params: {
+					textDocument: {
+						uri: file_uri,
+					},
+					position: {
+						line: position.lineNumber - 1,
+						character: position.column - 1,
+					},
+				},
+			});
+			return push_response_handler().then((resp) => {
+				console.log('hover', resp);
+				if (resp.result) {
+					return {
+						contents: [
+							{ value: resp.result.contents.value, },
+						],
+						range: resp.result.range,
+					};
+				}
+				return null;
+			});
+		}
 	});
 }
 
