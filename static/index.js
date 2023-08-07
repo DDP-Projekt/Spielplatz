@@ -29,10 +29,14 @@ monaco.editor.defineTheme('ddp-theme', {
     }
 });
 
+let value = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
+const initialContent = window.localStorage.getItem("content");
+if (initialContent !== null) {
+	value = initialContent;
+}
+
 const editor = monaco.editor.create(document.getElementById('editor'), {
-	value: [
-		'Die Zahl z ist 22.',
-	].join('\n'),
+	value: value,
 	language: 'ddp',
 	theme: 'ddp-theme',
 	'semanticHighlighting.enabled': true,
@@ -431,4 +435,6 @@ window.onbeforeunload = () => {
 		// close the websocket
 		socket.close();
 	});
+
+	window.localStorage.setItem("content", editor.getValue());
 }
