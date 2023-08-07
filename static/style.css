@@ -73,14 +73,17 @@ main[horizontal] {
 	align-items: center;
 }
 
-.controls img {
+img[invert] {
 	filter: invert();
-	transition: ease-in-out 100ms;
-	border-radius: 30%;
+}
+
+.controls img {
+	transition: ease-in-out 50ms;
 	margin: 5px;
 }
 
-.controls img:hover {
+.controls img.btn:hover {
+	border-radius: 30%;
 	background-color: #969696;
 	cursor: pointer;
 }
