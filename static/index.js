@@ -1,9 +1,40 @@
+monaco.editor.defineTheme('ddp-theme', {
+	"base": "vs-dark",
+    "inherit": true,
+    "rules": [
+       	{
+            "token": "keyword.control",
+            "foreground": "C586C0"
+        },
+		{
+			"token": "function",
+			"foreground": "DCDCAA"
+		},
+		{
+			"token": "parameter",
+			"foreground": "9CDCFE" 
+		},
+		{
+			"token": "variable",
+			"foreground": "9CDCFE" 
+		}
+    ],
+    "colors": {
+        "editor.background": "#1E1E1E",
+        "editor.foreground": "#D4D4D4",
+        "editor.inactiveSelectionBackground": "#3A3D41",
+        "editorIndentGuide.background": "#404040",
+        "editorIndentGuide.activeBackground": "#707070",
+        "editor.selectionHighlightBackground": "#ADD6FF26"
+    }
+});
+
 const editor = monaco.editor.create(document.getElementById('editor'), {
 	value: [
 		'Die Zahl z ist 22.',
 	].join('\n'),
 	language: 'ddp',
-	theme: 'vs-dark',
+	theme: 'ddp-theme',
 	'semanticHighlighting.enabled': true,
 	automaticLayout: true,
 });
