@@ -20,6 +20,7 @@ func main() {
 	r.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
 	// serve the static folder
 	r.StaticFS("/static", http.Dir("static"))
+	r.StaticFS("/img", http.Dir("img"))
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)

@@ -1,10 +1,11 @@
-const editor = monaco.editor.create(document.getElementById('container'), {
+const editor = monaco.editor.create(document.getElementById('editor'), {
 	value: [
 		'Die Zahl z ist 22.',
 	].join('\n'),
 	language: 'ddp',
 	theme: 'vs-dark',
 	'semanticHighlighting.enabled': true,
+	automaticLayout: true,
 });
 
 // add a new language called ddp to the editor
