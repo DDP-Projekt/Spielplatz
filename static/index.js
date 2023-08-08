@@ -230,6 +230,34 @@ socket.onopen = () => {
 	push_response_handler().then(handleInitializeResponse);
 };
 
+// map completion.kind from lsp kind to monaco kind
+const completion_kind_map = {
+	1: monaco.languages.CompletionItemKind.Method,
+	2: monaco.languages.CompletionItemKind.Function,
+	3: monaco.languages.CompletionItemKind.Constructor,
+	4: monaco.languages.CompletionItemKind.Field,
+	5: monaco.languages.CompletionItemKind.Variable,
+	6: monaco.languages.CompletionItemKind.Class,
+	7: monaco.languages.CompletionItemKind.Interface,
+	8: monaco.languages.CompletionItemKind.Module,
+	9: monaco.languages.CompletionItemKind.Property,
+	10: monaco.languages.CompletionItemKind.Unit,
+	11: monaco.languages.CompletionItemKind.Value,
+	12: monaco.languages.CompletionItemKind.Enum,
+	13: monaco.languages.CompletionItemKind.Keyword,
+	14: monaco.languages.CompletionItemKind.Snippet,
+	15: monaco.languages.CompletionItemKind.Text,
+	16: monaco.languages.CompletionItemKind.Color,
+	17: monaco.languages.CompletionItemKind.File,
+	18: monaco.languages.CompletionItemKind.Reference,
+	19: monaco.languages.CompletionItemKind.Folder,
+	20: monaco.languages.CompletionItemKind.EnumMember,
+	21: monaco.languages.CompletionItemKind.Constant,
+	22: monaco.languages.CompletionItemKind.Struct,
+	23: monaco.languages.CompletionItemKind.Event,
+	24: monaco.languages.CompletionItemKind.Operator,
+	25: monaco.languages.CompletionItemKind.TypeParameter,
+};
 let semantic_tokens_lengend = {}
 function handleInitializeResponse(resp) {
 	initialized = true;
@@ -349,20 +377,21 @@ function handleInitializeResponse(resp) {
 				}
 
 				// handle completion response
-				const completions = resp.result;
-				const suggestions = [];
-				for (const completion of completions) {
-					completion['range'] = {
-						startLineNumber: position.lineNumber,
-						startColumn: position.column,
-						endLineNumber: position.lineNumber,
-						endColumn: position.column,
+				const suggestions = resp.result.map((completion) => {
+					const kind = completion_kind_map[completion.kind];
+					return {
+						label: completion.label,
+						kind: kind,
+						insertText: completion.insertText ? completion.insertText : completion.label,
+						range: {
+							startLineNumber: position.lineNumber,
+							startColumn: position.column,
+							endLineNumber: position.lineNumber,
+							endColumn: position.column,
+						},
+						sortText: String.fromCharCode(97 + kind) + completion.label,
 					};
-					if (!completion.insertText) {
-						completion['insertText'] = completion.label;
-					}
-					suggestions.push(completion);
-				}
+				});
 				return {
 					suggestions: suggestions,
 				};
