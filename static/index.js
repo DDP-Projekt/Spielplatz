@@ -215,7 +215,7 @@ socket.onopen = () => {
 					// add completion capabilities with snipped support disabled
 					completion: {
 						completionItem: {
-							snippetSupport: true,
+							snippetSupport: false,
 						},
 					},
 				},
@@ -387,7 +387,7 @@ function handleInitializeResponse(resp) {
 				},
 			});
 			return push_response_handler().then((resp) => {
-				console.log('hover', resp);
+				console.log('hover');
 				if (!resp.result) {
 					return null;
 				}
@@ -444,6 +444,7 @@ editor.onDidChangeModelContent((event) => {
 		return;
 	}
 
+	console.log('change', event.changes);
 	send({
 		method: 'textDocument/didChange',
 		params: {
@@ -451,20 +452,24 @@ editor.onDidChangeModelContent((event) => {
 				uri: file_uri.toString(),
 				version: 2,
 			},
-			contentChanges: [{
-				range: {
-					start: {
-						line: event.changes[0].range.startLineNumber - 1,
-						character: event.changes[0].range.startColumn - 1,
-					},
-					end: {
-						line: event.changes[0].range.endLineNumber - 1,
-						character: event.changes[0].range.endColumn - 1,
-					},
-				},
-				rangeLength: event.changes[0].rangeLength,
-				text: event.changes[0].text,
-			}],
+			contentChanges:
+				// map all event.changes to lsp changes
+				event.changes.map((change) => {
+					return {
+						range: {
+							start: {
+								line: change.range.startLineNumber - 1,
+								character: change.range.startColumn - 1,
+							},
+							end: {
+								line: change.range.endLineNumber - 1,
+								character: change.range.endColumn - 1,
+							},
+						},
+						rangeLength: change.rangeLength,
+						text: change.text,
+					};
+				}),
 		},
 	});
 	push_response_handler().then(discard_response);
