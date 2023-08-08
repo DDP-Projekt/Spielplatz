@@ -24,11 +24,12 @@
 		<script src="static/controls.js"></script>
 	</head>
 	<body>
-		<main id="main">
+		<main id="main" style="visibility: hidden;">
 			<div id="editor-container" class="container">
 				<div id="editor-controls" class="controls">
 					<img src="img/vbb.svg" alt="logo" width="32px" title="DDP Spielplatz">
 					<img src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn">
+					<img onclick="openDocs()" src="img/help-circle-outline.svg" alt="help" title="Bedienungsanleitung öffnen" width="22px" height="22px" invert class="btn">
 
 					<label for="examples">Example:</label>
 					<select name="examples" id="example-select" onchange="loadExample(this.value)">
@@ -51,6 +52,7 @@
 			<div id="output-container" class="container">
 				<div id="output-controls" class="controls">
 					<img onclick="clearOutput()" src="img/trash-can-outline.svg" alt="clear" title="Ausgabe leeren" width="20px" height="20px" invert class="btn">
+					<img onclick="copy()" src="img/content-copy.svg" alt="copy" title="Ausgabe kopieren" width="20px" height="20px" invert class="btn">
 					<img onclick="split()" src="img/view-split-horizontal.svg" alt="split-view" title="Sicht ändern" width="24px" height="24px" id="split-btn" invert class="btn">
 				</div>
 				<div id="output">Output goes here</div>

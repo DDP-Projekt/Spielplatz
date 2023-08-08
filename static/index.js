@@ -23,13 +23,18 @@ if (initialContent !== null) {
 	value = initialContent;
 }
 
+const editorDiv = document.getElementById('editor');
 const file_uri = monaco.Uri.parse('inmemory://Spielplatz/Spielplatz');
-const editor = monaco.editor.create(document.getElementById('editor'), {
+const editor = monaco.editor.create(editorDiv, {
 	theme: 'ddp-theme',
 	'semanticHighlighting.enabled': true,
-	automaticLayout: true,
+	//automaticLayout: true,
 	model: monaco.editor.createModel(value, 'ddp', file_uri),
 });
+
+new ResizeObserver(function(mutations) {
+	editor.layout();
+}).observe(editorDiv);
 
 // add a new language called ddp to the editor
 monaco.languages.register({ id: 'ddp' });

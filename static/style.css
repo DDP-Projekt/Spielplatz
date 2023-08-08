@@ -101,6 +101,7 @@ img[invert] {
     background-color: #4d4d4d;
     border-radius: 2rem;
 	margin: 1rem;
+	color: white;
 }
 
 .container {
@@ -109,16 +110,6 @@ img[invert] {
 
 	user-select: var(--none-if-dragging);
 	pointer-events: var(--none-if-dragging);
-}
-
-#editor-container {
-	border-right: .5px solid var(--editor-border-color);
-	border-bottom: unset;
-}
-
-#editor-container[horizontal] {
-	border-right: unset;
-	border-bottom: .5px solid var(--editor-border-color);
 }
 
 #editor {

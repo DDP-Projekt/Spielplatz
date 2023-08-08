@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (window.localStorage.getItem("content") === null) {
 		document.getElementById("example-select").value = "HalloWelt";
 	}
+
+	main.style.visibility = "";
 });
 
 let saveCount = 0;
@@ -72,7 +74,8 @@ function loadExample(val) {
 const root = document.documentElement;
 
 function spacerDragStart(ev) {
-	ev.dataTransfer.setDragImage(ev.target, -1000, -1000);
+	
+	ev.dataTransfer.setDragImage(document.createElement('br'), 0, 0);
 
 	root.style.setProperty('--none-if-dragging', 'none');
 }
@@ -94,4 +97,12 @@ function spacerDrag(ev) {
 		if (x < 0.1 || x > 0.9) return;
 		root.style.setProperty('--editor-container-size', x*100 + '%');
 	}
+}
+
+function copy() {
+	navigator.clipboard.writeText(document.getElementById('output').innerText);
+}
+
+function openDocs() {
+	window.open("https://ddp-projekt.github.io/Bedienungsanleitung/", "_blank").focus();
 }
