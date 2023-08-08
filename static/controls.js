@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		editorContainer.setAttribute('horizontal', 'true');
 		outputContainer.setAttribute('horizontal', 'true');
 		splitBtn.setAttribute('src', 'img/view-split-vertical.svg');
+		document.getElementById("spacer").setAttribute('horizontal', 'true');
+
 		window.localStorage.setItem("vertical", "false");
 	}
 
@@ -43,6 +45,7 @@ function split() {
 	main.toggleAttribute('horizontal');
 	editorContainer.toggleAttribute('horizontal');
 	outputContainer.toggleAttribute('horizontal');
+	document.getElementById("spacer").toggleAttribute('horizontal');
 
 	if (window.localStorage.getItem("vertical") === "true") {
 		splitBtn.setAttribute('src', 'img/view-split-vertical.svg');
@@ -64,4 +67,31 @@ function loadExample(val) {
 	fetch(`https://raw.githubusercontent.com/DDP-Projekt/Kompilierer/master/examples/${val}.ddp`)
 		.then(r => r.text())
 		.then(t => editor.setValue(t))
+}
+
+const root = document.documentElement;
+
+function spacerDragStart(ev) {
+	ev.dataTransfer.setDragImage(ev.target, -1000, -1000);
+
+	root.style.setProperty('--none-if-dragging', 'none');
+}
+
+function spacerDragEnd() {
+	root.style.setProperty('--none-if-dragging', '');
+}
+
+function spacerDrag(ev) {
+	const main = document.getElementById('main');
+
+	if (main.hasAttribute('horizontal')) {
+		let y = ev.clientY/ev.view.innerHeight;
+		if (y < 0.1 || y > 0.9) return;
+		root.style.setProperty('--editor-container-size', y*100 + '%');
+	}
+	else {
+		let x = ev.clientX/ev.view.innerWidth;
+		if (x < 0.1 || x > 0.9) return;
+		root.style.setProperty('--editor-container-size', x*100 + '%');
+	}
 }
