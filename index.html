@@ -21,14 +21,15 @@
 		<script src="/monaco-editor/min/vs/editor/editor.main.js" defer></script>
 
 		<script src="/static/index.js" defer></script>
-		<script src="static/controls.js"></script>
+		<script src="/static/controls.js"></script>
+		<script src="/static/run.js"></script>
 	</head>
 	<body>
 		<main id="main" style="visibility: hidden;">
 			<div id="editor-container" class="container">
 				<div id="editor-controls" class="controls">
 					<img src="img/vbb.svg" alt="logo" width="32px" title="DDP Spielplatz">
-					<img src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn">
+					<img onclick="runProgram()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn">
 					<img onclick="openDocs()" src="img/help-circle-outline.svg" alt="help" title="Bedienungsanleitung öffnen" width="22px" height="22px" invert class="btn">
 
 					<label for="examples">Example:</label>
