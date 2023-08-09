@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -10,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -38,8 +38,8 @@ type TokenType int64
 // and will be sent to the client
 type ProgramResult struct {
 	ReturnCode int       `json:"returnCode,string"`
-	Stderr     []byte    `json:"stderr"`
-	Stdout     []byte    `json:"stdout"`
+	Stderr     string    `json:"stderr"`
+	Stdout     string    `json:"stdout"`
 	Error      *string   `json:"error"`        // null if no error occurred
 	Token      TokenType `json:"token,string"` // the token that was passed to compileDDPProgram
 }
@@ -55,8 +55,8 @@ func compileDDPProgram(src io.Reader, token TokenType) (ProgramResult, string, e
 
 	cmd := exec.Command("kddp", "kompiliere", "-o", exe_path)
 	cmd.Stdin = src
-	stderr := &bytes.Buffer{}
-	stdout := &bytes.Buffer{}
+	stderr := &strings.Builder{}
+	stdout := &strings.Builder{}
 	cmd.Stderr = stderr
 	cmd.Stdout = stdout
 
@@ -74,8 +74,8 @@ func compileDDPProgram(src io.Reader, token TokenType) (ProgramResult, string, e
 
 	return ProgramResult{
 		ReturnCode: cmd.ProcessState.ExitCode(),
-		Stderr:     stderr.Bytes(),
-		Stdout:     stdout.Bytes(),
+		Stderr:     stderr.String(),
+		Stdout:     stdout.String(),
 		Error:      err_string,
 		Token:      token,
 	}, exe_path, nil
