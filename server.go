@@ -156,10 +156,11 @@ func serve_run(c *gin.Context) {
 		ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "invalid token"))
 		return
 	}
+	args, _ := c.GetQueryArray("args")
 	websocket_rw := NewWebsocketRW(ws)
 	// run the executable
 	defer deleteExecutable(token, exe_path)
-	if err := runExecutable(exe_path, websocket_rw, websocket_rw, websocket_rw); err != nil {
+	if err := runExecutable(exe_path, websocket_rw, websocket_rw, websocket_rw, args...); err != nil {
 		log.Println(err)
 		websocket_rw.Close()
 		// report error to client

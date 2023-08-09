@@ -49,6 +49,10 @@ table {
 	--editor-container-size: 70%;
 	--controls-height: 2rem;
 	--none-if-dragging: '';
+	--scrollbar-shadow: #000000;
+    --scrollbarSlider-background: rgba(121, 121, 121, 0.4);
+    --scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
+    --scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
 }
 
 html, body {
@@ -57,6 +61,15 @@ html, body {
 	background-color: var(--background-color);
 	font-family: Arial, Helvetica, sans-serif;
 	color: white;
+}
+
+input {
+	background-color: #292929;
+	color: white;
+	outline: none;
+	border: none;
+	border: #5c5c5c solid .7px;
+	font-family: monospace;
 }
 
 main {
@@ -117,15 +130,6 @@ img[invert] {
 	height: 100%;
 }
 
-#output-container {
-	background-color: #1a1a1a;
-}
-
-#output {
-	height: 100%;
-	font-family: monospace;
-}
-
 #spacer {
 	display: flex;
     justify-content: center;
@@ -140,4 +144,59 @@ img[invert] {
 
 #spacer[horizontal] span {
 	transform: rotate(90deg);
+}
+
+#output-container {
+	background-color: #1a1a1a;
+}
+
+#output-container label {
+	float: left;
+}
+
+#output {
+	height: 100%;
+	font-family: monospace;
+	overflow: auto;
+}
+
+#outputText {
+	display: flex;
+    flex-direction: column;
+	padding: 0 1rem;
+}
+
+#outputText span { display: block; }
+span.stdin { color: lightblue; }
+span.stderr { color: lightcoral; }
+
+#input-holder {
+	overflow: hidden;
+    display: block;
+    padding: 0 4px 0 10px
+}
+
+#output-container input {
+	width: calc(100% - 1rem);
+}
+
+/*-- Scrollbar --*/
+::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbarSlider-hoverBackground);
+}
+::-webkit-scrollbar-thumb:active {
+    background: var(--scrollbarSlider-activeBackground);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbarSlider-background);
+}
+::-webkit-scrollbar-track {
+	box-shadow: .3px .3px 0 0 #5c5c5c inset;
+}
+::-webkit-scrollbar-corner {
+	display: none;
 }

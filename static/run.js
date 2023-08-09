@@ -1,8 +1,8 @@
 async function runProgram() {
 	console.log('requesting to compile the program')
-	src_code = editor.getValue();
+	const src_code = editor.getValue();
 	// send a request to the /compile endpoint using the fetch api
-	compile_result = await fetch('/compile', {
+	const compile_result = await fetch('/compile', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -12,14 +12,20 @@ async function runProgram() {
 
 	if (compile_result.error) {
 		console.log('compile error')
-		console.log(compile_result)
+		pushOutputMessage(compile_result.stderr, 'stderr');
 		return
 	}
 
-	token = compile_result.token
+	const token = compile_result.token
+	const args = document.getElementById('args').value;
+	let arguments = ""
+	for (let arg of args.split(';')) {
+		arguments += "&args=" + arg;
+	}
+	
 	console.log('requesting to run the program')
 	// connect to the /run endpoint using the websocket api with token as query parameter
-	ws = new WebSocket(`ws://${window.location.host}/run?token=${token}`)
+	const ws = new WebSocket(`ws://${window.location.host}/run?token=${token}${arguments}`)
 	if (ws) {
 		ws.onopen = () => {
 			console.log('websocket (run) connection opened')
@@ -27,7 +33,8 @@ async function runProgram() {
 		}
 
 		ws.onmessage = (event) => {
-			console.log(event.data)
+			console.log(event);
+			pushOutputMessage(event.data, 'stdout');
 		}
 
 		ws.onclose = () => {
@@ -36,7 +43,7 @@ async function runProgram() {
 
 		ws.onerror = (error) => {
 			console.log('websocket (run) error')
-			console.log(error)
+			pushOutputMessage(error.data, 'stderr');
 		}
 	} else {
 		console.error('websocket (run) connection failed')

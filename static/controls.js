@@ -35,7 +35,7 @@ document.addEventListener("keydown", function(e) {
   }, false);
 
 function clearOutput() {
-	document.getElementById('output').innerHTML = '';
+	document.getElementById('outputText').innerHTML = '';
 }
 
 function split() {
@@ -105,4 +105,26 @@ function copy() {
 
 function openDocs() {
 	window.open("https://ddp-projekt.github.io/Bedienungsanleitung/", "_blank").focus();
+}
+
+function pushOutputMessage(message, target) {
+	const outputText = document.getElementById('outputText');
+	const span = document.createElement('span');
+	span.classList.add(target);
+	span.innerHTML = message;
+	outputText.appendChild(span);
+
+	updateOutputScrollbar();
+}
+
+function updateOutputScrollbar() {
+	var element = document.getElementById("output");
+	element.scrollTop = element.scrollHeight;
+}
+
+function inputEnter(ev) {
+	if (ev.key !== "Enter") return;
+	ev.preventDefault();
+	pushOutputMessage(ev.target.value, 'stdin');
+	ev.target.value = "";
 }

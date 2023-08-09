@@ -30,6 +30,9 @@
 				<div id="editor-controls" class="controls">
 					<img src="img/vbb.svg" alt="logo" width="32px" title="DDP Spielplatz">
 					<img onclick="runProgram()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn">
+					
+					<label>Argumente:</label>
+					<input id="args" type="text"></input>
 					<img onclick="openDocs()" src="img/help-circle-outline.svg" alt="help" title="Bedienungsanleitung öffnen" width="22px" height="22px" invert class="btn">
 
 					<label for="examples">Example:</label>
@@ -56,7 +59,17 @@
 					<img onclick="copy()" src="img/content-copy.svg" alt="copy" title="Ausgabe kopieren" width="20px" height="20px" invert class="btn">
 					<img onclick="split()" src="img/view-split-horizontal.svg" alt="split-view" title="Sicht ändern" width="24px" height="24px" id="split-btn" invert class="btn">
 				</div>
-				<div id="output">Output goes here</div>
+				<div id="output">
+					<pre id="outputText"></pre>
+				</div>
+				
+				<form>
+					<label>&gt;</label>
+					<span id="input-holder">
+						<input type="text" onkeydown="inputEnter(event)"></input>
+					</span>
+				</form>
+				
 			</div>
 		</main>
 	</body>
