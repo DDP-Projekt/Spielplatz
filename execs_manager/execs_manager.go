@@ -28,7 +28,7 @@ func Delete(token TokenType) {
 
 func RemoveExecutableFile(token TokenType, exe_path string) {
 	if _, ok := executables.Get(token); ok {
-		log.Printf("deleting %s after timeout\n", exe_path)
+		log.Printf("deleting %s\n", exe_path)
 		if err := os.Remove(exe_path); err != nil {
 			log.Printf("could not delete executable: %s\n", err)
 		}

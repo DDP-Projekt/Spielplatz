@@ -93,8 +93,11 @@ func serve_compile(c *gin.Context) {
 	log.Printf("compilation of program %d finished\n", token)
 	// delete the executable after 3 minutes
 	go func() {
-		time.Sleep(3 * time.Minute)
-		executables.RemoveExecutableFile(token, exe_path)
+		time.Sleep(1 * time.Minute)
+		if _, ok := executables.Get(token); ok {
+			log.Printf("executable %s was unused for 1 minute, deleting it", exe_path)
+			executables.RemoveExecutableFile(token, exe_path)
+		}
 	}()
 	// send the result to the client
 	c.JSON(http.StatusOK, result)
@@ -134,10 +137,11 @@ func serve_run(c *gin.Context) {
 		return
 	}
 	args, _ := c.GetQueryArray("args")
-	websocket_rw := wsrw.NewWebsocketRW(ws)
+	stdin_cancel := make(chan error)
+	websocket_rw := wsrw.NewWebsocketRW(ws, stdin_cancel)
 	// run the executable
 	defer executables.RemoveExecutableFile(token, exe_path)
-	if err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw, websocket_rw, args...); err != nil {
+	if err := kddp.RunExecutable(exe_path, websocket_rw, stdin_cancel, websocket_rw, websocket_rw, args...); err != nil {
 		log.Println(err)
 		websocket_rw.Close()
 		// report error to client

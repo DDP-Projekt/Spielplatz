@@ -1,6 +1,7 @@
 package websocket_rw
 
 import (
+	"errors"
 	"io"
 	"log"
 
@@ -11,67 +12,103 @@ const buff_size = 128
 
 // implements io.ReadWriter on a websocket connection
 type WebsocketRW struct {
-	con        *websocket.Conn
-	cur_reader io.Reader
-	isEOF      bool
-	cur_writer io.WriteCloser
-	buffered   int // how many bytes are currently buffered
+	con           *websocket.Conn
+	cur_reader    io.Reader
+	isEOF         bool
+	readBuff      []byte
+	readInterrupt <-chan error
+	curWriter     io.WriteCloser
+	buffered      int // how many bytes are currently buffered
 }
 
-func NewWebsocketRW(con *websocket.Conn) *WebsocketRW {
+func NewWebsocketRW(con *websocket.Conn, read_cancel <-chan error) *WebsocketRW {
 	return &WebsocketRW{
-		con:        con,
-		cur_reader: nil,
-		isEOF:      false,
-		cur_writer: nil,
-		buffered:   0,
+		con:           con,
+		cur_reader:    nil,
+		isEOF:         false,
+		readBuff:      make([]byte, 0, buff_size),
+		readInterrupt: read_cancel,
+		curWriter:     nil,
+		buffered:      0,
+	}
+}
+
+func (rw *WebsocketRW) getNextReader() (io.Reader, error) {
+	type readerr struct {
+		r io.Reader
+		e error
+	}
+
+	result_chan := make(chan readerr, 1) // the buffer is necessary to not leak the goroutine below
+	go func() {
+		msg_type, r, err := rw.con.NextReader()
+		if err != nil {
+			result_chan <- readerr{nil, err}
+			return
+		}
+		if msg_type != websocket.TextMessage {
+			result_chan <- readerr{nil, errors.New("expected text message")}
+			return
+		}
+		result_chan <- readerr{r, nil}
+	}()
+
+	select {
+	case err := <-rw.readInterrupt:
+		return nil, err
+	case result := <-result_chan:
+		return result.r, result.e
 	}
 }
 
 func (rw *WebsocketRW) Read(p []byte) (int, error) {
-	return 0, io.EOF // no input is read
-	/*
-		if rw.isEOF {
-			return 0, io.EOF
+	if rw.isEOF {
+		return 0, io.EOF
+	}
+
+	if rw.cur_reader == nil {
+		var err error
+		if rw.cur_reader, err = rw.getNextReader(); err != nil {
+			log.Printf("getNextReader failed: %s", err)
+			rw.isEOF = true
+			return 0, err
 		}
-		if rw.cur_reader == nil {
-			msg_type, r, err := rw.con.NextReader()
-			if err != nil {
-				rw.isEOF = true
-				return 0, io.EOF
-			}
-			if msg_type != websocket.TextMessage {
-				return 0, errors.New("expected text message")
-			}
-			rw.cur_reader = r
-		}
-		n, err := rw.cur_reader.Read(p)
-		return n, err
-	*/
+	}
+
+	if len(rw.readBuff) != 0 {
+		n := copy(p, rw.readBuff)
+		rw.readBuff = rw.readBuff[n:]
+		return n, nil
+	}
+
+	msg, err := io.ReadAll(rw.cur_reader)
+	rw.cur_reader = nil
+	n := copy(p, msg)
+	rw.readBuff = msg[n:]
+	return n, err
 }
 
 func (rw *WebsocketRW) Write(p []byte) (int, error) {
-	log.Printf("writing %d bytes\n", len(p))
-	if rw.cur_writer == nil {
+	if rw.curWriter == nil {
 		w, err := rw.con.NextWriter(websocket.TextMessage)
 		if err != nil {
 			return 0, err
 		}
-		rw.cur_writer = w
+		rw.curWriter = w
 	}
-	n, err := rw.cur_writer.Write(p)
+	n, err := rw.curWriter.Write(p)
 	rw.buffered += n
 	if rw.buffered >= buff_size {
-		rw.cur_writer.Close()
-		rw.cur_writer = nil
+		rw.curWriter.Close()
+		rw.curWriter = nil
 		rw.buffered = 0
 	}
 	return n, err
 }
 
 func (rw *WebsocketRW) Close() error {
-	if rw.cur_writer != nil {
-		rw.cur_writer.Close()
+	if rw.curWriter != nil {
+		rw.curWriter.Close()
 	}
 	return nil
 }

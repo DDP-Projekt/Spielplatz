@@ -22,14 +22,16 @@ async function runProgram() {
 	for (let arg of args.split(';')) {
 		arguments += "&args=" + arg;
 	}
-	
+
 	console.log('requesting to run the program')
 	// connect to the /run endpoint using the websocket api with token as query parameter
 	const ws = new WebSocket(`ws://${window.location.host}/run?token=${token}${arguments}`)
 	if (ws) {
 		ws.onopen = () => {
 			console.log('websocket (run) connection opened')
-			ws.send('ein bisschen input')
+			ws.send('ein bisschen input');
+			ws.send('noch mehr input');
+			console.log('input sent')
 		}
 
 		ws.onmessage = (event) => {
