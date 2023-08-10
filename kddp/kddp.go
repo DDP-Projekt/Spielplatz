@@ -1,4 +1,4 @@
-package main
+package kddp
 
 import (
 	"context"
@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"golang.org/x/exp/constraints"
 )
 
 const exe_dir = "playground_executables"
@@ -32,11 +34,14 @@ func init() {
 	}
 }
 
-type TokenType int64
+// constraint that satisfies `json:"token,string"`
+type tokenType interface {
+	string | constraints.Float | constraints.Integer | bool
+}
 
 // CompilerResult is the result of a compilation
 // and will be sent to the client
-type ProgramResult struct {
+type ProgramResult[TokenType tokenType] struct {
 	ReturnCode int       `json:"returnCode,string"`
 	Stderr     string    `json:"stderr"`
 	Stdout     string    `json:"stdout"`
@@ -47,7 +52,7 @@ type ProgramResult struct {
 // compiles a DDP program and returns the result of the compilation,
 // the path to the executable,
 // and an error if one occurred
-func compileDDPProgram(src io.Reader, token TokenType) (ProgramResult, string, error) {
+func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType) (ProgramResult[TokenType], string, error) {
 	exe_path := filepath.Join(exe_dir, "Spielplatz_"+fmt.Sprint(token))
 	if runtime.GOOS == "windows" {
 		exe_path += ".exe"
@@ -72,7 +77,7 @@ func compileDDPProgram(src io.Reader, token TokenType) (ProgramResult, string, e
 		*err_string = err.Error()
 	}
 
-	return ProgramResult{
+	return ProgramResult[TokenType]{
 		ReturnCode: cmd.ProcessState.ExitCode(),
 		Stderr:     stderr.String(),
 		Stdout:     stdout.String(),
@@ -82,7 +87,7 @@ func compileDDPProgram(src io.Reader, token TokenType) (ProgramResult, string, e
 }
 
 // runs an executable and returns the result of the execution
-func runExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) error {
+func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -90,6 +95,7 @@ func runExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	cmd.Stderr = stderr
 	cmd.Stdout = stdout
 	cmd.Stdin = stdin
+	cmd.WaitDelay = time.Second * 1
 
 	return cmd.Run()
 }

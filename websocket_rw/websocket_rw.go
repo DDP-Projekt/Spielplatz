@@ -1,12 +1,13 @@
-package main
+package websocket_rw
 
 import (
 	"io"
+	"log"
 
 	"github.com/gorilla/websocket"
 )
 
-const buff_size = 32
+const buff_size = 128
 
 // implements io.ReadWriter on a websocket connection
 type WebsocketRW struct {
@@ -50,6 +51,7 @@ func (rw *WebsocketRW) Read(p []byte) (int, error) {
 }
 
 func (rw *WebsocketRW) Write(p []byte) (int, error) {
+	log.Printf("writing %d bytes\n", len(p))
 	if rw.cur_writer == nil {
 		w, err := rw.con.NextWriter(websocket.TextMessage)
 		if err != nil {

@@ -3,13 +3,14 @@ package main
 import (
 	"bytes"
 	"log"
-	"math/rand"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/DDP-Projekt/DDPLS/ddpls"
+	executables "github.com/DDP-Projekt/Spielplatz/execs_manager"
+	"github.com/DDP-Projekt/Spielplatz/kddp"
+	wsrw "github.com/DDP-Projekt/Spielplatz/websocket_rw"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	lslogging "github.com/tliron/kutil/logging"
@@ -61,38 +62,14 @@ func serve_ls(c *gin.Context) {
 	log.Printf("connection with %s closed\n", c.ClientIP())
 }
 
-var tokenGenerator = rand.NewSource(time.Now().UnixNano())
-var executables = NewSyncMap[TokenType, string]()
-
-func deleteExecutable(token TokenType, exe_path string) {
-	log.Printf("deleting %s\n", exe_path)
-	if _, ok := executables.Get(token); ok {
-		if err := os.Remove(exe_path); err != nil {
-			log.Printf("could not delete executable: %s\n", err)
-		}
-	}
-	executables.Delete(token)
-}
-
-// generates a token and adds it to the executables map
-func generateExeToken() TokenType {
-	for {
-		tok := TokenType(tokenGenerator.Int63())
-		if _, ok := executables.Get(tok); !ok {
-			executables.Set(tok, "")
-			return tok
-		}
-	}
-}
-
-type CompileRequest struct {
-	Src string `json:"src"`
-}
-
 // serves the /compile endpoint
 func serve_compile(c *gin.Context) {
+	type CompileRequest struct {
+		Src string `json:"src"`
+	}
+
 	log.Printf("new compilation request from %s\n", c.ClientIP())
-	token := generateExeToken()
+	token := executables.GenerateExeToken()
 	// read the src json property from the request body
 	var req CompileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -104,7 +81,7 @@ func serve_compile(c *gin.Context) {
 
 	src_code := bytes.NewBufferString(req.Src)
 	// compile the program
-	result, exe_path, err := compileDDPProgram(src_code, token)
+	result, exe_path, err := kddp.CompileDDPProgram(src_code, token)
 	if err != nil {
 		log.Println(err)
 		executables.Delete(token)
@@ -117,7 +94,7 @@ func serve_compile(c *gin.Context) {
 	// delete the executable after 3 minutes
 	go func() {
 		time.Sleep(3 * time.Minute)
-		deleteExecutable(token, exe_path)
+		executables.RemoveExecutableFile(token, exe_path)
 	}()
 	// send the result to the client
 	c.JSON(http.StatusOK, result)
@@ -142,7 +119,7 @@ func serve_run(c *gin.Context) {
 	}
 	// parse token_str to uint64
 	ti, err := strconv.ParseInt(token_str, 10, 64)
-	token := TokenType(ti)
+	token := executables.TokenType(ti)
 	if err != nil {
 		// send a close message to the client with error
 		ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "invalid token"))
@@ -157,10 +134,10 @@ func serve_run(c *gin.Context) {
 		return
 	}
 	args, _ := c.GetQueryArray("args")
-	websocket_rw := NewWebsocketRW(ws)
+	websocket_rw := wsrw.NewWebsocketRW(ws)
 	// run the executable
-	defer deleteExecutable(token, exe_path)
-	if err := runExecutable(exe_path, websocket_rw, websocket_rw, websocket_rw, args...); err != nil {
+	defer executables.RemoveExecutableFile(token, exe_path)
+	if err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw, websocket_rw, args...); err != nil {
 		log.Println(err)
 		websocket_rw.Close()
 		// report error to client

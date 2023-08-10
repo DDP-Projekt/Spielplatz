@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/tliron/kutil v0.1.68
+	golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0
 )
 
 require (

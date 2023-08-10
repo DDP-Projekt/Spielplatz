@@ -1,5 +1,3 @@
-github.com/DDP-Projekt/DDPLS v0.0.0-20230806093201-628c9ff9cf8f h1:f2y+Ku2yHfJyHAuxUQs90J79t4R/jbSa6Qz49LrC3cw=
-github.com/DDP-Projekt/DDPLS v0.0.0-20230806093201-628c9ff9cf8f/go.mod h1:mDfpXhyHoMdgpWg2OuGdDdq9uSWREAiZ4EcnTw0+VwY=
 github.com/DDP-Projekt/DDPLS v0.0.0-20230807153346-ecf81d95b109 h1:4NRonOEr0TX05SOTM7/9kP5KvrfN4W54LN+vkzlmL6M=
 github.com/DDP-Projekt/DDPLS v0.0.0-20230807153346-ecf81d95b109/go.mod h1:mDfpXhyHoMdgpWg2OuGdDdq9uSWREAiZ4EcnTw0+VwY=
 github.com/DDP-Projekt/Kompilierer v0.0.0-20230804102646-3a8e8850aca6 h1:iDlU2sEMh7he6f1ncN+zQ1HnHMiVBJcOzU747PZPsoo=
@@ -108,6 +106,8 @@ golang.org/x/arch v0.3.0 h1:02VY4/ZcO/gBOH6PUaoiptASxtXU10jazRCP865E97k=
 golang.org/x/arch v0.3.0/go.mod h1:5om86z9Hs0C8fWVUuoMHwpExlXzs5Tkyp9hOrfG7pp8=
 golang.org/x/crypto v0.9.0 h1:LF6fAI+IutBocDJ2OT0Q1g8plpYljMZ4+lty+dsqw3g=
 golang.org/x/crypto v0.9.0/go.mod h1:yrmDGqONDYtNj3tH8X9dzUun2m2lzPa9ngI6/RUPGR0=
+golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0 h1:LGJsf5LRplCck6jUCH3dBL2dmycNruWNF5xugkSlfXw=
+golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
 golang.org/x/net v0.10.0 h1:X2//UzNDwYmtCLn7To6G58Wr6f5ahEAQgKNzv9Y951M=
 golang.org/x/net v0.10.0/go.mod h1:0qNGK6F8kojg2nk9dLZ2mShWaEBan6FAoqfSigmmuDg=
 golang.org/x/sys v0.0.0-20220704084225-05e143d24a9e/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
