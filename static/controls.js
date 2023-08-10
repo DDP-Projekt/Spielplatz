@@ -1,3 +1,5 @@
+"use strict";
+
 document.addEventListener("DOMContentLoaded", () => {
 	const splitBtn = document.getElementById("split-btn");
 	const main = document.getElementById("main");
@@ -74,7 +76,6 @@ function loadExample(val) {
 const root = document.documentElement;
 
 function spacerDragStart(ev) {
-
 	ev.dataTransfer.setDragImage(document.createElement('br'), 0, 0);
 
 	root.style.setProperty('--none-if-dragging', 'none');
@@ -89,18 +90,22 @@ function spacerDrag(ev) {
 
 	if (main.hasAttribute('horizontal')) {
 		let y = ev.clientY / ev.view.innerHeight;
-		if (y < 0.1 || y > 0.9) return;
+		if (y < 0.2 || y > 0.8) return;
 		root.style.setProperty('--editor-container-size', y * 100 + '%');
 	}
 	else {
 		let x = ev.clientX / ev.view.innerWidth;
-		if (x < 0.1 || x > 0.9) return;
+		if (x < 0.2 || x > 0.8) return;
 		root.style.setProperty('--editor-container-size', x * 100 + '%');
 	}
 }
 
-function copy() {
+function copyOutput() {
 	navigator.clipboard.writeText(document.getElementById('output').innerText);
+}
+
+function copyCode() {
+	navigator.clipboard.writeText(editor.getValue());
 }
 
 function openDocs() {

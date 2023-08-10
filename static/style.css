@@ -42,6 +42,10 @@ table {
 	border-spacing: 0;
 }
 
+abbr {
+	cursor: help;
+}
+
 :root {
 	--background-color: #1e1e1e;
 	--editor-border-color: #3c3c3c;
@@ -50,6 +54,7 @@ table {
 	--controls-height: 2rem;
 	--none-if-dragging: '';
 	--scrollbar-shadow: #000000;
+	--scrollbar-size: 14px;
     --scrollbarSlider-background: rgba(121, 121, 121, 0.4);
     --scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
     --scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
@@ -91,7 +96,14 @@ main[horizontal] {
 	background-color: #292929;
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
+}
+
+.controls1 {
+	display: flex;
+	flex-direction: row;
 	align-items: center;
+	height: var(--controls-height);
 }
 
 img[invert] {
@@ -99,12 +111,15 @@ img[invert] {
 }
 
 .controls img {
-	transition: ease-in-out 50ms;
+	transition: background-color linear 200ms;
 	margin: 5px;
 }
 
-.controls img.btn:hover {
+.controls img.btn {
 	border-radius: 30%;
+}
+
+.controls img.btn:hover {
 	background-color: #969696;
 	cursor: pointer;
 }
@@ -182,8 +197,8 @@ span.stderr { color: lightcoral; }
 
 /*-- Scrollbar --*/
 ::-webkit-scrollbar {
-    width: 14px;
-    height: 14px;
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
 }
 ::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbarSlider-hoverBackground);

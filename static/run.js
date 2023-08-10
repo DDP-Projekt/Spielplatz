@@ -1,3 +1,5 @@
+"use strict";
+
 let run_ws = null;
 let compiling = false;
 
@@ -30,14 +32,14 @@ async function runProgram() {
 
 	const token = compile_result.token
 	const args = document.getElementById('args').value;
-	let arguments = ""
+	let argsString = ""
 	for (let arg of args.split(';')) {
-		arguments += "&args=" + arg;
+		argsString += "&args=" + arg;
 	}
 
 	console.log('requesting to run the program')
 	// connect to the /run endpoint using the websocket api with token as query parameter
-	run_ws = new WebSocket(`ws://${window.location.host}/run?token=${token}${arguments}`)
+	run_ws = new WebSocket(`ws://${window.location.host}/run?token=${token}${argsString}`)
 	if (run_ws) {
 		run_ws.onopen = () => {
 			console.log('websocket (run) connection opened')
@@ -60,5 +62,14 @@ async function runProgram() {
 		}
 	} else {
 		console.error('websocket (run) connection failed')
+	}
+}
+
+function stopProgram() {
+	console.log("terminating connection");
+	if (run_ws) {
+		run_ws.send(JSON.stringify({ msg: "EOF", eof: true }));
+		run_ws = null;
+		compiling = null;
 	}
 }
