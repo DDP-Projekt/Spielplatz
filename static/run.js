@@ -29,8 +29,9 @@ async function runProgram() {
 	if (ws) {
 		ws.onopen = () => {
 			console.log('websocket (run) connection opened')
-			ws.send('ein bisschen input');
-			ws.send('noch mehr input');
+			ws.send(JSON.stringify({ msg: 'ein bisschen input', eof: false }));
+			ws.send(JSON.stringify({ msg: 'noch mehr input', eof: false }));
+			ws.send(JSON.stringify({ msg: '', eof: true }));
 			console.log('input sent')
 		}
 

@@ -1,6 +1,7 @@
 package websocket_rw
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"log"
@@ -62,6 +63,11 @@ func (rw *WebsocketRW) getNextReader() (io.Reader, error) {
 }
 
 func (rw *WebsocketRW) Read(p []byte) (int, error) {
+	type Message struct {
+		Msg string `json:"msg"`
+		Eof bool   `json:"eof"`
+	}
+
 	if rw.isEOF {
 		return 0, io.EOF
 	}
@@ -81,11 +87,23 @@ func (rw *WebsocketRW) Read(p []byte) (int, error) {
 		return n, nil
 	}
 
-	msg, err := io.ReadAll(rw.cur_reader)
+	var msg Message
+	err := json.NewDecoder(rw.cur_reader).Decode(&msg)
+	if err != nil {
+		log.Printf("error decoding stdin message: %s", err)
+		return 0, err
+	}
+
+	if msg.Eof {
+		rw.isEOF = true
+		return 0, io.EOF
+	}
+
+	rw.readBuff = []byte(msg.Msg)
 	rw.cur_reader = nil
-	n := copy(p, msg)
-	rw.readBuff = msg[n:]
-	return n, err
+	n := copy(p, rw.readBuff)
+	rw.readBuff = rw.readBuff[n:]
+	return n, nil
 }
 
 func (rw *WebsocketRW) Write(p []byte) (int, error) {
