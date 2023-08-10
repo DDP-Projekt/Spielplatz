@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let saveCount = 0;
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function (e) {
 	if (e.key == "s" && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
 		e.preventDefault();
 		saveCount++;
@@ -32,7 +32,7 @@ document.addEventListener("keydown", function(e) {
 		}
 		alert('BRUDER HAT VERSUCHT ZU SPEICHERN \uD83D\uDC80\uD83D\uDC80\uD83D\uDC80')
 	}
-  }, false);
+}, false);
 
 function clearOutput() {
 	document.getElementById('outputText').innerHTML = '';
@@ -74,7 +74,7 @@ function loadExample(val) {
 const root = document.documentElement;
 
 function spacerDragStart(ev) {
-	
+
 	ev.dataTransfer.setDragImage(document.createElement('br'), 0, 0);
 
 	root.style.setProperty('--none-if-dragging', 'none');
@@ -88,14 +88,14 @@ function spacerDrag(ev) {
 	const main = document.getElementById('main');
 
 	if (main.hasAttribute('horizontal')) {
-		let y = ev.clientY/ev.view.innerHeight;
+		let y = ev.clientY / ev.view.innerHeight;
 		if (y < 0.1 || y > 0.9) return;
-		root.style.setProperty('--editor-container-size', y*100 + '%');
+		root.style.setProperty('--editor-container-size', y * 100 + '%');
 	}
 	else {
-		let x = ev.clientX/ev.view.innerWidth;
+		let x = ev.clientX / ev.view.innerWidth;
 		if (x < 0.1 || x > 0.9) return;
-		root.style.setProperty('--editor-container-size', x*100 + '%');
+		root.style.setProperty('--editor-container-size', x * 100 + '%');
 	}
 }
 
@@ -123,8 +123,19 @@ function updateOutputScrollbar() {
 }
 
 function inputEnter(ev) {
-	if (ev.key !== "Enter") return;
+	console.log(ev);
+	let eof = false;
+	let msg = ev.target.value + '\n';
+	if (ev.ctrlKey && ev.key === 'c') {
+		eof = true
+		msg = "EOF";
+	} else if (ev.key !== "Enter") {
+		return;
+	}
 	ev.preventDefault();
-	pushOutputMessage(ev.target.value, 'stdin');
+	pushOutputMessage(msg, 'stdin');
+	if (run_ws) {
+		run_ws.send(JSON.stringify({ msg: msg, eof: eof }));
+	}
 	ev.target.value = "";
 }

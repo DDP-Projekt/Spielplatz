@@ -86,7 +86,7 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType) (Pro
 	}, exe_path, nil
 }
 
-const timeout = time.Second * 5
+const timeout = time.Second * 10
 
 // runs an executable and returns the result of the execution
 func RunExecutable(exe_path string, stdin io.Reader, stdinCancel chan error, stdout, stderr io.Writer, args ...string) error {
