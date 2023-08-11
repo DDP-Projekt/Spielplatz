@@ -1,7 +1,6 @@
 package kddp
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -89,7 +88,7 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType) (Pro
 const timeout = time.Second * 10
 
 // runs an executable and returns the result of the execution
-func RunExecutable(exe_path string, stdin io.Reader, stdinCancel chan error, stdout, stderr io.Writer, args ...string) error {
+func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) error {
 	timeout_chan := time.After(timeout)
 
 	cmd := exec.Command(exe_path, args...)
@@ -100,7 +99,7 @@ func RunExecutable(exe_path string, stdin io.Reader, stdinCancel chan error, std
 	if err := cmd.Start(); err != nil {
 		return err
 	}
-	done := make(chan error)
+	done := make(chan error, 1)
 
 	go func() {
 		done <- cmd.Wait()
@@ -109,11 +108,7 @@ func RunExecutable(exe_path string, stdin io.Reader, stdinCancel chan error, std
 	select {
 	case <-timeout_chan:
 		log.Printf("process %s excceeded timeout\n", exe_path)
-		if kill_err := cmd.Process.Kill(); kill_err != nil {
-			return kill_err
-		}
-		stdinCancel <- errors.New("process excceeded timeout")
-		return <-done
+		return cmd.Process.Kill()
 	case err := <-done:
 		return err
 	}

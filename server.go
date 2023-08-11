@@ -137,11 +137,10 @@ func serve_run(c *gin.Context) {
 		return
 	}
 	args, _ := c.GetQueryArray("args")
-	stdin_cancel := make(chan error)
-	websocket_rw := wsrw.NewWebsocketRW(ws, stdin_cancel)
+	websocket_rw := wsrw.NewWebsocketRW(ws)
 	// run the executable
 	defer executables.RemoveExecutableFile(token, exe_path)
-	if err := kddp.RunExecutable(exe_path, websocket_rw, stdin_cancel, websocket_rw, websocket_rw, args...); err != nil {
+	if err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw, websocket_rw, args...); err != nil {
 		log.Println(err)
 		websocket_rw.Close()
 		// report error to client

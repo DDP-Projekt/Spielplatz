@@ -13,53 +13,34 @@ const buff_size = 128
 
 // implements io.ReadWriter on a websocket connection
 type WebsocketRW struct {
-	con           *websocket.Conn
-	cur_reader    io.Reader
-	isEOF         bool
-	readBuff      []byte
-	readInterrupt <-chan error
-	curWriter     io.WriteCloser
-	buffered      int // how many bytes are currently buffered
+	con        *websocket.Conn
+	cur_reader io.Reader
+	isEOF      bool
+	readBuff   []byte
+	curWriter  io.WriteCloser
+	buffered   int // how many bytes are currently buffered
 }
 
-func NewWebsocketRW(con *websocket.Conn, read_cancel <-chan error) *WebsocketRW {
+func NewWebsocketRW(con *websocket.Conn) *WebsocketRW {
 	return &WebsocketRW{
-		con:           con,
-		cur_reader:    nil,
-		isEOF:         false,
-		readBuff:      make([]byte, 0, buff_size),
-		readInterrupt: read_cancel,
-		curWriter:     nil,
-		buffered:      0,
+		con:        con,
+		cur_reader: nil,
+		isEOF:      false,
+		readBuff:   make([]byte, 0, buff_size),
+		curWriter:  nil,
+		buffered:   0,
 	}
 }
 
 func (rw *WebsocketRW) getNextReader() (io.Reader, error) {
-	type readerr struct {
-		r io.Reader
-		e error
-	}
-
-	result_chan := make(chan readerr, 1) // the buffer is necessary to not leak the goroutine below
-	go func() {
-		msg_type, r, err := rw.con.NextReader()
-		if err != nil {
-			result_chan <- readerr{nil, err}
-			return
-		}
-		if msg_type != websocket.TextMessage {
-			result_chan <- readerr{nil, errors.New("expected text message")}
-			return
-		}
-		result_chan <- readerr{r, nil}
-	}()
-
-	select {
-	case err := <-rw.readInterrupt:
+	msg_type, r, err := rw.con.NextReader()
+	if err != nil {
 		return nil, err
-	case result := <-result_chan:
-		return result.r, result.e
 	}
+	if msg_type != websocket.TextMessage {
+		return nil, errors.New("expected text message")
+	}
+	return r, nil
 }
 
 func (rw *WebsocketRW) Read(p []byte) (int, error) {
