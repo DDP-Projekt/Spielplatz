@@ -32,6 +32,7 @@ const editor = monaco.editor.create(editorDiv, {
 	'semanticHighlighting.enabled': true,
 	//automaticLayout: true,
 	model: monaco.editor.createModel(value, 'ddp', file_uri),
+	minimap: { enabled: minimapEnabled },
 });
 
 new ResizeObserver(function(mutations) {

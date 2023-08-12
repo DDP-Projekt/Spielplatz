@@ -3,7 +3,7 @@
 let run_ws = null;
 let compiling = false;
 
-async function runProgram() {
+async function runProgram(code) {
 	if (run_ws) {
 		pushOutputMessage('Programm läuft bereits', 'stderr');
 		return;
@@ -14,14 +14,13 @@ async function runProgram() {
 
 	compiling = true;
 	console.log('requesting to compile the program')
-	const src_code = editor.getValue();
 	// send a request to the /compile endpoint using the fetch api
 	const compile_result = await fetch('/compile', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: JSON.stringify({ src: src_code }),
+		body: JSON.stringify({ src: code }),
 	}).then(response => response.json())
 
 	if (compile_result.error) {

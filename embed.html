@@ -20,7 +20,7 @@
 		<link rel="stylesheet" data-name="vs/editor/editor.main" href="/monaco-editor/min/vs/editor/editor.main.css">
 		<link rel="stylesheet" type="text/css" href="static/style.css">
 
-		<script>var minimapEnabled = true;</script>
+		<script>var minimapEnabled = false;</script>
 		<script defer>
 			var require = { paths: { vs: '/monaco-editor/min/vs' } };
 		</script>
@@ -33,19 +33,18 @@
 		<script src="/static/run.js"></script>
 	</head>
 	<body>
-		<main id="main" style="visibility: hidden;">
-			<div id="editor-container" class="container">
+		<main id="main" style="visibility: hidden;" horizontal>
+			<div id="editor-container" class="container" horizontal>
 				<div id="editor-controls" class="controls">
 					<div class="controls1">
-						<img src="img/vbb.svg" alt="logo" width="32px" title="DDP Spielplatz">
-						<img onclick="runProgram(editor.getValue())" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn">
+						<img onclick="runProgram(editor.getValue());clearOutput()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn">
 						<img onclick="stopProgram()" src="img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" invert class="btn">
 						
-						<label><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
-						<input id="args" type="text"></input>
+						<label hidden><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
+						<input hidden id="args" type="text"></input>
 	
-						<label for="examples">Example:</label>
-						<select name="examples" id="example-select" onchange="loadExample(this.value)">
+						<label hidden for="examples">Example:</label>
+						<select hidden name="examples" id="example-select" onchange="loadExample(this.value)">
 							<option value=""></option>
 							<option value="HalloWelt">Hallo Welt</option>
 							<option value="Brainfuck">Brainfuck</option>
@@ -59,23 +58,14 @@
 					</div>
 					<div class="controls1">
 						<img onclick="copyCode()" src="img/content-copy.svg" alt="copy-code" title="Code kopieren" width="22px" height="22px" invert class="btn">
-						<img onclick="openDocs()" src="img/help-circle-outline.svg" alt="help" title="Bedienungsanleitung öffnen" width="22px" height="22px" invert class="btn">
 					</div>
 				</div>
 				<div id="editor"></div>
 			</div>
-			<div id="spacer" draggable="true" ondragstart="spacerDragStart(event)" ondragend="spacerDragEnd()" ondrag="spacerDrag(event)">
+			<div id="spacer" draggable="true" ondragstart="spacerDragStart(event)" ondragend="spacerDragEnd()" ondrag="spacerDrag(event)" horizontal>
 				<span>⣿</span>
 			</div>
-			<div id="output-container" class="container">
-				<div id="output-controls" class="controls">
-					<div class="controls1">
-						<img onclick="clearOutput()" src="img/trash-can-outline.svg" alt="clear-output" title="Ausgabe leeren" width="22px" height="22px" invert class="btn">
-						<img onclick="copyOutput()" src="img/content-copy.svg" alt="copy-output" title="Ausgabe kopieren" width="22px" height="22px" invert class="btn">
-					</div>
-					
-					<img onclick="split()" src="img/view-split-horizontal.svg" alt="split-view" title="Sicht ändern" width="22px" height="22px" id="split-btn" invert class="btn">
-				</div>
+			<div id="output-container" class="container" horizontal>
 				<div id="output">
 					<pre id="outputText"></pre>
 				</div>

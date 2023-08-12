@@ -36,7 +36,7 @@ func main() {
 	r := gin.Default()
 
 	// load index html as template
-	r.LoadHTMLFiles("index.html")
+	r.LoadHTMLFiles("index.html", "embed.html")
 
 	// serve node_modules/monaco-editor as /monaco-editor
 	r.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
@@ -46,6 +46,10 @@ func main() {
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
+	r.GET("/embed", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "embed.html", nil)
 	})
 
 	// websocket endpoint to connect to the language server
