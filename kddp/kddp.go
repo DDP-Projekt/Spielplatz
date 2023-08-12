@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/viper"
 	"golang.org/x/exp/constraints"
 )
 
@@ -85,11 +86,9 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType) (Pro
 	}, exe_path, nil
 }
 
-const timeout = time.Second * 10
-
 // runs an executable and returns the result of the execution
 func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) error {
-	timeout_chan := time.After(timeout)
+	timeout_chan := time.After(viper.GetDuration("run_timeout"))
 
 	cmd := exec.Command(exe_path, args...)
 	cmd.Stderr = stderr

@@ -13,10 +13,26 @@ import (
 	wsrw "github.com/DDP-Projekt/Spielplatz/websocket_rw"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/spf13/viper"
 	lslogging "github.com/tliron/kutil/logging"
 )
 
+func setup_config() {
+	viper.SetDefault("exe_cache_duration", time.Second*60)
+	viper.SetDefault("run_timeout", time.Second*10)
+	viper.SetDefault("port", ":8080")
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file: %s\n", err)
+	}
+}
+
 func main() {
+	setup_config()
+
 	r := gin.Default()
 
 	// load index html as template
@@ -41,7 +57,7 @@ func main() {
 	r.GET("/run", serve_run)
 
 	// run the server
-	log.Fatal(r.Run(":8080"))
+	log.Fatal(r.Run(viper.GetString("port")))
 }
 
 var upgrader = websocket.Upgrader{}
@@ -93,9 +109,10 @@ func serve_compile(c *gin.Context) {
 	log.Printf("compilation of program %d finished\n", token)
 	// delete the executable after 3 minutes
 	go func() {
-		time.Sleep(1 * time.Minute)
+		dur := viper.GetDuration("exe_cache_duration")
+		time.Sleep(dur)
 		if _, ok := executables.Get(token); ok {
-			log.Printf("executable %s was unused for 1 minute, deleting it", exe_path)
+			log.Printf("executable %s was unused for %s, deleting it", dur, exe_path)
 			executables.RemoveExecutableFile(token, exe_path)
 		}
 	}()
