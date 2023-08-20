@@ -58,7 +58,7 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType) (Pro
 		exe_path += ".exe"
 	}
 
-	cmd := exec.Command("kddp", "kompiliere", "-o", exe_path)
+	cmd := exec.Command("kddp", "kompiliere", "-o", exe_path, "--main", "seccomp_main.o", "--gcc_optionen", "-lseccomp")
 	cmd.Stdin = src
 	stderr := &strings.Builder{}
 	stdout := &strings.Builder{}

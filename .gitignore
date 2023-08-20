@@ -1,3 +1,5 @@
 node_modules/
 playground_executables/
 config.json
+*.o
+Spielplatz
