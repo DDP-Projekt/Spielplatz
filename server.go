@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"log"
 	"net/http"
-	"runtime"
 	"strconv"
 	"time"
 
@@ -161,10 +160,8 @@ func serve_run(c *gin.Context) {
 	args, _ := c.GetQueryArray("args")
 	websocket_rw := wsrw.NewWebsocketRW(ws)
 	// run the executable
-	log.Printf("goroutines before: %d\n", runtime.NumGoroutine())
-	defer log.Printf("goroutines after: %d\n", runtime.NumGoroutine())
 	defer executables.RemoveExecutableFile(token, exe_path)
-	if _, err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw, websocket_rw, args...); err != nil {
+	if err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw, websocket_rw, args...); err != nil {
 		log.Println(err)
 		websocket_rw.Close()
 		// report error to client
