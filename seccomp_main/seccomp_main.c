@@ -1,6 +1,7 @@
 #include "runtime/include/runtime.h"
 #include <seccomp.h>
 #include <errno.h>
+#include <stdio.h>
 
 void install_seccomp_filter() {
     // install seccomp filter that only allows some syscalls
@@ -27,6 +28,8 @@ extern int ddp_ddpmain();
 
 int main(int argc, char* argv[]) {
     ddp_init_runtime(argc, argv);
+    setvbuf(stdout, NULL, _IOLBF, 0);
+    setvbuf(stderr, NULL, _IOLBF, 0);
     install_seccomp_filter();
     int ret = ddp_ddpmain();
     ddp_end_runtime();

@@ -18,7 +18,6 @@ type WebsocketRW struct {
 	isEOF      bool
 	readBuff   []byte
 	curWriter  io.WriteCloser
-	buffered   int // how many bytes are currently buffered
 }
 
 func NewWebsocketRW(con *websocket.Conn) *WebsocketRW {
@@ -28,7 +27,6 @@ func NewWebsocketRW(con *websocket.Conn) *WebsocketRW {
 		isEOF:      false,
 		readBuff:   make([]byte, 0, buff_size),
 		curWriter:  nil,
-		buffered:   0,
 	}
 }
 
@@ -96,12 +94,8 @@ func (rw *WebsocketRW) Write(p []byte) (int, error) {
 		rw.curWriter = w
 	}
 	n, err := rw.curWriter.Write(p)
-	rw.buffered += n
-	if rw.buffered >= buff_size {
-		rw.curWriter.Close()
-		rw.curWriter = nil
-		rw.buffered = 0
-	}
+	rw.curWriter.Close()
+	rw.curWriter = nil
 	return n, err
 }
 
