@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 
 	"github.com/gorilla/websocket"
 )
@@ -54,7 +53,6 @@ func (rw *WebsocketRW) Read(p []byte) (int, error) {
 	if rw.cur_reader == nil {
 		var err error
 		if rw.cur_reader, err = rw.getNextReader(); err != nil {
-			log.Printf("getNextReader failed: %s", err)
 			rw.isEOF = true
 			return 0, err
 		}
@@ -69,7 +67,6 @@ func (rw *WebsocketRW) Read(p []byte) (int, error) {
 	var msg Message
 	err := json.NewDecoder(rw.cur_reader).Decode(&msg)
 	if err != nil {
-		log.Printf("error decoding stdin message: %s", err)
 		return 0, err
 	}
 

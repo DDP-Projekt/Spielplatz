@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/constraints"
 )
@@ -93,7 +94,10 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	cmd := exec.Command(exe_path, args...)
 	cmd.Stderr = stderr
 	cmd.Stdout = stdout
-	cmd.Stdin = stdin
+	stdin_pipe, err := cmd.StdinPipe()
+	if err != nil {
+		return err
+	}
 
 	if err := cmd.Start(); err != nil {
 		return err
@@ -102,6 +106,12 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 
 	go func() {
 		done <- cmd.Wait()
+	}()
+	go func() {
+		if _, err := io.Copy(stdin_pipe, stdin); err != nil && !websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+			log.Printf("error copying stdin to process: %s\n", err)
+		}
+		stdin_pipe.Close()
 	}()
 
 	select {
