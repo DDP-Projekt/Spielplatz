@@ -1,6 +1,7 @@
 package kddp
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -88,7 +89,7 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType) (Pro
 }
 
 // runs an executable and returns the result of the execution
-func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) error {
+func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) (int, error) {
 	timeout_chan := time.After(viper.GetDuration("run_timeout"))
 
 	cmd := exec.Command(exe_path, args...)
@@ -96,11 +97,11 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	cmd.Stdout = stdout
 	stdin_pipe, err := cmd.StdinPipe()
 	if err != nil {
-		return err
+		return -1, err
 	}
 
 	if err := cmd.Start(); err != nil {
-		return err
+		return -1, err
 	}
 	done := make(chan error, 1)
 
@@ -116,9 +117,13 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 
 	select {
 	case <-timeout_chan:
-		log.Printf("process %s excceeded timeout\n", exe_path)
-		return cmd.Process.Kill()
+		log.Printf("process %s exceeded timeout\n", exe_path)
+		err := errors.New("Process exceeded timeout")
+		if kerr := cmd.Process.Kill(); kerr != nil {
+			err = errors.Join(err, kerr)
+		}
+		return -1, err
 	case err := <-done:
-		return err
+		return cmd.ProcessState.ExitCode(), err
 	}
 }

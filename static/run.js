@@ -52,8 +52,10 @@ async function runProgram(code) {
 			pushOutputMessage(msg.msg, msg.isStderr ? 'stderr' : 'stdout');
 		}
 
-		run_ws.onclose = () => {
-			console.log('websocket (run) connection closed')
+		run_ws.onclose = (event) => {
+			console.log('websocket (run) connection closed: ', event)
+			pushOutputMessage(" ", 'stdout')
+			pushOutputMessage(event.reason, event.code !== 1000 ? 'stderr' : 'stdout')
 			run_ws = null;
 			compiling = false;
 		}

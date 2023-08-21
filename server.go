@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -161,7 +162,8 @@ func serve_run(c *gin.Context) {
 	websocket_rw := wsrw.NewWebsocketRW(ws)
 	// run the executable
 	defer executables.RemoveExecutableFile(token, exe_path)
-	if err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw.StdoutWriter(), websocket_rw.StderrWriter(), args...); err != nil {
+	exitStatus, err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw.StdoutWriter(), websocket_rw.StderrWriter(), args...)
+	if err != nil {
 		log.Println(err)
 		websocket_rw.Close()
 		// report error to client
@@ -169,5 +171,5 @@ func serve_run(c *gin.Context) {
 		return
 	}
 	websocket_rw.Close()
-	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("Process exited with stauts %d", exitStatus)))
 }
