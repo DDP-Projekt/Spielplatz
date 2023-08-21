@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -17,6 +18,7 @@ type WebsocketRW struct {
 	isEOF      bool
 	readBuff   []byte
 	curWriter  io.WriteCloser
+	writeMutex *sync.Mutex
 }
 
 func NewWebsocketRW(con *websocket.Conn) *WebsocketRW {
@@ -26,6 +28,7 @@ func NewWebsocketRW(con *websocket.Conn) *WebsocketRW {
 		isEOF:      false,
 		readBuff:   make([]byte, 0, buff_size),
 		curWriter:  nil,
+		writeMutex: &sync.Mutex{},
 	}
 }
 
@@ -82,7 +85,14 @@ func (rw *WebsocketRW) Read(p []byte) (int, error) {
 	return n, nil
 }
 
-func (rw *WebsocketRW) Write(p []byte) (int, error) {
+type ws_msg struct {
+	Msg      string `json:"msg"`
+	IsStderr bool   `json:"isStderr"`
+}
+
+func (rw *WebsocketRW) writeMsg(msg ws_msg, n int) (int, error) {
+	rw.writeMutex.Lock()
+	defer rw.writeMutex.Unlock()
 	if rw.curWriter == nil {
 		w, err := rw.con.NextWriter(websocket.TextMessage)
 		if err != nil {
@@ -90,10 +100,34 @@ func (rw *WebsocketRW) Write(p []byte) (int, error) {
 		}
 		rw.curWriter = w
 	}
-	n, err := rw.curWriter.Write(p)
+	err := json.NewEncoder(rw.curWriter).Encode(msg)
 	rw.curWriter.Close()
 	rw.curWriter = nil
 	return n, err
+}
+
+type stdoutWriter func([]byte) (int, error)
+
+func (w stdoutWriter) Write(p []byte) (int, error) {
+	return w(p)
+}
+
+func (rw *WebsocketRW) StdoutWriter() io.Writer {
+	return stdoutWriter(func(p []byte) (int, error) {
+		return rw.writeMsg(ws_msg{Msg: string(p), IsStderr: false}, len(p))
+	})
+}
+
+type stderrWriter func([]byte) (int, error)
+
+func (w stderrWriter) Write(p []byte) (int, error) {
+	return w(p)
+}
+
+func (rw *WebsocketRW) StderrWriter() io.Writer {
+	return stderrWriter(func(p []byte) (int, error) {
+		return rw.writeMsg(ws_msg{Msg: string(p), IsStderr: true}, len(p))
+	})
 }
 
 func (rw *WebsocketRW) Close() error {

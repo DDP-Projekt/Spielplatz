@@ -25,6 +25,8 @@ async function runProgram(code) {
 
 	if (compile_result.error) {
 		console.log('compile error')
+		pushOutputMessage("Kompilier Fehler: " + compile_result.error, 'stderr');
+		pushOutputMessage(" ", 'stderr');
 		pushOutputMessage(compile_result.stderr, 'stderr');
 		return
 	}
@@ -46,7 +48,8 @@ async function runProgram(code) {
 
 		run_ws.onmessage = (event) => {
 			console.log(event);
-			pushOutputMessage(event.data, 'stdout');
+			let msg = JSON.parse(event.data)
+			pushOutputMessage(msg.msg, msg.isStderr ? 'stderr' : 'stdout');
 		}
 
 		run_ws.onclose = () => {
