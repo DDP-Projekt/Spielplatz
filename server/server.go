@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/DDP-Projekt/DDPLS/ddpls"
-	executables "github.com/DDP-Projekt/Spielplatz/execs_manager"
-	"github.com/DDP-Projekt/Spielplatz/kddp"
-	wsrw "github.com/DDP-Projekt/Spielplatz/websocket_rw"
+	executables "github.com/DDP-Projekt/Spielplatz/server/execs_manager"
+	"github.com/DDP-Projekt/Spielplatz/server/kddp"
+	wsrw "github.com/DDP-Projekt/Spielplatz/server/websocket_rw"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"

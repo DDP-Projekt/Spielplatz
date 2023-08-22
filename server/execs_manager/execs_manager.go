@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/DDP-Projekt/Spielplatz/syncmap"
+	"github.com/DDP-Projekt/Spielplatz/server/syncmap"
 )
 
 type TokenType int64

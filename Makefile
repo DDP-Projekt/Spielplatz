@@ -12,10 +12,11 @@ $(BIN): $(BIN_DIR)seccomp_main.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 all: $(BIN)
-	go build .
+	go build -o Spielplatz ./server
 
 clean:
 	rm -f $(BIN) Spielplatz
 
 install-dependencies:
 	sudo apt-get install libseccomp-dev
+	npm install
