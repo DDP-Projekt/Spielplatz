@@ -35,7 +35,7 @@ const editor = monaco.editor.create(editorDiv, {
 	minimap: { enabled: minimapEnabled },
 });
 
-new ResizeObserver(function(mutations) {
+new ResizeObserver(function (mutations) {
 	editor.layout();
 }).observe(editorDiv);
 
@@ -530,4 +530,7 @@ window.onbeforeunload = () => {
 	});
 
 	window.localStorage.setItem("content", editor.getValue());
+
+	const argsContainer = document.getElementById("args");
+	window.localStorage.setItem("args", argsContainer.value);
 }

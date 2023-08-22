@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const main = document.getElementById("main");
 	const editorContainer = document.getElementById("editor-container");
 	const outputContainer = document.getElementById("output-container");
+	const argsContainer = document.getElementById("args");
 
 	if (splitBtn && window.localStorage.getItem("vertical") === "false") {
 		main.setAttribute('horizontal', 'true');
@@ -18,6 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	if (window.localStorage.getItem("content") === null) {
 		document.getElementById("example-select").value = "HalloWelt";
+	}
+
+	const args = window.localStorage.getItem("args");
+	if (args !== null) {
+		argsContainer.value = args;
 	}
 
 	main.style.visibility = "";
