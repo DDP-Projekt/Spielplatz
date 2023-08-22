@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const editorContainer = document.getElementById("editor-container");
 	const outputContainer = document.getElementById("output-container");
 
-	if (window.localStorage.getItem("vertical") === "false") {
+	if (splitBtn && window.localStorage.getItem("vertical") === "false") {
 		main.setAttribute('horizontal', 'true');
 		editorContainer.setAttribute('horizontal', 'true');
 		outputContainer.setAttribute('horizontal', 'true');
