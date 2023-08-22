@@ -36,8 +36,8 @@ func main() {
 
 	r := gin.Default()
 
-	// load index html as template
-	r.LoadHTMLFiles("index.html", "embed.html")
+	// load html files as template
+	r.LoadHTMLGlob("static/html/*")
 
 	// serve node_modules/monaco-editor as /monaco-editor
 	r.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
@@ -171,5 +171,5 @@ func serve_run(c *gin.Context) {
 		return
 	}
 	websocket_rw.Close()
-	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("Process exited with stauts %d", exitStatus)))
+	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("Process exited with status %d", exitStatus)))
 }
