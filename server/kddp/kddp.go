@@ -90,7 +90,7 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType) (Pro
 
 // runs an executable and returns the result of the execution
 func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) (int, error) {
-	timeout_chan := time.After(time.Second * viper.GetDuration("run_timeout"))
+	timeout_chan := time.After(viper.GetDuration("run_timeout"))
 
 	cmd := exec.Command(exe_path, args...)
 	cmd.Stderr = stderr

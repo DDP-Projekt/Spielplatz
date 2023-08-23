@@ -19,8 +19,8 @@ import (
 )
 
 func setup_config() {
-	viper.SetDefault("exe_cache_duration", 60)
-	viper.SetDefault("run_timeout", 60)
+	viper.SetDefault("exe_cache_duration", time.Second*60)
+	viper.SetDefault("run_timeout", time.Second*60)
 	viper.SetDefault("port", "8080")
 
 	viper.SetConfigName("config")
@@ -114,7 +114,7 @@ func serve_compile(c *gin.Context) {
 	log.Printf("compilation of program %d finished\n", token)
 	// delete the executable after 3 minutes
 	go func() {
-		dur := time.Second * viper.GetDuration("exe_cache_duration")
+		dur := viper.GetDuration("exe_cache_duration")
 		time.Sleep(dur)
 		if _, ok := executables.Get(token); ok {
 			log.Printf("executable %s was unused for %s, deleting it", exe_path, dur)
