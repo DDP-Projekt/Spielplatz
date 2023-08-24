@@ -2,13 +2,10 @@ package kddp
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 
@@ -17,22 +14,12 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-const exe_dir = "playground_executables"
-
 func init() {
 	if _, err := exec.LookPath("kddp"); err != nil {
 		log.Fatalf("kddp not found: %s", err)
 	}
 	if _, ok := os.LookupEnv("DDPPATH"); !ok {
 		log.Println("DDPPATH not set, kddp might not work correctly")
-	}
-	if _, err := os.Stat(exe_dir); err == nil {
-		if err := os.RemoveAll(exe_dir); err != nil {
-			log.Fatalf("could not delete directory for executables: %s", err)
-		}
-	}
-	if err := os.Mkdir(exe_dir, os.ModePerm); err != nil {
-		log.Fatalf("could not create directory for executables: %s", err)
 	}
 }
 
@@ -54,12 +41,7 @@ type ProgramResult[TokenType tokenType] struct {
 // compiles a DDP program and returns the result of the compilation,
 // the path to the executable,
 // and an error if one occurred
-func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType) (ProgramResult[TokenType], string, error) {
-	exe_path := filepath.Join(exe_dir, "Spielplatz_"+fmt.Sprint(token))
-	if runtime.GOOS == "windows" {
-		exe_path += ".exe"
-	}
-
+func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType, exe_path string) (ProgramResult[TokenType], string, error) {
 	cmd := exec.Command("kddp", "kompiliere", "-o", exe_path, "--main", "seccomp_main.o", "--gcc_optionen", "-lseccomp")
 	cmd.Stdin = src
 	stderr := &strings.Builder{}

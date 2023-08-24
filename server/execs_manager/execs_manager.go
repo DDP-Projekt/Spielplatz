@@ -1,12 +1,15 @@
 package execsmanager
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
-	"github.com/DDP-Projekt/Spielplatz/server/syncmap"
+	"github.com/DDP-Projekt/Spielplatz/server/execs_manager/syncmap"
 )
 
 type TokenType int64
@@ -37,12 +40,21 @@ func RemoveExecutableFile(token TokenType, exe_path string) {
 }
 
 // generates a token and adds it to the executables map
-func GenerateExeToken() TokenType {
+// returns the token and the path to the executable
+func GenerateExeToken() (TokenType, string) {
 	for {
 		tok := TokenType(tokenGenerator.Int63())
 		if _, ok := executables.Get(tok); !ok {
 			executables.Set(tok, "")
-			return tok
+			return tok, genExePath(tok)
 		}
 	}
+}
+
+func genExePath(token TokenType) string {
+	exe_path := filepath.Join(Exe_Dir, "Spielplatz_"+fmt.Sprint(token))
+	if runtime.GOOS == "windows" {
+		exe_path += ".exe"
+	}
+	return exe_path
 }

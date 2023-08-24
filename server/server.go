@@ -90,7 +90,7 @@ func serve_compile(c *gin.Context) {
 	}
 
 	log.Printf("new compilation request from %s\n", c.ClientIP())
-	token := executables.GenerateExeToken()
+	token, exe_path := executables.GenerateExeToken()
 	// read the src json property from the request body
 	var req CompileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -102,7 +102,7 @@ func serve_compile(c *gin.Context) {
 
 	src_code := bytes.NewBufferString(req.Src)
 	// compile the program
-	result, exe_path, err := kddp.CompileDDPProgram(src_code, token)
+	result, exe_path, err := kddp.CompileDDPProgram(src_code, token, exe_path)
 	if err != nil {
 		log.Println(err)
 		executables.Delete(token)
