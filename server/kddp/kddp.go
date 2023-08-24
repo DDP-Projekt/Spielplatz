@@ -1,13 +1,14 @@
 package kddp
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
@@ -72,9 +73,10 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType, exe_
 
 // runs an executable and returns the result of the execution
 func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) (int, error) {
-	timeout_chan := time.After(viper.GetDuration("run_timeout"))
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("run_timeout"))
+	defer cancel()
 
-	cmd := exec.Command(exe_path, args...)
+	cmd := exec.CommandContext(ctx, exe_path, args...)
 	cmd.Stderr = stderr
 	cmd.Stdout = stdout
 	stdin_pipe, err := cmd.StdinPipe()
@@ -85,27 +87,30 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	if err := cmd.Start(); err != nil {
 		return -1, err
 	}
-	done := make(chan error, 1)
+	done := make(chan error)
 
 	go func() {
 		done <- cmd.Wait()
 	}()
+
 	go func() {
 		if _, err := io.Copy(stdin_pipe, stdin); err != nil && !websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 			log.Printf("error copying stdin to process: %s\n", err)
+			cancel()
 		}
 		stdin_pipe.Close()
 	}()
 
-	select {
-	case <-timeout_chan:
-		log.Printf("process %s exceeded timeout\n", exe_path)
-		err := errors.New("Process exceeded timeout")
-		if kerr := cmd.Process.Kill(); kerr != nil {
-			err = errors.Join(err, kerr)
+	err = <-done
+	if cerr := ctx.Err(); cerr != nil {
+		switch cerr {
+		case context.DeadlineExceeded:
+			err = errors.New("Das Programm hat die Frist überschritten")
+		case context.Canceled:
+			err = fmt.Errorf("Das Programm wurde abgebrochen: %s", cerr.Error())
+		default:
+			err = cerr
 		}
-		return -1, err
-	case err := <-done:
-		return cmd.ProcessState.ExitCode(), err
 	}
+	return cmd.ProcessState.ExitCode(), err
 }

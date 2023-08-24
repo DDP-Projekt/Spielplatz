@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -162,6 +163,8 @@ func serve_run(c *gin.Context) {
 	websocket_rw := wsrw.NewWebsocketRW(ws)
 	// run the executable
 	defer executables.RemoveExecutableFile(token, exe_path)
+	log.Printf("goroutines: %d\n", runtime.NumGoroutine())
+	defer log.Printf("goroutines after: %d\n", runtime.NumGoroutine())
 	exitStatus, err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw.StdoutWriter(), websocket_rw.StderrWriter(), args...)
 	if err != nil {
 		log.Println(err)
@@ -171,5 +174,5 @@ func serve_run(c *gin.Context) {
 		return
 	}
 	websocket_rw.Close()
-	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("Process exited with status %d", exitStatus)))
+	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("Das Programm wurde mit Code %d beendet", exitStatus)))
 }
