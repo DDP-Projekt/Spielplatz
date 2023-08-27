@@ -37,8 +37,8 @@
 			<div id="editor-container" class="container" horizontal>
 				<div id="editor-controls" class="controls">
 					<div class="controls1">
-						<img onclick="runProgram(editor.getValue());clearOutput()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn">
-						<img onclick="stopProgram()" src="img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" invert class="btn">
+						<img onclick="runProgram(editor.getValue());clearOutput()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn" id="run-btn">
+						<img hidden onclick="stopProgram()" src="img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" invert class="btn" id="stop-btn">
 						
 						<label hidden><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
 						<input hidden id="args" type="text"></input>

@@ -5,12 +5,18 @@ let compiling = false;
 
 async function runProgram(code) {
 	if (run_ws) {
-		pushOutputMessage('Programm läuft bereits', 'stderr');
+		pushOutputMessage('Programm läuft bereits.', MessageTarget.error);
 		return;
 	} else if (compiling) {
-		pushOutputMessage('Programm wird gerade kompiliert', 'stderr');
+		pushOutputMessage('Programm wird gerade kompiliert.', MessageTarget.error);
 		return;
 	}
+
+	if (autoClear) {
+		clearOutput();
+	}
+
+	toggleBtnVisibility();
 
 	compiling = true;
 	console.log('requesting to compile the program')
@@ -25,9 +31,12 @@ async function runProgram(code) {
 
 	if (compile_result.error) {
 		console.log('compile error')
-		pushOutputMessage("Kompilier Fehler: " + compile_result.error, 'stderr');
-		pushOutputMessage(" ", 'stderr');
-		pushOutputMessage(compile_result.stderr, 'stderr');
+		pushOutputMessage("Kompilier Fehler: " + compile_result.error, MessageTarget.error);
+		pushOutputMessage(" ", MessageTarget.error);
+		pushOutputMessage(compile_result.stderr, MessageTarget.error);
+
+		compiling = false;
+		toggleBtnVisibility();
 		return
 	}
 
@@ -41,39 +50,52 @@ async function runProgram(code) {
 	console.log('requesting to run the program')
 	// connect to the /run endpoint using the websocket api with token as query parameter
 	run_ws = new WebSocket(`ws://${window.location.host}/run?token=${token}${argsString}`)
-	if (run_ws) {
-		run_ws.onopen = () => {
-			console.log('websocket (run) connection opened')
-		}
-
-		run_ws.onmessage = (event) => {
-			console.log(event);
-			let msg = JSON.parse(event.data)
-			pushOutputMessage(msg.msg, msg.isStderr ? 'stderr' : 'stdout');
-		}
-
-		run_ws.onclose = (event) => {
-			console.log('websocket (run) connection closed: ', event)
-			pushOutputMessage(" ", 'stdout')
-			pushOutputMessage(event.reason, event.code !== 1000 ? 'stderr' : 'stdout')
-			run_ws = null;
-			compiling = false;
-		}
-
-		run_ws.onerror = (error) => {
-			console.log('websocket (run) error')
-			pushOutputMessage(error.data, 'stderr');
-		}
-	} else {
+	if (!run_ws){
 		console.error('websocket (run) connection failed')
+		return;
+	} 
+	
+	run_ws.onopen = () => {
+		console.log('websocket (run) connection opened')
+	}
+
+	run_ws.onmessage = (event) => {
+		console.log(event);
+		let msg = JSON.parse(event.data)
+		pushOutputMessage(msg.msg, msg.isStderr ? MessageTarget.error : MessageTarget.output);
+	}
+
+	run_ws.onclose = (event) => {
+		console.log('websocket (run) connection closed: ', event)
+		pushOutputMessage(" ", MessageTarget.system)
+		pushOutputMessage(event.reason, event.code !== 1000 ? MessageTarget.error : MessageTarget.system)
+		run_ws = null;
+		compiling = false;
+
+		toggleBtnVisibility();
+	}
+
+	run_ws.onerror = (error) => {
+		console.log('websocket (run) error')
+		pushOutputMessage(error.data, 'stderr');
+
+		toggleBtnVisibility();
 	}
 }
 
 function stopProgram() {
 	console.log("terminating connection");
-	if (run_ws) {
-		run_ws.send(JSON.stringify({ msg: "EOF", eof: true }));
-		run_ws = null;
-		compiling = null;
+	if (!run_ws) {
+		return;
 	}
+
+	pushOutputMessage("Das Programm wurde abgebrochen", MessageTarget.system);
+	run_ws.send(JSON.stringify({ msg: "EOF", eof: true }));
+	run_ws = null;
+	compiling = null;
+}
+
+function toggleBtnVisibility() {
+	document.getElementById("run-btn").toggleAttribute("hidden");
+	document.getElementById("stop-btn").toggleAttribute("hidden");
 }

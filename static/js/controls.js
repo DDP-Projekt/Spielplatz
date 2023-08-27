@@ -46,6 +46,12 @@ function clearOutput() {
 	document.getElementById('outputText').innerHTML = '';
 }
 
+let autoClear = false;
+function toggleAutoClear() {
+	autoClear = !autoClear;
+	document.getElementById('auto-clear-btn').toggleAttribute('active');
+}
+
 function split() {
 	const splitBtn = document.getElementById("split-btn");
 	const main = document.getElementById("main");
@@ -118,6 +124,13 @@ function openDocs() {
 	window.open("https://ddp-projekt.github.io/Bedienungsanleitung/", "_blank").focus();
 }
 
+const MessageTarget = {
+	input: "stdin",
+	output: "stdout",
+	error: "stderr",
+	system: "sysmsg"
+}
+
 function pushOutputMessage(message, target) {
 	const outputText = document.getElementById('outputText');
 	const span = document.createElement('span');
@@ -144,7 +157,7 @@ function inputEnter(ev) {
 		return;
 	}
 	ev.preventDefault();
-	pushOutputMessage(msg, 'stdin');
+	pushOutputMessage(msg, MessageTarget.input);
 	if (run_ws) {
 		run_ws.send(JSON.stringify({ msg: msg, eof: eof }));
 	}

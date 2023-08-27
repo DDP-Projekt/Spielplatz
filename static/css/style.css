@@ -110,6 +110,10 @@ img[invert] {
 	filter: invert();
 }
 
+img[active] {
+	outline: 1px gray solid;
+}
+
 .controls img {
 	transition: background-color linear 200ms;
 	margin: 5px;
@@ -184,6 +188,7 @@ img[invert] {
 #outputText span { display: block; }
 span.stdin { color: lightblue; }
 span.stderr { color: lightcoral; }
+span.sysmsg { color: gray; }
 
 #input-holder {
 	overflow: hidden;
