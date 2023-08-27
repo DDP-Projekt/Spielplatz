@@ -40,8 +40,8 @@
 						<img onclick="runProgram(editor.getValue());clearOutput()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn" id="run-btn">
 						<img hidden onclick="stopProgram()" src="img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" invert class="btn" id="stop-btn">
 						
-						<label hidden><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
-						<input hidden id="args" type="text"></input>
+						<label hidden for="args"><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
+						<input hidden id="args" type="text" name="args" autocomplete="off"></input>
 	
 						<label hidden for="examples">Example:</label>
 						<select hidden name="examples" id="example-select" onchange="loadExample(this.value)">
@@ -71,9 +71,9 @@
 				</div>
 				
 				<form>
-					<label>&gt;</label>
+					<label for="input">&gt;</label>
 					<span id="input-holder">
-						<input type="text" onkeydown="inputEnter(event)"></input>
+						<input id="input" type="text" onkeydown="inputEnter(event)" autocomplete="off"></input>
 					</span>
 				</form>
 				
