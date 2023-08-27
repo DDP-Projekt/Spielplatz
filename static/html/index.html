@@ -28,6 +28,7 @@
 		<script src="/monaco-editor/min/vs/editor/editor.main.nls.js" defer></script>
 		<script src="/monaco-editor/min/vs/editor/editor.main.js" defer></script>
 
+		<script id="lzutf8" src="https://cdn.jsdelivr.net/npm/lzutf8/build/production/lzutf8.min.js"></script>
 		<script src="/static/js/editor.js" defer></script>
 		<script src="/static/js/controls.js"></script>
 		<script src="/static/js/run.js"></script>
@@ -58,6 +59,7 @@
 							<option value="reverse_string">reverse_string</option>
 						</select>
 
+						<img onclick="share()" src="/img/share.svg" alt="share-code" title="Code teilen" width="22px" height="22px" invert class="btn">
 						<img onclick="copyCode()" src="img/content-copy.svg" alt="copy-code" title="Code kopieren" width="22px" height="22px" invert class="btn">
 						<img onclick="openDocs()" src="img/help-circle-outline.svg" alt="help" title="Bedienungsanleitung öffnen" width="22px" height="22px" invert class="btn">
 					</div>

@@ -120,6 +120,13 @@ function copyCode() {
 	navigator.clipboard.writeText(editor.getValue());
 }
 
+function share() {
+	const lzCode = LZUTF8.compress(editor.getValue(), {outputEncoding: "Base64"});
+
+	const newUrl = `${window.location.origin}${window.location.pathname}?code=${encodeURIComponent(lzCode)}`;
+	navigator.clipboard.writeText(newUrl);
+}
+
 function openDocs() {
 	window.open("https://ddp-projekt.github.io/Bedienungsanleitung/", "_blank").focus();
 }

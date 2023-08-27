@@ -25,6 +25,11 @@ if (initialContent !== null) {
 	value = initialContent;
 }
 
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has("code")) {
+	value = decodeURIComponent(LZUTF8.decompress(urlParams.get("code"), {inputEncoding: "Base64"}));
+}
+
 const editorDiv = document.getElementById('editor');
 const file_uri = monaco.Uri.parse('inmemory://Spielplatz/Spielplatz');
 const editor = monaco.editor.create(editorDiv, {
