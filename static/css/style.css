@@ -48,16 +48,32 @@ abbr {
 
 :root {
 	--background-color: #1e1e1e;
-	--editor-border-color: #3c3c3c;
-	--spacer-width: 15px;
-	--editor-container-size: 70%;
+
+	--input-background-color: #383838;
+	--input-border-color: #5c5c5c;
+	--input-border-width: 1px;
+
 	--controls-height: 2rem;
+	--controls-background-color: #292929;
+
+	--editor-container-size: 70%;
+
+	--spacer-background-color: #3c3c3c;
+	--spacer-width: 15px;
 	--none-if-dragging: '';
-	--scrollbar-shadow: #000000;
+
 	--scrollbar-size: 14px;
+	--scrollbar-outline-size: 0.3px;
+	--scrollbar-outline-color: #5c5c5c;
     --scrollbarSlider-background: rgba(121, 121, 121, 0.4);
     --scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
     --scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
+
+	--output-text-padding: 1rem;
+
+	--stdin-color: lightblue;
+	--stderr-color: lightcoral;
+	--sysmsg-color: gray;
 }
 
 html, body {
@@ -69,12 +85,11 @@ html, body {
 }
 
 input {
-	background-color: #292929;
-	color: white;
+	background-color: var(--input-background-color);
 	outline: none;
-	border: none;
-	border: #5c5c5c solid .7px;
+	border: var(--input-border-color) solid var(--input-border-width);
 	font-family: monospace;
+	color: white;
 }
 
 main {
@@ -91,9 +106,9 @@ main[horizontal] {
 }
 
 .controls {
-	height: var(--controls-height);
 	width: 100%;
-	background-color: #292929;
+	height: var(--controls-height);
+	background-color: var(--controls-background-color);
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -130,10 +145,15 @@ img[active] {
 
 .controls select {
 	outline: none;
-    background-color: #4d4d4d;
+    background-color: var(--input-background-color);
     border-radius: 2rem;
+	border: var(--input-border-color) solid var(--input-border-width);
 	margin: 1rem;
 	color: white;
+}
+
+#args {
+	margin: 1rem;
 }
 
 .container {
@@ -145,8 +165,8 @@ img[active] {
 }
 
 #editor {
-	overflow: hidden;
 	height: 100%;
+	overflow: hidden;
 }
 
 #spacer {
@@ -154,7 +174,7 @@ img[active] {
     justify-content: center;
     align-items: center;
 	cursor: col-resize;
-	background-color: #3c3c3c;
+	background-color: var(--spacer-background-color);
 }
 
 #spacer[horizontal] {
@@ -171,6 +191,8 @@ img[active] {
 
 #output-container label {
 	float: left;
+	text-align: center;
+	width: var(--output-text-padding);
 }
 
 #output {
@@ -182,22 +204,21 @@ img[active] {
 #outputText {
 	display: flex;
     flex-direction: column;
-	padding: 0 1rem;
+	padding: 0 var(--output-text-padding);
 }
 
 #outputText span { display: block; }
-span.stdin { color: lightblue; }
-span.stderr { color: lightcoral; }
-span.sysmsg { color: gray; }
+span.stdin { color: var(--stdin-color); }
+span.stderr { color: var(--stderr-color); }
+span.sysmsg { color: var(--sysmsg-color); }
 
 #input-holder {
 	overflow: hidden;
     display: block;
-    padding: 0 4px 0 10px
 }
 
 #output-container input {
-	width: calc(100% - 1rem);
+	width: calc(100% - var(--output-text-padding) - 3px);
 }
 
 /*-- Scrollbar --*/
@@ -215,7 +236,7 @@ span.sysmsg { color: gray; }
     background: var(--scrollbarSlider-background);
 }
 ::-webkit-scrollbar-track {
-	box-shadow: .3px .3px 0 0 #5c5c5c inset;
+	box-shadow: var(--scrollbar-outline-size) var(--scrollbar-outline-size) 0 0 var(--scrollbar-outline-color) inset;
 }
 ::-webkit-scrollbar-corner {
 	display: none;
