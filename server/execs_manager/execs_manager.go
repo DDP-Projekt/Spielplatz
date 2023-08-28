@@ -1,3 +1,6 @@
+/*
+package excsmanager manages the executable files that are created by the server
+*/
 package execsmanager
 
 import (

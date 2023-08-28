@@ -1,3 +1,6 @@
+/*
+package kddp manages the compilation and execution of the created programs
+*/
 package kddp
 
 import (

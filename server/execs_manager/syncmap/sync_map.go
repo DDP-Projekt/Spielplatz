@@ -2,6 +2,7 @@ package syncmap
 
 import "sync"
 
+// a thread-safe map
 type SyncMap[K comparable, V any] struct {
 	m  map[K]V
 	mu *sync.RWMutex
