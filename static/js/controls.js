@@ -131,6 +131,12 @@ function openDocs() {
 	window.open("https://ddp-projekt.github.io/Bedienungsanleitung/", "_blank").focus();
 }
 
+let lockScroll = false;
+function toggleLockScroll() {
+	lockScroll = !lockScroll;
+	document.getElementById('lock-scroll-btn').toggleAttribute('active');
+}
+
 const MessageTarget = {
 	input: "stdin",
 	output: "stdout",
@@ -145,7 +151,9 @@ function pushOutputMessage(message, target) {
 	span.innerHTML = message;
 	outputText.appendChild(span);
 
-	updateOutputScrollbar();
+	if (!lockScroll) {
+		updateOutputScrollbar();
+	}
 }
 
 function updateOutputScrollbar() {
