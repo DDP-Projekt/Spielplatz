@@ -38,9 +38,9 @@
 			<div id="editor-container" class="container">
 				<div id="editor-controls" class="controls">
 					<div class="controls1">
-						<img src="img/vbb.svg" alt="logo" width="32px" title="DDP Spielplatz">
-						<img onclick="runProgram(editor.getValue())" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn" id="run-btn">
-						<img hidden onclick="stopProgram()" src="img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" invert class="btn" id="stop-btn">
+						<img src="/img/vbb.svg" alt="logo" width="32px" title="DDP Spielplatz">
+						<img onclick="runProgram(editor.getValue())" src="/img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn" id="run-btn">
+						<img hidden onclick="stopProgram()" src="/img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" invert class="btn" id="stop-btn">
 						
 						<label for="args"><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
 						<input id="args" type="text" name="args" autocomplete="off"></input>
@@ -60,8 +60,9 @@
 						</select>
 
 						<img onclick="share()" src="/img/share.svg" alt="share-code" title="Code teilen" width="22px" height="22px" invert class="btn">
-						<img onclick="copyCode()" src="img/content-copy.svg" alt="copy-code" title="Code kopieren" width="22px" height="22px" invert class="btn">
-						<img onclick="openDocs()" src="img/help-circle-outline.svg" alt="help" title="Bedienungsanleitung öffnen" width="22px" height="22px" invert class="btn">
+						<img onclick="copyCode()" src="/img/content-copy.svg" alt="copy-code" title="Code kopieren" width="22px" height="22px" invert class="btn">
+						<a href="https://github.com/DDP-Projekt/Spielplatz" target="_blank"><img src="/img/github.svg" alt="github" title="Spielplatz GitHub" width="22px" height="22px" invert class="btn"></a>
+						<img onclick="openDocs()" src="/img/help-circle-outline.svg" alt="help" title="Bedienungsanleitung öffnen" width="22px" height="22px" invert class="btn">
 					</div>
 				</div>
 				<div id="editor"></div>
@@ -72,12 +73,13 @@
 			<div id="output-container" class="container">
 				<div id="output-controls" class="controls">
 					<div class="controls1">
-						<img onclick="clearOutput()" src="img/trash-can-outline.svg" alt="clear-output" title="Ausgabe leeren" width="22px" height="22px" invert class="btn">
-						<img onclick="copyOutput()" src="img/content-copy.svg" alt="copy-output" title="Ausgabe kopieren" width="22px" height="22px" invert class="btn">
+						<img onclick="clearOutput()" src="/img/trash-can-outline.svg" alt="clear-output" title="Ausgabe leeren" width="22px" height="22px" invert class="btn">
+						<img onclick="copyOutput()" src="/img/content-copy.svg" alt="copy-output" title="Ausgabe kopieren" width="22px" height="22px" invert class="btn">
 						<img onclick="toggleAutoClear()" src="/img/delete-clock-outline.svg" alt="auto-clear" title="Automatisch leeren" width="22px" height="22px" invert class="btn" id="auto-clear-btn">
+						<img onclick="toggleLockScroll()" src="/img/arrow-vertical-lock.svg" alt="lock-scroll" title="Scrollen sperren" width="22px" height="22px" invert class="btn" id="lock-scroll-btn">
 					</div>
 					
-					<img onclick="split()" src="img/view-split-horizontal.svg" alt="split-view" title="Sicht ändern" width="22px" height="22px" id="split-btn" invert class="btn">
+					<img onclick="split()" src="/img/view-split-horizontal.svg" alt="split-view" title="Sicht ändern" width="22px" height="22px" id="split-btn" invert class="btn">
 				</div>
 				<div id="output">
 					<pre id="outputText"></pre>
