@@ -2,16 +2,17 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"runtime"
 	"strconv"
 	"time"
 
 	"github.com/DDP-Projekt/DDPLS/ddpls"
 	executables "github.com/DDP-Projekt/Spielplatz/server/execs_manager"
 	"github.com/DDP-Projekt/Spielplatz/server/kddp"
+	"github.com/DDP-Projekt/Spielplatz/server/kddp/cgroup"
 	wsrw "github.com/DDP-Projekt/Spielplatz/server/websocket_rw"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -23,6 +24,8 @@ func setup_config() {
 	viper.SetDefault("exe_cache_duration", time.Second*60)
 	viper.SetDefault("run_timeout", time.Second*60)
 	viper.SetDefault("port", "8080")
+	viper.SetDefault("memory_limit_bytes", 4*cgroup.GiB)
+	viper.SetDefault("cpu_limit_percent", 50)
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
@@ -30,10 +33,23 @@ func setup_config() {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file: %s\n", err)
 	}
+
+	json_string, err := json.MarshalIndent(viper.AllSettings(), "", "\t")
+	if err == nil {
+		log.Printf("using config: \n%s\n", json_string)
+	}
 }
 
 func main() {
 	setup_config()
+
+	if err := cgroup.Initialize(cgroup.Limit{
+		Memory: viper.GetInt64("memory_limit_bytes"),
+		CPU:    viper.GetUint64("cpu_limit_percent"),
+	}); err != nil {
+		log.Fatalf("could not initialize cgroup: %s\n", err)
+	}
+	defer cgroup.Destroy()
 
 	r := gin.Default()
 
@@ -163,8 +179,7 @@ func serve_run(c *gin.Context) {
 	websocket_rw := wsrw.NewWebsocketRW(ws)
 	// run the executable
 	defer executables.RemoveExecutableFile(token, exe_path)
-	log.Printf("goroutines: %d\n", runtime.NumGoroutine())
-	defer log.Printf("goroutines after: %d\n", runtime.NumGoroutine())
+
 	exitStatus, err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw.StdoutWriter(), websocket_rw.StderrWriter(), args...)
 	if err != nil {
 		log.Println(err)

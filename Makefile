@@ -17,6 +17,8 @@ all: $(BIN)
 clean:
 	rm -f $(BIN) Spielplatz
 
-install-dependencies:
-	sudo apt-get install libseccomp-dev
+node_modules:
 	npm install
+
+install-dependencies: node_modules
+	sudo apt-get install libseccomp-dev

@@ -1,4 +1,4 @@
 set -e
 
 make
-./Spielplatz
+sudo DDPPATH=$DDPPATH PATH=$PATH ./Spielplatz
