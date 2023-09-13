@@ -9,7 +9,6 @@ Inspiriert von anderen Sprachen wie [Go](https://go.dev/play/), [Rust](https://p
 ## Starten
 ### Vorraussetzungen
 * Go version 1.20.0
-* NodeJS
 * Npm
 
 ### Ausführen
@@ -21,8 +20,10 @@ Man kann im root des Projektes eine `config.json` Datei erstellen um das Program
 Die standart Konfigurationsdatei sieht so aus.
 ```json
 {
+	"cpu_limit_percent": 50,
 	"exe_cache_duration": "1m",
-	"run_timeout": "30s",
-	"port": "8080"
+	"memory_limit_bytes": 4294967296,
+	"port": "8080",
+	"run_timeout": "30s"
 }
 ```
