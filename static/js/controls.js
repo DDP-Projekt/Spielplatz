@@ -162,15 +162,16 @@ function updateOutputScrollbar() {
 }
 
 function inputEnter(ev) {
-	console.log(ev);
 	let eof = false;
 	let msg = ev.target.value + '\n';
+
 	if (ev.ctrlKey && ev.key === 'c') {
 		eof = true
 		msg = "EOF";
 	} else if (ev.key !== "Enter") {
 		return;
 	}
+	
 	ev.preventDefault();
 	pushOutputMessage(msg, MessageTarget.input);
 	if (run_ws) {

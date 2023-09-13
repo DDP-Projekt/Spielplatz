@@ -55,6 +55,9 @@ async function runProgram(code) {
 		return;
 	} 
 	
+	// focus input
+	document.getElementById('input').focus();
+
 	run_ws.onopen = () => {
 		console.log('websocket (run) connection opened')
 	}
