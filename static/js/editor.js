@@ -46,7 +46,7 @@ if (initialContent !== null) {
 
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has("code")) {
-	value = decodeURIComponent(LZUTF8.decompress(urlParams.get("code"), {inputEncoding: "Base64"}));
+	value = decodeURIComponent(LZUTF8.decompress(urlParams.get("code"), { inputEncoding: "Base64" }));
 }
 
 let editorTheme = 'ddp-theme-dark';
@@ -59,6 +59,7 @@ if (window.localStorage.getItem("dark-mode") === 'false' || urlParams.has('light
 	document.getElementById('light').media = 'not all';
 }
 
+const isReadOnly = urlParams.has("readonly");
 const editorDiv = document.getElementById('editor');
 const file_uri = monaco.Uri.parse('inmemory://Spielplatz/Spielplatz');
 const editor = monaco.editor.create(editorDiv, {
@@ -67,7 +68,7 @@ const editor = monaco.editor.create(editorDiv, {
 	//automaticLayout: true,
 	model: monaco.editor.createModel(value, 'ddp', file_uri),
 	minimap: { enabled: minimapEnabled },
-	readOnly: urlParams.has("readonly"),
+	readOnly: isReadOnly,
 	lineNumbers: !urlParams.has("nolines")
 });
 
@@ -130,8 +131,8 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 });
 
 // connect to a websocket on the /ls endpoint
-const socket = new WebSocket(`ws://${window.location.host}/ls`);
-socket.onerror = (error) => {
+const ls_socket = new WebSocket(`ws://${window.location.host}/ls`);
+ls_socket.onerror = (error) => {
 	console.error('WebSocket error:', error);
 };
 let initialized = false;
@@ -139,18 +140,18 @@ let initialized = false;
 //a function that takes a javascript object and sends it to the language server
 function send(msg) {
 	// return if the socket is not able to send
-	if (socket.readyState !== WebSocket.OPEN) {
+	if (ls_socket.readyState !== WebSocket.OPEN) {
 		return;
 	}
 	// send the msg to the language server and add basic jsonrpc fields
-	socket.send(JSON.stringify({
+	ls_socket.send(JSON.stringify({
 		jsonrpc: '2.0',
 		id: 1,
 		...msg,
 	}));
 }
 
-socket.onclose = () => {
+ls_socket.onclose = () => {
 	console.log('disconnected from /ls');
 };
 
@@ -174,7 +175,7 @@ function discard_response(resp) {
 	console.log('discarding response', resp);
 }
 
-socket.onmessage = (event) => {
+ls_socket.onmessage = (event) => {
 	// handle langue server protocol messages
 	const msg = JSON.parse(event.data);
 	// handle errors
@@ -213,7 +214,7 @@ socket.onmessage = (event) => {
 	}
 };
 
-socket.onopen = () => {
+ls_socket.onopen = () => {
 	console.log('connected to /ls');
 	// send a language server protocol initialize request
 	send({
@@ -303,7 +304,8 @@ const completion_kind_map = {
 	24: monaco.languages.CompletionItemKind.Operator,
 	25: monaco.languages.CompletionItemKind.TypeParameter,
 };
-let semantic_tokens_lengend = {}
+let semantic_tokens_lengend = {};
+let cached_readonly_semantic_tokens = null;
 function handleInitializeResponse(resp) {
 	initialized = true;
 	console.log('initializeResult', resp)
@@ -325,7 +327,6 @@ function handleInitializeResponse(resp) {
 				version: 1,
 				text: editor.getValue(),
 			},
-
 		},
 	});
 	push_response_handler().then(discard_response);
@@ -336,6 +337,10 @@ function handleInitializeResponse(resp) {
 		getLegend: () => semantic_tokens_lengend,
 		// request semantic tokens
 		provideDocumentSemanticTokens: async (model, lastResultId, token) => {
+			if (cached_readonly_semantic_tokens !== null) {
+				return cached_readonly_semantic_tokens;
+			}
+
 			send({
 				method: 'textDocument/semanticTokens/full',
 				params: {
@@ -351,203 +356,214 @@ function handleInitializeResponse(resp) {
 				}
 				// handle semantic token response
 				const tokens = resp.result;
+				// if we are readOnly we only need to fetch the tokens once
+				// and can then close the websocket connection to safe resources on the server
+				if (readOnly) {
+					cached_readonly_semantic_tokens = tokens;
+					ls_socket.close();
+				}
 				return tokens;
 			});
 		},
 		releaseDocumentSemanticTokens: (resultId) => { },
 	});
 
-	// add support for textDocument/semanticTokens/range
-	monaco.languages.registerDocumentRangeSemanticTokensProvider('ddp', {
-		getLegend: () => semantic_tokens_lengend,
-		// request semantic tokens
-		provideDocumentRangeSemanticTokens: async (model, range, token) => {
-			send({
-				method: 'textDocument/semanticTokens/range',
-				params: {
-					textDocument: {
-						uri: file_uri.toString(),
-					},
-					range: {
-						start: {
-							line: range.startLineNumber - 1,
-							character: range.startColumn - 1,
+	// if the editor is readOnly we don't need all those things below because we
+	// only want to view and run the code, not edit it (we don't need hover or goto definition etc.)
+	if (!isReadOnly) {
+		// add support for textDocument/semanticTokens/range
+		monaco.languages.registerDocumentRangeSemanticTokensProvider('ddp', {
+			getLegend: () => semantic_tokens_lengend,
+			// request semantic tokens
+			provideDocumentRangeSemanticTokens: async (model, range, token) => {
+				send({
+					method: 'textDocument/semanticTokens/range',
+					params: {
+						textDocument: {
+							uri: file_uri.toString(),
 						},
-						end: {
-							line: range.endLineNumber - 1,
-							character: range.endColumn - 1,
-						},
-					},
-				},
-			});
-			return push_response_handler().then((resp) => {
-				console.log('semantic tokens range');
-				if (!resp.result) {
-					return null;
-				}
-				// handle semantic token response
-				const tokens = resp.result;
-				return tokens;
-			});
-		},
-	});
-
-
-	// register a completion provider
-	monaco.languages.registerCompletionItemProvider('ddp', {
-		triggerCharacters: resp.result.capabilities.completionProvider.triggerCharacters,
-		provideCompletionItems: async (model, position, context, token) => {
-			// send a language server protocol completion request
-			console.log('requesting completion for trigger character', context.triggerCharacter);
-			send({
-				method: 'textDocument/completion',
-				params: {
-					textDocument: {
-						uri: file_uri.toString(),
-					},
-					position: {
-						line: position.lineNumber - 1,
-						character: position.column - 1,
-					},
-					context: {
-						triggerKind: context.triggerKind,
-						triggerCharacter: context.triggerCharacter,
-					},
-				},
-			});
-			return push_response_handler().then((resp) => {
-				console.log('completion');
-				if (!resp.result) {
-					return null;
-				}
-
-				// handle completion response
-				const suggestions = resp.result.map((completion) => {
-					const kind = completion_kind_map[completion.kind];
-					return {
-						label: completion.label,
-						kind: kind,
-						insertText: completion.insertText ? completion.insertText : completion.label,
-						range: {
-							startLineNumber: position.lineNumber,
-							startColumn: position.column,
-							endLineNumber: position.lineNumber,
-							endColumn: position.column,
-						},
-						sortText: String.fromCharCode(97 + kind) + completion.label,
-					};
-				});
-				return {
-					suggestions: suggestions,
-				};
-			});
-		},
-	});
-
-	// register a hover provider
-	monaco.languages.registerHoverProvider('ddp', {
-		provideHover: async (model, position, token) => {
-			// send a language server protocol hover request
-			send({
-				method: 'textDocument/hover',
-				params: {
-					textDocument: {
-						uri: file_uri.toString(),
-					},
-					position: {
-						line: position.lineNumber - 1,
-						character: position.column - 1,
-					},
-				},
-			});
-			return push_response_handler().then((resp) => {
-				console.log('hover');
-				if (!resp.result) {
-					return null;
-				}
-				return {
-					contents: [
-						{ value: resp.result.contents.value, },
-					],
-					range: resp.result.range,
-				};
-			});
-		}
-	});
-
-	// register a definition provider	
-	monaco.languages.registerDefinitionProvider('ddp', {
-		provideDefinition: async (model, position, token) => {
-			// send a language server protocol definition request
-			send({
-				method: 'textDocument/definition',
-				params: {
-					textDocument: {
-						uri: file_uri.toString(),
-					},
-					position: {
-						line: position.lineNumber - 1,
-						character: position.column - 1,
-					},
-				},
-			});
-			return push_response_handler().then((resp) => {
-				console.log('definition');
-
-				// handle definition response
-				if (!resp.result) {
-					return null;
-				}
-				return {
-					uri: resp.result.uri,
-					range: {
-						startLineNumber: resp.result.range.start.line + 1,
-						startColumn: resp.result.range.start.character + 1,
-						endLineNumber: resp.result.range.end.line + 1,
-						endColumn: resp.result.range.end.character + 1,
-					}
-				};
-			});
-		}
-	});
-}
-
-// when the editor is changed, send a didChange notification to the language server
-editor.onDidChangeModelContent((event) => {
-	if (!initialized) {
-		return;
-	}
-
-	console.log('change', event.changes);
-	send({
-		method: 'textDocument/didChange',
-		params: {
-			textDocument: {
-				uri: file_uri.toString(),
-				version: 2,
-			},
-			contentChanges:
-				// map all event.changes to lsp changes
-				event.changes.map((change) => {
-					return {
 						range: {
 							start: {
-								line: change.range.startLineNumber - 1,
-								character: change.range.startColumn - 1,
+								line: range.startLineNumber - 1,
+								character: range.startColumn - 1,
 							},
 							end: {
-								line: change.range.endLineNumber - 1,
-								character: change.range.endColumn - 1,
+								line: range.endLineNumber - 1,
+								character: range.endColumn - 1,
 							},
 						},
-						rangeLength: change.rangeLength,
-						text: change.text,
+					},
+				});
+				return push_response_handler().then((resp) => {
+					console.log('semantic tokens range');
+					if (!resp.result) {
+						return null;
+					}
+					// handle semantic token response
+					const tokens = resp.result;
+					return tokens;
+				});
+			},
+		});
+
+		// register a completion provider
+		monaco.languages.registerCompletionItemProvider('ddp', {
+			triggerCharacters: resp.result.capabilities.completionProvider.triggerCharacters,
+			provideCompletionItems: async (model, position, context, token) => {
+				// send a language server protocol completion request
+				console.log('requesting completion for trigger character', context.triggerCharacter);
+				send({
+					method: 'textDocument/completion',
+					params: {
+						textDocument: {
+							uri: file_uri.toString(),
+						},
+						position: {
+							line: position.lineNumber - 1,
+							character: position.column - 1,
+						},
+						context: {
+							triggerKind: context.triggerKind,
+							triggerCharacter: context.triggerCharacter,
+						},
+					},
+				});
+				return push_response_handler().then((resp) => {
+					console.log('completion');
+					if (!resp.result) {
+						return null;
+					}
+
+					// handle completion response
+					const suggestions = resp.result.map((completion) => {
+						const kind = completion_kind_map[completion.kind];
+						return {
+							label: completion.label,
+							kind: kind,
+							insertText: completion.insertText ? completion.insertText : completion.label,
+							range: {
+								startLineNumber: position.lineNumber,
+								startColumn: position.column,
+								endLineNumber: position.lineNumber,
+								endColumn: position.column,
+							},
+							sortText: String.fromCharCode(97 + kind) + completion.label,
+						};
+					});
+					return {
+						suggestions: suggestions,
 					};
-				}),
-		},
+				});
+			},
+		});
+
+		// register a hover provider
+		monaco.languages.registerHoverProvider('ddp', {
+			provideHover: async (model, position, token) => {
+				// send a language server protocol hover request
+				send({
+					method: 'textDocument/hover',
+					params: {
+						textDocument: {
+							uri: file_uri.toString(),
+						},
+						position: {
+							line: position.lineNumber - 1,
+							character: position.column - 1,
+						},
+					},
+				});
+				return push_response_handler().then((resp) => {
+					console.log('hover');
+					if (!resp.result) {
+						return null;
+					}
+					return {
+						contents: [
+							{ value: resp.result.contents.value, },
+						],
+						range: resp.result.range,
+					};
+				});
+			}
+		});
+
+		// register a definition provider	
+		monaco.languages.registerDefinitionProvider('ddp', {
+			provideDefinition: async (model, position, token) => {
+				// send a language server protocol definition request
+				send({
+					method: 'textDocument/definition',
+					params: {
+						textDocument: {
+							uri: file_uri.toString(),
+						},
+						position: {
+							line: position.lineNumber - 1,
+							character: position.column - 1,
+						},
+					},
+				});
+				return push_response_handler().then((resp) => {
+					console.log('definition');
+
+					// handle definition response
+					if (!resp.result) {
+						return null;
+					}
+					return {
+						uri: resp.result.uri,
+						range: {
+							startLineNumber: resp.result.range.start.line + 1,
+							startColumn: resp.result.range.start.character + 1,
+							endLineNumber: resp.result.range.end.line + 1,
+							endColumn: resp.result.range.end.character + 1,
+						}
+					};
+				});
+			}
+		});
+	}
+}
+
+if (!isReadOnly) {
+	// when the editor is changed, send a didChange notification to the language server
+	editor.onDidChangeModelContent((event) => {
+		if (!initialized) {
+			return;
+		}
+
+		console.log('change', event.changes);
+		send({
+			method: 'textDocument/didChange',
+			params: {
+				textDocument: {
+					uri: file_uri.toString(),
+					version: 2,
+				},
+				contentChanges:
+					// map all event.changes to lsp changes
+					event.changes.map((change) => {
+						return {
+							range: {
+								start: {
+									line: change.range.startLineNumber - 1,
+									character: change.range.startColumn - 1,
+								},
+								end: {
+									line: change.range.endLineNumber - 1,
+									character: change.range.endColumn - 1,
+								},
+							},
+							rangeLength: change.rangeLength,
+							text: change.text,
+						};
+					}),
+			},
+		});
+		push_response_handler().then(discard_response);
 	});
-	push_response_handler().then(discard_response);
-});
+}
 
 // when the website is closed, send a shutdown request to the language server
 window.onbeforeunload = () => {
@@ -562,7 +578,7 @@ window.onbeforeunload = () => {
 			params: {},
 		});
 		// close the websocket
-		socket.close();
+		ls_socket.close();
 	});
 
 	window.localStorage.setItem("content", editor.getValue());
