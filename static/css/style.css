@@ -47,18 +47,13 @@ abbr {
 }
 
 :root {
-	--background-color: #1e1e1e;
-
-	--input-background-color: #383838;
-	--input-border-color: #5c5c5c;
+	color: var(--text-color);
 	--input-border-width: 1px;
 
 	--controls-height: 2rem;
-	--controls-background-color: #292929;
 
 	--editor-container-size: 70%;
 
-	--spacer-background-color: #3c3c3c;
 	--spacer-width: 15px;
 	--none-if-dragging: '';
 
@@ -81,7 +76,6 @@ html, body {
 	height: 100%;
 	background-color: var(--background-color);
 	font-family: Arial, Helvetica, sans-serif;
-	color: white;
 }
 
 input {
@@ -89,7 +83,7 @@ input {
 	outline: none;
 	border: var(--input-border-color) solid var(--input-border-width);
 	font-family: monospace;
-	color: white;
+	color: var(--text-color)
 }
 
 main {
@@ -121,10 +115,6 @@ main[horizontal] {
 	height: var(--controls-height);
 }
 
-img[invert] {
-	filter: invert();
-}
-
 img[active] {
 	outline: 1px gray solid;
 }
@@ -139,7 +129,7 @@ img[active] {
 }
 
 .controls img.btn:hover {
-	background-color: #969696;
+	background-color: var(--controls-btn-hover-color);
 	cursor: pointer;
 }
 
@@ -149,7 +139,7 @@ img[active] {
     border-radius: 2rem;
 	border: var(--input-border-color) solid var(--input-border-width);
 	margin: 1rem;
-	color: white;
+	color: var(--text-color);
 }
 
 #args {
@@ -186,7 +176,7 @@ img[active] {
 }
 
 #output-container {
-	background-color: #1a1a1a;
+	background-color: var(--output-background-color);
 }
 
 #output-container label {

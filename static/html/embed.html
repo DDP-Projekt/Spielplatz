@@ -19,6 +19,8 @@
 
 		<link rel="stylesheet" data-name="vs/editor/editor.main" href="/monaco-editor/min/vs/editor/editor.main.css">
 		<link rel="stylesheet" type="text/css" href="static/css/style.css">
+		<link id="dark" rel="stylesheet" href="static/css/dark-mode.css" media="all">
+		<link id="light" rel="stylesheet" href="static/css/light-mode.css" media="not all">
 
 		<script>var minimapEnabled = false;</script>
 		<script defer>
@@ -37,8 +39,8 @@
 			<div id="editor-container" class="container" horizontal>
 				<div id="editor-controls" class="controls">
 					<div class="controls1">
-						<img onclick="runProgram(editor.getValue());clearOutput()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" invert class="btn" id="run-btn">
-						<img hidden onclick="stopProgram()" src="img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" invert class="btn" id="stop-btn">
+						<img onclick="runProgram(editor.getValue());clearOutput()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" class="btn" id="run-btn">
+						<img hidden onclick="stopProgram()" src="img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" class="btn" id="stop-btn">
 						
 						<label hidden for="args"><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
 						<input hidden id="args" type="text" name="args" autocomplete="off"></input>
@@ -57,7 +59,7 @@
 						</select>
 					</div>
 					<div class="controls1">
-						<img onclick="copyCode()" src="img/content-copy.svg" alt="copy-code" title="Code kopieren" width="22px" height="22px" invert class="btn">
+						<img onclick="copyCode()" src="img/content-copy.svg" alt="copy-code" title="Code kopieren" width="22px" height="22px" class="btn">
 					</div>
 				</div>
 				<div id="editor"></div>

@@ -1,0 +1,18 @@
+:root {
+	--text-color: #454545;
+	--background-color: #fafafa;
+
+	--input-background-color: #f4f4f5;
+	--input-border-color: #b0b0b0;
+
+	--output-background-color: #ffffff;
+
+	--controls-background-color: #eeeeee;
+	--controls-btn-hover-color: #c6c6c6;
+
+	--spacer-background-color: #d0d7de;
+}
+
+img.btn {
+	filter: none;
+}

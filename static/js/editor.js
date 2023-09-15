@@ -1,6 +1,6 @@
 "use strict";
 
-monaco.editor.defineTheme('ddp-theme', {
+monaco.editor.defineTheme('ddp-theme-dark', {
 	base: 'vs-dark',
 	inherit: true,
 	colors: {},
@@ -19,6 +19,25 @@ monaco.editor.defineTheme('ddp-theme', {
 	]
 });
 
+monaco.editor.defineTheme('ddp-theme-light', {
+	base: 'vs',
+	inherit: true,
+	colors: {},
+	rules: [
+		{ token: 'keyword.control', foreground: 'AF00DB' },
+		{ token: 'string.escape', foreground: 'D7BA7D' },
+		{ token: 'keyword.controlFlow', foreground: 'AF00DB' },
+		{ token: 'variable', foreground: '0070C1' },
+		{ token: 'parameter', foreground: '9CDCFE' },
+		{ token: 'property', foreground: '9CDCFE' },
+		{ token: 'support.function', foreground: '795E26' },
+		{ token: 'function', foreground: '795E26' },
+		{ token: 'member', foreground: '4FC1FF' },
+		{ token: 'variable.constant', foreground: '4FC1FF' },
+		{ token: 'typeParameter', foreground: '4EC9B0' },
+	]
+});
+
 let value = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
 const initialContent = window.localStorage.getItem("content");
 if (initialContent !== null) {
@@ -30,10 +49,20 @@ if (urlParams.has("code")) {
 	value = decodeURIComponent(LZUTF8.decompress(urlParams.get("code"), {inputEncoding: "Base64"}));
 }
 
+let editorTheme = 'ddp-theme-dark';
+if (window.localStorage.getItem("dark-mode") === 'false' || urlParams.has('light')) {
+	editorTheme = "ddp-theme-light";
+	document.getElementById('dark').media = 'not all';
+	document.getElementById('light').media = 'all';
+} else {
+	document.getElementById('dark').media = 'all';
+	document.getElementById('light').media = 'not all';
+}
+
 const editorDiv = document.getElementById('editor');
 const file_uri = monaco.Uri.parse('inmemory://Spielplatz/Spielplatz');
 const editor = monaco.editor.create(editorDiv, {
-	theme: 'ddp-theme',
+	theme: editorTheme,
 	'semanticHighlighting.enabled': true,
 	//automaticLayout: true,
 	model: monaco.editor.createModel(value, 'ddp', file_uri),

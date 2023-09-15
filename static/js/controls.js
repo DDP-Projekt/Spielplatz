@@ -131,6 +131,22 @@ function openDocs() {
 	window.open("https://ddp-projekt.github.io/Bedienungsanleitung/", "_blank").focus();
 }
 
+function toggleDarkMode() {
+	let isDark = document.getElementById('dark').media === 'all';
+	if (isDark) {
+		document.getElementById('dark').media = 'not all';
+		document.getElementById('light').media = 'all';
+		monaco.editor.setTheme("ddp-theme-light");
+		window.localStorage.setItem("dark-mode", "false");
+	}
+	else {
+		document.getElementById('dark').media = 'all';
+		document.getElementById('light').media = 'not all';
+		monaco.editor.setTheme("ddp-theme-dark");
+		window.localStorage.setItem("dark-mode", "true");
+	}
+}
+
 let lockScroll = false;
 function toggleLockScroll() {
 	lockScroll = !lockScroll;
