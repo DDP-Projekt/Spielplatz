@@ -38,6 +38,8 @@ const editor = monaco.editor.create(editorDiv, {
 	//automaticLayout: true,
 	model: monaco.editor.createModel(value, 'ddp', file_uri),
 	minimap: { enabled: minimapEnabled },
+	readOnly: urlParams.has("readonly"),
+	lineNumbers: !urlParams.has("nolines")
 });
 
 new ResizeObserver(function (mutations) {
