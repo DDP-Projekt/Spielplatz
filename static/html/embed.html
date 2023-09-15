@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="--editor-container-size: 100%;">
 	<head>
 		<title>DDP Spielplatz</title>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -39,24 +39,10 @@
 			<div id="editor-container" class="container" horizontal>
 				<div id="editor-controls" class="controls">
 					<div class="controls1">
-						<img onclick="runProgram(editor.getValue());clearOutput()" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" class="btn" id="run-btn">
+						<img onclick="runProgram(editor.getValue());clearOutput();showOutput();" src="img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" class="btn" id="run-btn">
 						<img hidden onclick="stopProgram()" src="img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" class="btn" id="stop-btn">
 						
-						<label hidden for="args"><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
 						<input hidden id="args" type="text" name="args" autocomplete="off"></input>
-	
-						<label hidden for="examples">Example:</label>
-						<select hidden name="examples" id="example-select" onchange="loadExample(this.value)">
-							<option value=""></option>
-							<option value="HalloWelt">Hallo Welt</option>
-							<option value="Brainfuck">Brainfuck</option>
-							<option value="Fibonacci">Fibonacci</option>
-							<option value="Fizzbuzz">Fizzbuzz</option>
-							<option value="Mandelbrot">Mandelbrot</option>
-							<option value="Roemische_Zahlen">Roemische_Zahlen</option>
-							<option value="Tictactoe">Tictactoe</option>
-							<option value="reverse_string">reverse_string</option>
-						</select>
 					</div>
 					<div class="controls1">
 						<img onclick="copyCode()" src="img/content-copy.svg" alt="copy-code" title="Code kopieren" width="22px" height="22px" class="btn">
@@ -64,10 +50,10 @@
 				</div>
 				<div id="editor"></div>
 			</div>
-			<div id="spacer" draggable="true" ondragstart="spacerDragStart(event)" ondragend="spacerDragEnd()" ondrag="spacerDrag(event)" horizontal>
+			<div style="display:none" id="spacer" draggable="true" ondragstart="spacerDragStart(event)" ondragend="spacerDragEnd()" ondrag="spacerDrag(event)" horizontal>
 				<span>⣿</span>
 			</div>
-			<div id="output-container" class="container" horizontal>
+			<div id="output-container" class="container" horizontal style="display:none">
 				<div id="output">
 					<pre id="outputText"></pre>
 				</div>

@@ -195,3 +195,9 @@ function inputEnter(ev) {
 	}
 	ev.target.value = "";
 }
+
+function showOutput() {
+	document.getElementById('output-container').style.display = 'flex';
+	document.getElementById('spacer').style.display = 'flex';
+	document.querySelector('html').style = '';
+}
