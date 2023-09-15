@@ -10,6 +10,7 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/tliron/kutil v0.1.68
 	golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0
+	golang.org/x/sync v0.1.0
 )
 
 require (

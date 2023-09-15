@@ -17,6 +17,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/constraints"
+	"golang.org/x/sync/semaphore"
 )
 
 func init() {
@@ -26,6 +27,16 @@ func init() {
 	if _, ok := os.LookupEnv("DDPPATH"); !ok {
 		log.Println("DDPPATH not set, kddp might not work correctly")
 	}
+}
+
+var proc_sem *semaphore.Weighted
+
+func InitializeSemaphore(weight int64) error {
+	if weight < 1 {
+		return errors.New("weight must be at least 1")
+	}
+	proc_sem = semaphore.NewWeighted(weight)
+	return nil
 }
 
 // constraint that satisfies `json:"token,string"`
@@ -77,6 +88,15 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType, exe_
 
 // runs an executable and returns the result of the execution
 func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) (int, error) {
+	if proc_sem != nil {
+		sem_ctx, sem_cancel := context.WithTimeout(context.Background(), viper.GetDuration("process_aquire_timeout"))
+		if err := proc_sem.Acquire(sem_ctx, 1); err != nil {
+			sem_cancel()
+			return -1, errors.Join(errors.New("Der Server ist momentan ausgelastet, versuchen sie es später erneut"), err)
+		}
+		defer proc_sem.Release(1)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("run_timeout"))
 	defer cancel()
 
@@ -91,9 +111,13 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	if err := cmd.Start(); err != nil {
 		return -1, err
 	}
-	if err := cgroup.Add(uint64(cmd.Process.Pid)); err != nil {
-		return -1, errors.Join(errors.New("could not add process to cgroup"), err)
+
+	if viper.GetBool("use_cgroup") {
+		if err := cgroup.Add(uint64(cmd.Process.Pid)); err != nil {
+			return -1, errors.Join(errors.New("could not add process to cgroup"), err)
+		}
 	}
+
 	done := make(chan error)
 
 	go func() {

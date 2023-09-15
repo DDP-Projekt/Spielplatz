@@ -20,10 +20,13 @@ Man kann im root des Projektes eine `config.json` Datei erstellen um das Program
 Die standart Konfigurationsdatei sieht so aus.
 ```json
 {
-	"cpu_limit_percent": 50,
-	"exe_cache_duration": "1m",
-	"memory_limit_bytes": 4294967296,
 	"port": "8080",
+	"exe_cache_duration": "1m",
 	"run_timeout": "30s"
+	"memory_limit_bytes": 4294967296,
+	"cpu_limit_percent": 50,
+	"use_cgroups": true,
+	"max_concurrent_processes": 50,
+	"process_aquire_timeout": "3s"
 }
 ```
