@@ -1,15 +1,21 @@
 # Spielplatz
 
-Ein online-Spielplatz für DDP.
+Ein online-Spielplatz für [DDP](https://github.com/DDP-Projekt/Kompilierer).
 
 Inspiriert von anderen Sprachen wie [Go](https://go.dev/play/), [Rust](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021) und [Dart](https://dartpad.dev/?).
 
-![showcase](img/showcase.png)
+| dark mode | light mode |
+|---|---|
+|![showcase-dark](img/showcase-dark.png)|![showcase-light](img/showcase-light.png)|
 
-## Starten
+## Lokal Ausführen
 ### Vorraussetzungen
-* Go version 1.20.0
-* Npm
+* [Go](https://go.dev/doc/install) (mindestens version 1.20.0)
+* npm
+
+### Installieren
+1. Die Git Repository clonen
+2. `make install-dependencies` ausführen
 
 ### Ausführen
 Um das Programm zu starten führt man `run.sh` aus.
@@ -22,7 +28,7 @@ Die standart Konfigurationsdatei sieht so aus.
 {
 	"port": "8080",
 	"exe_cache_duration": "1m",
-	"run_timeout": "30s"
+	"run_timeout": "30s",
 	"memory_limit_bytes": 4294967296,
 	"cpu_limit_percent": 50,
 	"use_cgroups": true,
