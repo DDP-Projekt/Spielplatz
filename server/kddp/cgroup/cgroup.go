@@ -30,7 +30,7 @@ type Limit struct {
 
 // initializes the cgroup
 func Initialize(limit Limit) error {
-	if cgroups.Mode() != cgroups.Unified {
+	if cgroups.Mode() != cgroups.Unified && cgroups.Mode() != cgroups.Hybrid {
 		return errors.New("cgroups v2 is not supported")
 	}
 
