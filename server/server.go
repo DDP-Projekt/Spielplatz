@@ -27,6 +27,8 @@ func setup_config() {
 	viper.SetDefault("memory_limit_bytes", 4*cgroup.GiB)
 	viper.SetDefault("cpu_limit_percent", 50)
 	viper.SetDefault("use_cgroups", true)
+	viper.SetDefault("max_concurrent_processes", 50)
+	viper.SetDefault("process_aquire_timeout", time.Second*3)
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
@@ -52,6 +54,10 @@ func main() {
 			log.Fatalf("could not initialize cgroup: %s\n", err)
 		}
 		defer cgroup.Destroy()
+	}
+
+	if err := kddp.InitializeSemaphore(viper.GetInt64("max_concurrent_processes")); err != nil {
+		log.Fatalf("could not initialize semaphore: %s\n", err)
 	}
 
 	r := gin.Default()
