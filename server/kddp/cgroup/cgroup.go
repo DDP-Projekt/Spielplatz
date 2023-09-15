@@ -53,16 +53,25 @@ func Initialize(limit Limit) error {
 
 // destroys the cgroup
 func Destroy() error {
+	if cgroup == nil {
+		return errors.New("cgroup not initialized")
+	}
 	return cgroup.Delete()
 }
 
 var cgroup *cgroup2.Manager
 
 func Add(pid uint64) error {
+	if cgroup == nil {
+		return errors.New("cgroup not initialized")
+	}
 	log.Printf("adding %d to cgroup\n", pid)
 	return cgroup.AddProc(pid)
 }
 
 func Processes() ([]uint64, error) {
+	if cgroup == nil {
+		return nil, errors.New("cgroup not initialized")
+	}
 	return cgroup.Procs(true)
 }
