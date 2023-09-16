@@ -131,7 +131,7 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 });
 
 // connect to a websocket on the /ls endpoint
-const ls_socket = new WebSocket(`ws://${window.location.host}/ls`);
+const ls_socket = new WebSocket(`wss://${window.location.host}/ls`);
 ls_socket.onerror = (error) => {
 	console.error('WebSocket error:', error);
 };
@@ -358,7 +358,7 @@ function handleInitializeResponse(resp) {
 				const tokens = resp.result;
 				// if we are readOnly we only need to fetch the tokens once
 				// and can then close the websocket connection to safe resources on the server
-				if (readOnly) {
+				if (isReadOnly) {
 					cached_readonly_semantic_tokens = tokens;
 					ls_socket.close();
 				}
