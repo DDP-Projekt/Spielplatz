@@ -49,7 +49,7 @@ async function runProgram(code) {
 
 	console.log('requesting to run the program')
 	// connect to the /run endpoint using the websocket api with token as query parameter
-	run_ws = new WebSocket(`ws://${window.location.host}/run?token=${token}${argsString}`)
+	run_ws = new WebSocket(`wss://${window.location.host}/run?token=${token}${argsString}`)
 	if (!run_ws){
 		console.error('websocket (run) connection failed')
 		return;
