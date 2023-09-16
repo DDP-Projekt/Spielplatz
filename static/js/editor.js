@@ -131,7 +131,8 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 });
 
 // connect to a websocket on the /ls endpoint
-const ls_socket = new WebSocket(`wss://${window.location.host}/ls`);
+let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
+const ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/ls`);
 ls_socket.onerror = (error) => {
 	console.error('WebSocket error:', error);
 };
