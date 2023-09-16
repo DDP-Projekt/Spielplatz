@@ -1,12 +1,13 @@
 # Spielplatz
 
-Ein online-Spielplatz für [DDP](https://github.com/DDP-Projekt/Kompilierer).
+Ein online-Spielplatz um [DDP](https://github.com/DDP-Projekt/Kompilierer) auszuprobieren.\
+Erreichbar unter https://ddp.le0n.dev/Spielplatz
 
 Inspiriert von anderen Sprachen wie [Go](https://go.dev/play/), [Rust](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021) und [Dart](https://dartpad.dev/?).
 
 | dark mode | light mode |
 |---|---|
-|![showcase-dark](img/showcase-dark.png)|![showcase-light](img/showcase-light.png)|
+|![showcase-dark](static/img/showcase-dark.png)|![showcase-light](static/img/showcase-light.png)|
 
 ## Lokal Ausführen
 ### Vorraussetzungen
