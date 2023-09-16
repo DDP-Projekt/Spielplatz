@@ -29,6 +29,9 @@ func setup_config() {
 	viper.SetDefault("use_cgroups", true)
 	viper.SetDefault("max_concurrent_processes", 50)
 	viper.SetDefault("process_aquire_timeout", time.Second*3)
+	viper.SetDefault("useHTTPS", false)
+	viper.SetDefault("certPath", "")
+	viper.SetDefault("keyPath", "")
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
@@ -88,7 +91,14 @@ func main() {
 	r.GET("/run", serve_run)
 
 	// run the server
-	log.Fatal(r.Run(":" + viper.GetString("port")))
+	if viper.GetBool("useHTTPS") {
+		if viper.GetString("certPath") == "" || viper.GetString("keyPath") == "" {
+			log.Fatal("certPath and keyPath can not be empty!")
+		}
+		log.Fatal(r.RunTLS(":"+viper.GetString("port"), viper.GetString("certPath"), viper.GetString("keyPath")))
+	} else {
+		log.Fatal(r.Run(":" + viper.GetString("port")))
+	}
 }
 
 var upgrader = websocket.Upgrader{}

@@ -33,6 +33,9 @@ Die standart Konfigurationsdatei sieht so aus.
 	"cpu_limit_percent": 50,
 	"use_cgroups": true,
 	"max_concurrent_processes": 50,
-	"process_aquire_timeout": "3s"
+	"process_aquire_timeout": "3s",
+	"useHTTPS": false,
+	"certPath": "",
+	"keyPath": ""
 }
 ```
