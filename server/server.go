@@ -68,27 +68,29 @@ func main() {
 	// load html files as template
 	r.LoadHTMLGlob("static/html/*")
 
-	// serve node_modules/monaco-editor as /monaco-editor
-	r.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
-	// serve the static folder
-	r.StaticFS("/static", http.Dir("static"))
-	r.StaticFS("/img", http.Dir("img"))
+	g := r.Group("/Spielplatz")
 
-	r.GET("/", func(c *gin.Context) {
+	// serve node_modules/monaco-editor as /monaco-editor
+	g.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
+	// serve the static folder
+	g.StaticFS("/static", http.Dir("static"))
+	g.StaticFS("/img", http.Dir("img"))
+
+	g.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
-	r.GET("/embed", func(c *gin.Context) {
+	g.GET("/embed", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "embed.html", nil)
 	})
 
 	// websocket endpoint to connect to the language server
 	lslogging.Configure(1, nil)
-	r.GET("/ls", serve_ls)
+	g.GET("/ls", serve_ls)
 
 	// endpoint to compile a ddp program
-	r.POST("/compile", serve_compile)
-	r.GET("/run", serve_run)
+	g.POST("/compile", serve_compile)
+	g.GET("/run", serve_run)
 
 	// run the server
 	if viper.GetBool("useHTTPS") {

@@ -21,7 +21,7 @@ async function runProgram(code) {
 	compiling = true;
 	console.log('requesting to compile the program')
 	// send a request to the /compile endpoint using the fetch api
-	const compile_result = await fetch('/compile', {
+	const compile_result = await fetch('compile', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -50,7 +50,7 @@ async function runProgram(code) {
 	console.log('requesting to run the program')
 	// connect to the /run endpoint using the websocket api with token as query parameter
 	let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
-	run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/run?token=${token}${argsString}`)
+	run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/Spielplatz/run?token=${token}${argsString}`)
 	if (!run_ws){
 		console.error('websocket (run) connection failed')
 		return;
