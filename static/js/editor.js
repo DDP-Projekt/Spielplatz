@@ -131,7 +131,7 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 });
 
 // connect to a websocket on the /ls endpoint
-let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
+let ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
 const ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/Spielplatz/ls`);
 ls_socket.onerror = (error) => {
 	console.error('WebSocket error:', error);
@@ -307,6 +307,7 @@ const completion_kind_map = {
 };
 let semantic_tokens_lengend = {};
 let cached_readonly_semantic_tokens = null;
+let last_completion_request_timestamp = new Date().getTime();
 function handleInitializeResponse(resp) {
 	initialized = true;
 	console.log('initializeResult', resp)
@@ -411,6 +412,13 @@ function handleInitializeResponse(resp) {
 		monaco.languages.registerCompletionItemProvider('ddp', {
 			triggerCharacters: resp.result.capabilities.completionProvider.triggerCharacters,
 			provideCompletionItems: async (model, position, context, token) => {
+				// get the current time in milliseconds
+				const current_time = new Date().getTime();
+				// if the last completion request was less than 500ms ago, don't send another one
+				if (current_time - last_completion_request_timestamp < 500) {
+					return null;
+				}
+				last_completion_request_timestamp = current_time;
 				// send a language server protocol completion request
 				console.log('requesting completion for trigger character', context.triggerCharacter);
 				send({
@@ -527,6 +535,18 @@ function handleInitializeResponse(resp) {
 	}
 }
 
+let cached_changes = {
+	length: 0,
+	changes: [],
+};
+// update the language server every 250ms even if there was only a single change
+setInterval(() => {
+	if (cached_changes.changes.length > 0) {
+		doChangeRequest(cached_changes.changes);
+		cached_changes.length = 0;
+		cached_changes.changes = [];
+	}
+}, 250);
 if (!isReadOnly) {
 	// when the editor is changed, send a didChange notification to the language server
 	editor.onDidChangeModelContent((event) => {
@@ -534,36 +554,48 @@ if (!isReadOnly) {
 			return;
 		}
 
-		console.log('change', event.changes);
-		send({
-			method: 'textDocument/didChange',
-			params: {
-				textDocument: {
-					uri: file_uri.toString(),
-					version: 2,
-				},
-				contentChanges:
-					// map all event.changes to lsp changes
-					event.changes.map((change) => {
-						return {
-							range: {
-								start: {
-									line: change.range.startLineNumber - 1,
-									character: change.range.startColumn - 1,
-								},
-								end: {
-									line: change.range.endLineNumber - 1,
-									character: change.range.endColumn - 1,
-								},
-							},
-							rangeLength: change.rangeLength,
-							text: change.text,
-						};
-					}),
-			},
-		});
-		push_response_handler().then(discard_response);
+		cached_changes.length += event.changes.reduce((acc, change) => acc + change.text.length, 0);
+		cached_changes.changes.push(...event.changes);
+
+		// only update the language server immediately if there are more than 15 changes
+		if (cached_changes.length > 15) {
+			doChangeRequest(cached_changes.changes);
+			cached_changes.length = 0;
+			cached_changes.changes = [];
+		}
 	});
+}
+
+function doChangeRequest(changes) {
+	console.log('change', changes);
+	send({
+		method: 'textDocument/didChange',
+		params: {
+			textDocument: {
+				uri: file_uri.toString(),
+				version: 2,
+			},
+			contentChanges:
+				// map all changes to lsp changes
+				changes.map((change) => {
+					return {
+						range: {
+							start: {
+								line: change.range.startLineNumber - 1,
+								character: change.range.startColumn - 1,
+							},
+							end: {
+								line: change.range.endLineNumber - 1,
+								character: change.range.endColumn - 1,
+							},
+						},
+						rangeLength: change.rangeLength,
+						text: change.text,
+					};
+				}),
+		},
+	});
+	push_response_handler().then(discard_response);
 }
 
 // when the website is closed, send a shutdown request to the language server
