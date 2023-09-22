@@ -3,8 +3,9 @@ module github.com/DDP-Projekt/Spielplatz
 go 1.20
 
 require (
-	github.com/DDP-Projekt/DDPLS v0.0.0-20230919173733-e636ffe7d9a0
+	github.com/DDP-Projekt/DDPLS v0.0.0-20230922143657-37be49b4821a
 	github.com/containerd/cgroups/v3 v3.0.2
+	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/spf13/viper v1.16.0
@@ -14,7 +15,7 @@ require (
 )
 
 require (
-	github.com/DDP-Projekt/Kompilierer v0.0.1-pre.0.20230910165437-55021c335bab // indirect
+	github.com/DDP-Projekt/Kompilierer v0.0.8-pre.0.20230922160545-3f0d264c554e // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
@@ -62,11 +63,11 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.9.0 // indirect
+	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/term v0.8.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/term v0.11.0 // indirect
+	golang.org/x/text v0.12.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -3,3 +3,4 @@ playground_executables/
 config.json
 *.o
 Spielplatz
+*.prof

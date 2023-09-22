@@ -37,6 +37,7 @@ Die standart Konfigurationsdatei sieht so aus.
 	"process_aquire_timeout": "3s",
 	"useHTTPS": false,
 	"certPath": "",
-	"keyPath": ""
+	"keyPath": "",
+	"pprof": false,
 }
 ```

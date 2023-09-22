@@ -14,6 +14,7 @@ import (
 	"github.com/DDP-Projekt/Spielplatz/server/kddp"
 	"github.com/DDP-Projekt/Spielplatz/server/kddp/cgroup"
 	wsrw "github.com/DDP-Projekt/Spielplatz/server/websocket_rw"
+	gin_pprof "github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
@@ -32,6 +33,7 @@ func setup_config() {
 	viper.SetDefault("useHTTPS", false)
 	viper.SetDefault("certPath", "")
 	viper.SetDefault("keyPath", "")
+	viper.SetDefault("pprof", false)
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
@@ -91,6 +93,10 @@ func main() {
 	// endpoint to compile a ddp program
 	g.POST("/compile", serve_compile)
 	g.GET("/run", serve_run)
+
+	if viper.GetString("pprof") != "" {
+		gin_pprof.Register(r, "/Spielplatz/debug/pprof")
+	}
 
 	// run the server
 	if viper.GetBool("useHTTPS") {
