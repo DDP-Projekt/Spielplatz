@@ -17,8 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		window.localStorage.setItem("vertical", "false");
 	}
 
-	if (window.localStorage.getItem("content") === null) {
-		document.getElementById("example-select").value = "HalloWelt";
+	const exampleSelect = document.getElementById("example-select")
+	if (exampleSelect && window.localStorage.getItem("content") === null) {
+		exampleSelect.value = "HalloWelt";
 	}
 
 	const args = window.localStorage.getItem("args");
