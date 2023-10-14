@@ -19,7 +19,6 @@ async function runProgram(code) {
 	toggleBtnVisibility();
 
 	compiling = true;
-	console.log('requesting to compile the program')
 	// send a request to the /compile endpoint using the fetch api
 	const compile_result = await fetch('compile', {
 		method: 'POST',
@@ -30,7 +29,6 @@ async function runProgram(code) {
 	}).then(response => response.json())
 
 	if (compile_result.error) {
-		console.log('compile error')
 		pushOutputMessage("Kompilier Fehler: " + compile_result.error, MessageTarget.error);
 		pushOutputMessage(" ", MessageTarget.error);
 		pushOutputMessage(compile_result.stderr, MessageTarget.error);
@@ -47,7 +45,6 @@ async function runProgram(code) {
 		argsString += "&args=" + arg;
 	}
 
-	console.log('requesting to run the program')
 	// connect to the /run endpoint using the websocket api with token as query parameter
 	let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
 	run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/Spielplatz/run?token=${token}${argsString}`)
@@ -60,17 +57,16 @@ async function runProgram(code) {
 	document.getElementById('input').focus();
 
 	run_ws.onopen = () => {
-		console.log('websocket (run) connection opened')
+		//console.log('websocket (run) connection opened')
 	}
 
 	run_ws.onmessage = (event) => {
-		console.log(event);
 		let msg = JSON.parse(event.data)
 		pushOutputMessage(msg.msg, msg.isStderr ? MessageTarget.error : MessageTarget.output);
 	}
 
 	run_ws.onclose = (event) => {
-		console.log('websocket (run) connection closed: ', event)
+		//console.log('websocket (run) connection closed: ', event)
 		pushOutputMessage(" ", MessageTarget.system)
 		pushOutputMessage(event.reason, event.code !== 1000 ? MessageTarget.error : MessageTarget.system)
 		run_ws = null;
@@ -80,7 +76,7 @@ async function runProgram(code) {
 	}
 
 	run_ws.onerror = (error) => {
-		console.log('websocket (run) error')
+		console.error('websocket (run) error')
 		pushOutputMessage(error.data, 'stderr');
 
 		toggleBtnVisibility();
@@ -88,7 +84,6 @@ async function runProgram(code) {
 }
 
 function stopProgram() {
-	console.log("terminating connection");
 	if (!run_ws) {
 		return;
 	}

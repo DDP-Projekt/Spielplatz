@@ -173,7 +173,7 @@ function pull_response_handler() {
 }
 
 function discard_response(resp) {
-	console.log('discarding response', resp);
+	//console.log('discarding response', resp);
 }
 
 ls_socket.onmessage = (event) => {
@@ -193,7 +193,6 @@ ls_socket.onmessage = (event) => {
 
 	switch (msg.method) {
 		case 'textDocument/publishDiagnostics':
-			console.log('diagnostics');
 			// handle diagnostic messages
 			const diagnostics = msg.params.diagnostics;
 			const markers = [];
@@ -310,9 +309,7 @@ let cached_readonly_semantic_tokens = null;
 let last_completion_request_timestamp = new Date().getTime();
 function handleInitializeResponse(resp) {
 	initialized = true;
-	console.log('initializeResult', resp)
 
-	console.log('initialized')
 	// send a language server protocol initialized notification	
 	send({
 		method: 'initialized',
@@ -352,7 +349,6 @@ function handleInitializeResponse(resp) {
 				},
 			});
 			return push_response_handler().then((resp) => {
-				console.log('semantic tokens');
 				if (!resp.result) {
 					return null;
 				}
@@ -397,7 +393,6 @@ function handleInitializeResponse(resp) {
 					},
 				});
 				return push_response_handler().then((resp) => {
-					console.log('semantic tokens range');
 					if (!resp.result) {
 						return null;
 					}
@@ -409,6 +404,8 @@ function handleInitializeResponse(resp) {
 		});
 
 		// register a completion provider
+		// commented out for performance reasons and buggy behavior
+		/*
 		monaco.languages.registerCompletionItemProvider('ddp', {
 			triggerCharacters: resp.result.capabilities.completionProvider.triggerCharacters,
 			provideCompletionItems: async (model, position, context, token) => {
@@ -420,7 +417,7 @@ function handleInitializeResponse(resp) {
 				}
 				last_completion_request_timestamp = current_time;
 				// send a language server protocol completion request
-				console.log('requesting completion for trigger character', context.triggerCharacter);
+				//console.log('requesting completion for trigger character', context.triggerCharacter);
 				send({
 					method: 'textDocument/completion',
 					params: {
@@ -438,7 +435,6 @@ function handleInitializeResponse(resp) {
 					},
 				});
 				return push_response_handler().then((resp) => {
-					console.log('completion');
 					if (!resp.result) {
 						return null;
 					}
@@ -464,7 +460,7 @@ function handleInitializeResponse(resp) {
 					};
 				});
 			},
-		});
+		});*/
 
 		// register a hover provider
 		monaco.languages.registerHoverProvider('ddp', {
@@ -483,7 +479,6 @@ function handleInitializeResponse(resp) {
 					},
 				});
 				return push_response_handler().then((resp) => {
-					console.log('hover');
 					if (!resp.result) {
 						return null;
 					}
@@ -514,8 +509,6 @@ function handleInitializeResponse(resp) {
 					},
 				});
 				return push_response_handler().then((resp) => {
-					console.log('definition');
-
 					// handle definition response
 					if (!resp.result) {
 						return null;
@@ -567,7 +560,6 @@ if (!isReadOnly) {
 }
 
 function doChangeRequest(changes) {
-	console.log('change', changes);
 	send({
 		method: 'textDocument/didChange',
 		params: {
