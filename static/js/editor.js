@@ -69,7 +69,11 @@ const editor = monaco.editor.create(editorDiv, {
 	model: monaco.editor.createModel(value, 'ddp', file_uri),
 	minimap: { enabled: minimapEnabled },
 	readOnly: isReadOnly,
-	lineNumbers: !urlParams.has("nolines")
+	lineNumbers: !urlParams.has("nolines"),
+	scrollbar: {
+		vertical: urlParams.has("noscroll") ? "hidden" : undefined,	
+		handleMouseWheel: !urlParams.has("noscroll")
+	}
 });
 
 new ResizeObserver(function (mutations) {
