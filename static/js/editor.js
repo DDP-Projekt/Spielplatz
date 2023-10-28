@@ -109,7 +109,6 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 			{ include: '@whitespace' },
 			[/(ist\s+in\s+)("[\s\S]+")(\s+definiert)/, ['keyword', 'string', 'keyword']],
 			[/([Uu]nd\s+kann\s+so\s+benutzt\s+werden)/, 'keyword.control.ddp'],
-			[/"[\S\s]*"/, 'string'],
 			[/(Der\s+)(Alias\s+)("[\s\S]+")(\s+steht\s+für\s+die\s+Funktion\s+)([\wäöüÄÖÜ]+)/, ['keyword', 'type', 'string', 'keyword', 'function']],
 			[/\b((Zahl)|(Kommazahl)|(Boolean)|(Buchstabe[n]?)|(Text)|(Zahlen Liste)|(Kommazahlen Liste)|(Boolean Liste)|(Buchstaben Liste)|(Text Liste)|(Zahlen Referenz)|(Kommazahlen Referenz)|(Boolean Referenz)|(Buchstaben Referenz)|(Text Referenz)|(Zahlen Listen Referenz)|(Kommazahlen Listen Referenz)|(Boolean Listen Referenz)|(Buchstaben Listen Referenz)|(Text Listen Referenz)|(nichts))\b/, 'type.identifier'],
 			[/\b(([Ww]enn)|(dann)|([Ss]onst)|(aber)|([Ff](ü|(ue))r)|(jede[n]?)|(in)|([Ss]olange)|([Mm]ach(e|t))|(zur(ü|(ue))ck)|([Gg]ibt?)|([Vv]erlasse die Funktion)|(von)|(vom)|(bis)|(jede)|(jeder)|(Schrittgr(ö|(oe))(ß|(ss))e))|(Mal)|([Ww]iederhole)|((ö|(oe))ffentliche)\b/, 'keyword.control.ddp'],
@@ -125,6 +124,10 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 			[/\[/, 'comment', '@push'],    // nested comment
 			[/\]/, 'comment', '@pop'],
 			[/[\]*]/, 'comment']
+		],
+		string: [
+			[/[^"]+/, 'string'],
+			[/"/, { token: 'string.quote', bracket: '@close', next: '@pop' } ]
 		],
 		whitespace: [
 			[/[ \t\r\n]+/, 'white'],
