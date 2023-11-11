@@ -9,7 +9,7 @@ RUN apt-get install -y libseccomp-dev
 # install ddp
 ARG ddppath
 ENV DDPPATH=/app/DDP
-ENV PATH=/app/DDP:${PATH}
+ENV PATH=/app/DDP/bin:${PATH}
 ADD ${ddppath} /app/DDP
 
 # clone the repo
