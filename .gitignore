@@ -6,3 +6,4 @@ Spielplatz
 *.prof
 seccomp_exec
 DDP.tar.gz
+*.pem

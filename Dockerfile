@@ -16,7 +16,13 @@ ADD ${ddppath} /app/DDP
 RUN git clone https://github.com/DDP-Projekt/Spielplatz.git
 WORKDIR /app/Spielplatz
 RUN npm install
+
+# clone the config
 COPY config.json ./
+ARG certpath
+ARG keypath
+COPY ${certpath} ./
+COPY ${keypath} ./
 
 # run the app
 EXPOSE 8001
