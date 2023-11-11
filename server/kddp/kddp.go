@@ -14,7 +14,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/DDP-Projekt/Spielplatz/server/kddp/cgroup"
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/constraints"
@@ -119,12 +118,6 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 
 	if err := cmd.Start(); err != nil {
 		return -1, err
-	}
-
-	if viper.GetBool("use_cgroup") {
-		if err := cgroup.Add(uint64(cmd.Process.Pid)); err != nil {
-			return -1, errors.Join(errors.New("could not add process to cgroup"), err)
-		}
 	}
 
 	done := make(chan error)

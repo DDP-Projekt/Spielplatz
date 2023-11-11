@@ -12,7 +12,6 @@ import (
 	"github.com/DDP-Projekt/DDPLS/ddpls"
 	executables "github.com/DDP-Projekt/Spielplatz/server/execs_manager"
 	"github.com/DDP-Projekt/Spielplatz/server/kddp"
-	"github.com/DDP-Projekt/Spielplatz/server/kddp/cgroup"
 	wsrw "github.com/DDP-Projekt/Spielplatz/server/websocket_rw"
 	gin_pprof "github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
@@ -25,9 +24,8 @@ func setup_config() {
 	viper.SetDefault("exe_cache_duration", time.Second*60)
 	viper.SetDefault("run_timeout", time.Second*60)
 	viper.SetDefault("port", "8080")
-	viper.SetDefault("memory_limit_bytes", 4*cgroup.GiB)
+	viper.SetDefault("memory_limit_bytes", 4*(2<<29)) // 4 GiB
 	viper.SetDefault("cpu_limit_percent", 50)
-	viper.SetDefault("use_cgroups", true)
 	viper.SetDefault("max_concurrent_processes", 50)
 	viper.SetDefault("process_aquire_timeout", time.Second*3)
 	viper.SetDefault("useHTTPS", false)
@@ -50,16 +48,6 @@ func setup_config() {
 
 func main() {
 	setup_config()
-
-	if viper.GetBool("use_cgroups") {
-		if err := cgroup.Initialize(cgroup.Limit{
-			Memory: viper.GetInt64("memory_limit_bytes"),
-			CPU:    viper.GetUint64("cpu_limit_percent"),
-		}); err != nil {
-			log.Fatalf("could not initialize cgroup: %s\n", err)
-		}
-		defer cgroup.Destroy()
-	}
 
 	if err := kddp.InitializeSemaphore(viper.GetInt64("max_concurrent_processes")); err != nil {
 		log.Fatalf("could not initialize semaphore: %s\n", err)
