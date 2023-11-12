@@ -53,7 +53,8 @@ func main() {
 		log.Fatalf("could not initialize semaphore: %s\n", err)
 	}
 
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
 
 	// load html files as template
 	r.LoadHTMLGlob("static/html/*")
