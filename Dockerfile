@@ -27,4 +27,4 @@ COPY ${keypath} ./
 # run the app
 ENV GIN_MODE=release
 EXPOSE 8001
-CMD make && ./run.sh
+CMD git pull origin main && ./run.sh

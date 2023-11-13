@@ -13,14 +13,15 @@ seccomp_main.o: $(BIN_DIR)seccomp_main.c
 seccomp_exec: $(BIN_DIR)seccomp_exec.c
 	$(CC) $(CFLAGS) $< -o $@ -lseccomp
 
-all: seccomp_main.o seccomp_exec
+all: seccomp_main.o seccomp_exec node_modules install-dependencies
 	go build -o Spielplatz ./server
 
 clean:
 	rm -f seccomp_main.o seccomp_exec Spielplatz
+	rm -rf ./node_modules
 
 node_modules:
 	npm install
 
 install-dependencies: node_modules
-	sudo apt-get install libseccomp-dev
+	apt-get install libseccomp-dev
