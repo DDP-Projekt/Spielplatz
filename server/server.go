@@ -88,6 +88,7 @@ func main() {
 	}
 
 	// run the server
+	log.Println("starting server")
 	if viper.GetBool("useHTTPS") {
 		if viper.GetString("certPath") == "" || viper.GetString("keyPath") == "" {
 			log.Fatal("certPath and keyPath can not be empty!")
