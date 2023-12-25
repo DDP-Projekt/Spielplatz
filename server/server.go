@@ -17,7 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
-	lslogging "github.com/tliron/kutil/logging"
+	lslogging "github.com/tliron/commonlog"
 )
 
 func setup_config() {
