@@ -1,21 +1,43 @@
 FROM golang:1.21
-WORKDIR /app
+WORKDIR /
 
 # install dependencies
-RUN apt-get update && apt-get install -y git npm
-RUN apt-get install -y build-essential
-RUN apt-get install -y libseccomp-dev
+RUN apt-get update && apt-get install -y git \
+    npm \
+    build-essential \
+    libseccomp-dev \
+    locales
+
+RUN echo "de_DE.UTF-8 UTF-8" > /etc/locale.gen
+RUN echo "LANG=de_DE.UTF-8" > /etc/default/locale
+RUN locale-gen de_DE.UTF-8
+
+# install llvm
+WORKDIR /llvm
+ARG llvm_url
+RUN wget ${llvm_url}
+RUN tar -xvf *.tar.* -C ./ --strip-components 1
+RUN rm *.tar.*
+ENV PATH=/llvm/bin:${PATH}
+
+# clone the Kompilierer repo
+WORKDIR /
+RUN git clone https://github.com/DDP-Projekt/Kompilierer.git
+ENV DDPPATH=/Kompilierer/build/DDP
+ENV PATH=/Kompilierer/build/DDP/bin:${PATH}
 
 # install ddp
-ARG ddppath
-ENV DDPPATH=/app/DDP
-ENV PATH=/app/DDP/bin:${PATH}
-ADD ${ddppath} /app/DDP
+WORKDIR /Kompilierer
+RUN go mod tidy
+RUN make LLVM_CONFIG=llvm-config
+RUN make test
 
 # clone the repo
+WORKDIR /app
 RUN git clone https://github.com/DDP-Projekt/Spielplatz.git
 WORKDIR /app/Spielplatz
 RUN npm install
+RUN go mod tidy
 
 # clone the config
 COPY config.json ./
@@ -24,7 +46,18 @@ ARG keypath
 COPY ${certpath} ./
 COPY ${keypath} ./
 
+# configure git to use https instead of ssh
+RUN git config --global url."https://github.com/".insteadOf git@github.com:
+RUN git config --global url."https://".insteadOf git://
+
 # run the app
 ENV GIN_MODE=release
 EXPOSE 8001
-CMD git pull origin main && ./run.sh
+CMD  cd /Kompilierer && \
+    git pull origin master && \
+    go mod tidy && \
+    make LLVM_CONFIG=llvm-config && \
+    cd /app/Spielplatz && \
+    git pull origin main && \
+    go mod tidy && \
+    ./run.sh
