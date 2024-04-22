@@ -6,7 +6,11 @@ RUN apt-get update && apt-get install -y git \
     npm \
     build-essential \
     libseccomp-dev \
-    locales
+    locales \
+	libncurses5 \
+	libz-dev \
+	libtinfo-dev \
+	libxml2-dev
 
 RUN echo "de_DE.UTF-8 UTF-8" > /etc/locale.gen
 RUN echo "LANG=de_DE.UTF-8" > /etc/default/locale
