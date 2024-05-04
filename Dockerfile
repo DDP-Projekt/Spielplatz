@@ -3,10 +3,11 @@ WORKDIR /
 
 # install dependencies
 RUN apt-get update && apt-get install -y git \
-    npm \
-    build-essential \
-    libseccomp-dev \
-    locales \
+	npm \
+	build-essential \
+	libseccomp-dev \
+	libpcre2-dev \
+	locales \
 	libncurses5 \
 	libz-dev \
 	libtinfo-dev \
@@ -57,10 +58,10 @@ RUN git config --global url."https://".insteadOf git://
 ENV GIN_MODE=release
 EXPOSE 8001
 CMD  cd /Kompilierer && \
-    git pull origin master && \
-    go mod tidy && \
-    make LLVM_CONFIG=llvm-config && \
-    cd /app/Spielplatz && \
-    git pull origin main && \
-    go mod tidy && \
-    ./run.sh
+	git pull origin master && \
+	go mod tidy && \
+	make LLVM_CONFIG=llvm-config && \
+	cd /app/Spielplatz && \
+	git pull origin main && \
+	go mod tidy && \
+	./run.sh
