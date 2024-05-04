@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	github.com/DDP-Projekt/DDPLS v0.2.0
+	github.com/DDP-Projekt/DDPLS v0.2.1-0.20240503164353-ce2702239447
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gorilla/websocket v1.5.1
@@ -16,7 +16,7 @@ require (
 )
 
 require (
-	github.com/DDP-Projekt/Kompilierer v0.2.0-alpha // indirect
+	github.com/DDP-Projekt/Kompilierer v0.2.0-alpha.0.20240427065541-8b31e87740a0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
@@ -54,21 +54,19 @@ require (
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/tliron/glsp v0.2.1 // indirect
+	github.com/tliron/glsp v0.2.2-0.20240309182338-ab78d718ad7d // indirect
 	github.com/tliron/kutil v0.3.13 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.17.0 // indirect
-	golang.org/x/net v0.19.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/tliron/glsp => github.com/bafto/glsp v0.1.2-0.20230806091905-942e1aee0810

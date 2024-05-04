@@ -1,4 +1,4 @@
-FROM golang:1.21
+FROM golang:1.22.2
 WORKDIR /
 
 # install dependencies
@@ -62,6 +62,7 @@ CMD  cd /Kompilierer && \
     go mod tidy && \
     make LLVM_CONFIG=llvm-config && \
     cd /app/Spielplatz && \
-    git pull origin main && \
+	git switch docker && \
+    git pull origin docker && \
     go mod tidy && \
     ./run.sh
