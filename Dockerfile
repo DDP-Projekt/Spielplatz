@@ -27,7 +27,7 @@ ENV PATH=/llvm/bin:${PATH}
 
 # clone the Kompilierer repo
 WORKDIR /
-RUN git clone https://github.com/DDP-Projekt/Kompilierer.git
+RUN git clone https://github.com/DDP-Projekt/Kompilierer.git --depth=1
 ENV DDPPATH=/Kompilierer/build/DDP
 ENV PATH=/Kompilierer/build/DDP/bin:${PATH}
 
@@ -38,7 +38,7 @@ RUN make LLVM_CONFIG=llvm-config
 
 # clone the repo
 WORKDIR /app
-RUN git clone https://github.com/DDP-Projekt/Spielplatz.git
+RUN git clone https://github.com/DDP-Projekt/Spielplatz.git --depth=1
 WORKDIR /app/Spielplatz
 RUN npm install
 RUN go mod tidy
