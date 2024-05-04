@@ -61,7 +61,6 @@ CMD  cd /Kompilierer && \
     go mod tidy && \
     make LLVM_CONFIG=llvm-config && \
     cd /app/Spielplatz && \
-	git switch docker && \
-    git pull origin docker && \
+    git pull origin main && \
     go mod tidy && \
     ./run.sh
