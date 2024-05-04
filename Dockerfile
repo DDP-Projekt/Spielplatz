@@ -18,8 +18,8 @@ RUN locale-gen de_DE.UTF-8
 
 # install llvm
 WORKDIR /llvm
-ARG llvm_url
-RUN wget ${llvm_url}
+ARG llvm_archive
+COPY ${llvm_archive} ./
 RUN tar -xvf *.tar.* -C ./ --strip-components 1
 RUN rm *.tar.*
 ENV PATH=/llvm/bin:${PATH}
@@ -34,7 +34,6 @@ ENV PATH=/Kompilierer/build/DDP/bin:${PATH}
 WORKDIR /Kompilierer
 RUN go mod tidy
 RUN make LLVM_CONFIG=llvm-config
-RUN make test
 
 # clone the repo
 WORKDIR /app

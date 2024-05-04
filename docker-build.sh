@@ -11,5 +11,5 @@ elif [ $# -eq 3 ] ; then
 	cp $3 $key_path
 	docker build --build-arg llvm_url=$llvm_url --build-arg certpath=$cert_path --build-arg keypath=$key_path --tag ddp-spielplatz .
 else
-	echo "Usage: docker-build.sh <llvm_url> [cert_path key_path]"
+	echo "Usage: docker-build.sh <llvm-archive-path> [cert-path key-path]"
 fi

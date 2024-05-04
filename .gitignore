@@ -5,5 +5,5 @@ config.json
 Spielplatz
 *.prof
 seccomp_exec
-DDP.tar.gz
+*.tar.*
 *.pem
