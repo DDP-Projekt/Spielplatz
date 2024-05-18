@@ -62,6 +62,6 @@ Die standart Konfigurationsdatei sieht so aus.
 	"useHTTPS": false,
 	"certPath": "",
 	"keyPath": "",
-	"pprof": false,
+	"pprof": false
 }
 ```
