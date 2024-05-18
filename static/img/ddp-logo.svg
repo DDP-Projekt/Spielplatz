@@ -32,8 +32,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="0.6889353"
-     inkscape:cx="259.09545"
-     inkscape:cy="292.48029"
+     inkscape:cx="259.82121"
+     inkscape:cy="292.4803"
      inkscape:window-width="1128"
      inkscape:window-height="694"
      inkscape:window-x="0"
@@ -84,42 +84,25 @@
        height="160"
        x="0"
        y="176" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:166.36px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#002b36;fill-opacity:1;stroke-width:0.99999999;stroke-dasharray:none"
-       x="83.512733"
-       y="308.8605"
+    <path
+       d="m 196.97025,248.30546 q 0,30.11116 -17.13508,45.41628 -16.96872,15.13876 -47.74532,15.13876 H 98.485134 V 190.07946 h 37.264636 q 18.63232,0 32.27384,6.6544 13.80788,6.6544 21.29408,19.63048 7.65256,12.80972 7.65256,31.94112 z m -26.11852,0.66544 q 0,-19.79684 -8.65072,-28.94664 -8.65072,-9.31616 -25.12036,-9.31616 h -13.47516 v 77.3574 h 10.8134 q 36.43284,0 36.43284,-39.0946 z"
        id="textD1"
-       transform="scale(0.97476643,1.0258868)"><tspan
-         sodipodi:role="line"
-         id="tspan22"
-         x="83.512733"
-         y="308.8605"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:166.36px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.99999999;stroke-dasharray:none">D</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:166.36px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#002b36;fill-opacity:1;stroke-width:1;stroke-dasharray:none"
-       x="198.41226"
-       y="308.86032"
+       style="font-weight:bold;font-size:166.36px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Bold';fill:#002b36"
+       transform="scale(0.97476643,1.0258868)"
+       aria-label="D" />
+    <path
+       d="m 311.86978,248.30528 c 0,20.07411 -5.71169,35.21287 -17.13508,45.41628 -5.73685,5.11817 -12.65739,8.93857 -20.76162,11.46118 -7.87648,2.45172 -16.87104,3.67758 -26.9837,3.67758 H 213.38466 V 190.07928 h 37.26464 c 12.42155,0 23.17949,2.21813 32.27384,6.6544 9.20525,4.43627 16.30328,10.97976 21.29408,19.63048 5.10171,8.53981 7.65256,19.18685 7.65256,31.94112 z m -26.11852,0.66544 c 0,-13.19789 -2.88357,-22.84677 -8.65072,-28.94664 -5.76715,-6.21077 -14.1406,-9.31616 -25.12036,-9.31616 h -13.47516 v 77.3574 h 10.8134 c 24.28856,0 36.43284,-13.03153 36.43284,-39.0946 z"
        id="textD2"
-       transform="scale(0.97476557,1.0258877)"><tspan
-         sodipodi:role="line"
-         id="tspan22-4"
-         x="198.41226"
-         y="308.86032"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:166.36px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:1;stroke-dasharray:none">D</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:167.979px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#002b36;fill-opacity:1;stroke-width:0.99999998;stroke-dasharray:none"
-       x="317.15631"
-       y="311.86551"
+       style="font-weight:bold;font-size:166.36px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Bold';fill:#002b36"
+       transform="scale(0.97476557,1.0258877)"
+       aria-label="D"
+       sodipodi:nodetypes="scssccsccsscsccss" />
+    <path
+       d="m 370.57363,191.9285 q 23.18111,0 33.76378,10.07874 10.75066,9.91076 10.75066,27.38058 0,10.4147 -4.36745,19.65354 -4.36746,9.07087 -14.61418,14.61417 -10.07874,5.54331 -27.54855,5.54331 h -10.91864 v 42.66667 H 332.27442 V 191.9285 Z m -1.34383,20.8294 h -11.59055 v 35.61155 h 8.39895 q 10.75066,0 16.96588,-4.19948 6.3832,-4.36745 6.3832,-13.94226 0,-17.46981 -20.15748,-17.46981 z"
        id="textP"
-       transform="scale(0.98424997,1.0160021)"><tspan
-         sodipodi:role="line"
-         id="tspan26"
-         x="317.15631"
-         y="311.86551"
-         style="stroke-width:0.99999998;stroke-dasharray:none">P</tspan></text>
+       style="font-weight:bold;font-size:167.979px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Bold';fill:#002b36"
+       transform="scale(0.98424997,1.0160021)"
+       aria-label="P" />
   </g>
   <metadata
      id="metadata26">
