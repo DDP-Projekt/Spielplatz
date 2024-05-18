@@ -24,7 +24,7 @@
 		<link id="dark" rel="stylesheet" href="static/css/dark-mode.css" media="all">
 		<link id="light" rel="stylesheet" href="static/css/light-mode.css" media="not all">
 
-		<script>var minimapEnabled = true;</script>
+		<script>var embedded = false;</script>
 		<script defer>
 			var require = { paths: { vs: 'monaco-editor/min/vs' } };
 		</script>
@@ -50,7 +50,7 @@
 						<input id="args" type="text" name="args" autocomplete="off"></input>
 					</div>
 					<div class="controls1">
-						<label for="example-select">Example:</label>
+						<label for="example-select">Beispiele:</label>
 						<select id="example-select" onchange="loadExample(this.value)">
 							<option value=""></option>
 							<option value="HalloWelt">Hallo Welt</option>
