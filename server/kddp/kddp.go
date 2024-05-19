@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,12 +20,17 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
+func fatal(msg string, args ...any) {
+	slog.Log(context.Background(), slog.LevelError+4, msg, args...)
+	panic(fmt.Errorf(msg))
+}
+
 func init() {
 	if _, err := exec.LookPath("kddp"); err != nil {
-		log.Fatalf("kddp not found: %s", err)
+		fatal("kddp not found", "err", err)
 	}
 	if _, ok := os.LookupEnv("DDPPATH"); !ok {
-		log.Println("DDPPATH not set, kddp might not work correctly")
+		slog.Warn("DDPPATH not set, kddp might not work correctly")
 	}
 }
 
@@ -57,7 +62,7 @@ type ProgramResult[TokenType tokenType] struct {
 // compiles a DDP program and returns the result of the compilation,
 // the path to the executable,
 // and an error if one occurred
-func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType, exe_path string) (ProgramResult[TokenType], string, error) {
+func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType, exe_path string, logger *slog.Logger) (ProgramResult[TokenType], string, error) {
 	cmd := exec.Command("kddp", "kompiliere", "-o", exe_path, "--main", "seccomp_main.o", "--gcc_optionen=-lseccomp -static -no-pie")
 	cmd.Stdin = src
 	stderr := &strings.Builder{}
@@ -70,7 +75,7 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType, exe_
 		// delete exe_path if it exists
 		if _, err := os.Stat(exe_path); err == nil {
 			if err := os.Remove(exe_path); err != nil {
-				log.Printf("could not delete executable: %s\n", err)
+				logger.Warn("failed to delete executable after error", "err", err)
 			}
 		}
 		err_string = new(string)
@@ -87,11 +92,11 @@ func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType, exe_
 }
 
 // runs an executable and returns the result of the execution
-func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args ...string) (int, error) {
+func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, args []string, logger *slog.Logger) (int, error) {
 	if proc_sem != nil {
 		sem_ctx, sem_cancel := context.WithTimeout(context.Background(), viper.GetDuration("process_aquire_timeout"))
+		defer sem_cancel()
 		if err := proc_sem.Acquire(sem_ctx, 1); err != nil {
-			sem_cancel()
 			return -1, errors.Join(errors.New("Der Server ist momentan ausgelastet, versuchen sie es später erneut"), err)
 		}
 		defer proc_sem.Release(1)
@@ -103,8 +108,10 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	var err error
 	exe_path, err = filepath.Abs(exe_path)
 	if err != nil {
-		return -1, err
+		logger.Error("failed to get absolute path to executable", "err", err)
+		return -1, fmt.Errorf("error getting absoulte path to executable: %w", err)
 	}
+	logger = logger.With("exe_path", exe_path)
 
 	args = append([]string{exe_path}, args...)
 
@@ -113,11 +120,13 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	cmd.Stdout = stdout
 	stdin_pipe, err := cmd.StdinPipe()
 	if err != nil {
-		return -1, err
+		logger.Error("failed to create stdin pipe", "err", err)
+		return -1, fmt.Errorf("error creating stdin pipe: %w", err)
 	}
 
 	if err := cmd.Start(); err != nil {
-		return -1, err
+		logger.Error("failed to start executable", "err", err)
+		return -1, fmt.Errorf("error starting executable: %w", err)
 	}
 
 	done := make(chan error)
@@ -128,7 +137,7 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 
 	go func() {
 		if _, err := io.Copy(stdin_pipe, stdin); err != nil && !websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-			log.Printf("error copying stdin to process: %s\n", err)
+			logger.Info("error copying stdin to process", "err", err)
 			cancel()
 		}
 		stdin_pipe.Close()
@@ -138,9 +147,11 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	if cerr := ctx.Err(); cerr != nil {
 		switch cerr {
 		case context.DeadlineExceeded:
+			logger.Info("deadline exceeded")
 			err = errors.New("Das Programm hat die Frist überschritten")
 		case context.Canceled:
-			err = fmt.Errorf("Das Programm wurde abgebrochen: %s", cerr.Error())
+			logger.Info("program cancelled")
+			err = fmt.Errorf("Das Programm wurde abgebrochen: %w", cerr.Error())
 		default:
 			err = cerr
 		}

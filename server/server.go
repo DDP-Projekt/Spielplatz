@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -22,7 +23,13 @@ import (
 )
 
 func fatal(msg string, args ...any) {
-	slog.Log(context.Background(), slog.LevelError+4, msg, args...)
+	// see https://pkg.go.dev/log/slog#example-package-Wrapping
+	var pcs [1]uintptr
+	runtime.Callers(2, pcs[:]) // skip [Callers, fatal]
+	r := slog.NewRecord(time.Now(), slog.LevelInfo+4, msg, pcs[0])
+	r.Add(args...)
+
+	slog.Default().Handler().Handle(context.Background(), r)
 	panic(fmt.Errorf(msg))
 }
 
@@ -176,8 +183,9 @@ func serve_compile(c *gin.Context) {
 	}
 
 	src_code := bytes.NewBufferString(req.Src)
+	logger.Info("compiling the program")
 	// compile the program
-	result, exe_path, err := kddp.CompileDDPProgram(src_code, token, exe_path)
+	result, exe_path, err := kddp.CompileDDPProgram(src_code, token, exe_path, logger)
 	if err != nil {
 		logger.Error("compiling program", "err", err)
 		executables.Delete(token)
@@ -246,7 +254,8 @@ func serve_run(c *gin.Context) {
 	// run the executable
 	defer executables.RemoveExecutableFile(token, exe_path)
 
-	exitStatus, err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw.StdoutWriter(), websocket_rw.StderrWriter(), args...)
+	logger.Info("running executable")
+	exitStatus, err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw.StdoutWriter(), websocket_rw.StderrWriter(), args, logger)
 	if err != nil {
 		logger.Error("failed to run executable", "err", err)
 		websocket_rw.Close()
@@ -254,6 +263,7 @@ func serve_run(c *gin.Context) {
 		ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, err.Error()))
 		return
 	}
+	logger.Info("executable ran successfully")
 	websocket_rw.Close()
 	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("Das Programm wurde mit Code %d beendet", exitStatus)))
 }

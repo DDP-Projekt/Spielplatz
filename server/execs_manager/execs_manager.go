@@ -6,6 +6,7 @@ package execsmanager
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -17,8 +18,10 @@ import (
 
 type TokenType int64
 
-var tokenGenerator = rand.NewSource(time.Now().UnixNano())
-var executables = syncmap.NewSyncMap[TokenType, string]()
+var (
+	tokenGenerator = rand.NewSource(time.Now().UnixNano())
+	executables    = syncmap.NewSyncMap[TokenType, string]()
+)
 
 func Get(token TokenType) (string, bool) {
 	return executables.Get(token)
@@ -34,9 +37,9 @@ func Delete(token TokenType) {
 
 func RemoveExecutableFile(token TokenType, exe_path string) {
 	if _, ok := executables.Get(token); ok {
-		log.Printf("deleting %s\n", exe_path)
+		slog.Info("deleting executable", "executable", exe_path)
 		if err := os.Remove(exe_path); err != nil {
-			log.Printf("could not delete executable: %s\n", err)
+			slog.Warn("failed to delete executable", "err", err, "executable", exe_path)
 		}
 		executables.Delete(token)
 	}
