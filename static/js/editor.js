@@ -6,6 +6,7 @@ monaco.editor.defineTheme('ddp-theme-dark', {
 	colors: {},
 	rules: [
 		{ token: 'keyword.control', foreground: 'C586C0' },
+		{ token: 'string.invalid', foreground: 'F44640' },
 		{ token: 'string.escape', foreground: 'D7BA7D' },
 		{ token: 'keyword.controlFlow', foreground: 'C586C0' },
 		{ token: 'variable', foreground: '9CDCFE' },
@@ -25,6 +26,7 @@ monaco.editor.defineTheme('ddp-theme-light', {
 	colors: {},
 	rules: [
 		{ token: 'keyword.control', foreground: 'AF00DB' },
+		{ token: 'string.invalid', foreground: 'F44640' },
 		{ token: 'string.escape', foreground: 'D7BA7D' },
 		{ token: 'keyword.controlFlow', foreground: 'AF00DB' },
 		{ token: 'variable', foreground: '0070C1' },
@@ -40,7 +42,7 @@ monaco.editor.defineTheme('ddp-theme-light', {
 
 let value = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
 const initialContent = window.localStorage.getItem("content");
-if (initialContent !== null) {
+if (initialContent !== null && !embedded) {
 	value = initialContent;
 }
 
@@ -67,7 +69,7 @@ const editor = monaco.editor.create(editorDiv, {
 	'semanticHighlighting.enabled': true,
 	//automaticLayout: true,
 	model: monaco.editor.createModel(value, 'ddp', file_uri),
-	minimap: { enabled: minimapEnabled },
+	minimap: { enabled: !embedded },
 	readOnly: isReadOnly,
 	lineNumbers: !urlParams.has("nolines"),
 	scrollbar: {
@@ -103,21 +105,39 @@ monaco.languages.setLanguageConfiguration('ddp', {
 //https://raw.githubusercontent.com/DDP-Projekt/vscode-ddp/main/syntaxes/ddp.tmLanguage.json
 
 monaco.languages.setMonarchTokensProvider('ddp', {
+	escapes: /\\(?:[nrbta\\"'])/,
+
 	tokenizer: {
 		root: [
 			// whitespace
 			{ include: '@whitespace' },
+			
+			// functions
 			[/(ist\s+in\s+)("[\s\S]+")(\s+definiert)/, ['keyword', 'string', 'keyword']],
-			[/([Uu]nd\s+kann\s+so\s+benutzt\s+werden)/, 'keyword.control.ddp'],
+			[/([Uu]nd\s+kann\s+so\s+benutzt\s+werden)/, 'keyword.control.ddp'],	
 			[/(Der\s+)(Alias\s+)("[\s\S]+")(\s+steht\s+für\s+die\s+Funktion\s+)([\wäöüÄÖÜ]+)/, ['keyword', 'type', 'string', 'keyword', 'function']],
+			
+			// types
 			[/\b((Zahl)|(Kommazahl)|(Boolean)|(Buchstabe[n]?)|(Text)|(Zahlen Liste)|(Kommazahlen Liste)|(Boolean Liste)|(Buchstaben Liste)|(Text Liste)|(Zahlen Referenz)|(Kommazahlen Referenz)|(Boolean Referenz)|(Buchstaben Referenz)|(Text Referenz)|(Zahlen Listen Referenz)|(Kommazahlen Listen Referenz)|(Boolean Listen Referenz)|(Buchstaben Listen Referenz)|(Text Listen Referenz)|(nichts))\b/, 'type.identifier'],
+			
+			// Keywords
 			[/\b(([Ww]enn)|(dann)|([Ss]onst)|(aber)|([Ff](ü|(ue))r)|(jede[n]?)|(in)|([Ss]olange)|([Mm]ach(e|t))|(zur(ü|(ue))ck)|([Gg]ibt?)|([Vv]erlasse die Funktion)|(von)|(vom)|(bis)|(jede)|(jeder)|(Schrittgr(ö|(oe))(ß|(ss))e))|(Mal)|([Ww]iederhole)|((ö|(oe))ffentliche)\b/, 'keyword.control.ddp'],
 			[/\b([Dd]er)|([Dd]ie)|([Dd]as)|(de[mn])|(ist)|(an)|(Stelle)|([Ss]peichere das Ergebnis von)|([Ss]peichere)|(einer)|(einen?)|(leere[n]?)|(Liste)|(aus)|(besteht)|(Funktion)|(mit)|(Parameter[n]?)|(Typ)\b/, 'keyword.other.ddp'],
+			
+			// constants
 			[/(wahr)|(falsch)/, 'constant'],
+			
+			// Operatoren
 			[/\b((oder)|(und)|(nicht)|(plus)|(minus)|(mal)|(durch)|(modulo)|(hoch)|(Wurzel)|(logisch)|(kontra)|(gleich)|(ungleich)|(kleiner)|(größer)|(groesser)|(als)|(Logarithmus)|(Betrag)|(Länge)|(Laenge)|(Größe)|(Groesse)|(um)|(Bit)|(verschoben)|(nach)|(links)|(rechts)|(zur)|(Basis)|(verkettet mit)|([Vv]erringere)|([Ee]rhöhe)|([Ee]rhoehe)|([Tt]eile)|([Vv]ervielfache)|([Ss]ubtrahiere)|([Aa]ddiere)|([Mm]ultipliziere)|([Dd]ividiere)|([Nn]egiere))\b/, 'keyword.operator'],
+			
+			// Einbinden
 			[/Binde\s+("[\s\S]*")\s+ein/, 'keyword.ddp'],
 			[/(Binde\s+)([\wäöüÄÖÜ]+)(\s+aus\s+)("[\s\S]*")(\s+ein)/, ['keyword', 'function', 'keyword', 'string', 'keyword']],
 			[/(Binde\s+)([\wäöüÄÖÜ]+(?:,\s*[\wäöüÄÖÜ]+)*)(\s+und\s+)([\wäöüÄÖÜ]+)(\s+aus\s+)("[\s\S]*")(\s+ein)/, ['keyword', 'function', 'keyword', 'function', 'keyword', 'string', 'keyword']],
+
+			// strings
+			[/"([^"\\]|\\.)*$/, 'string.invalid' ],  // non-teminated string
+			[/"/,  { token: 'string.quote', bracket: '@open', next: '@string' } ],
 		],
 		comment: [
 			[/[^\[\]]+/, 'comment'],
@@ -126,8 +146,10 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 			[/[\]*]/, 'comment']
 		],
 		string: [
-			[/[^"]+/, 'string'],
-			[/"/, { token: 'string.quote', bracket: '@close', next: '@pop' } ]
+			[/[^\\"]+/,  'string'],
+			[/@escapes/, 'string.escape'],
+			[/\\./,      'string.invalid'],
+			[/"/,        { token: 'string.quote', bracket: '@close', next: '@pop' } ]
 		],
 		whitespace: [
 			[/[ \t\r\n]+/, 'white'],
@@ -613,7 +635,9 @@ window.onbeforeunload = () => {
 		ls_socket.close();
 	});
 
-	window.localStorage.setItem("content", editor.getValue());
+	if (!embedded) {
+		window.localStorage.setItem("content", editor.getValue());
+	}
 
 	const argsContainer = document.getElementById("args");
 	window.localStorage.setItem("args", argsContainer.value);

@@ -119,6 +119,7 @@ function copyOutput() {
 
 function copyCode() {
 	navigator.clipboard.writeText(editor.getValue());
+	alert("In die Zwischenablage kopiert.")
 }
 
 function share() {
