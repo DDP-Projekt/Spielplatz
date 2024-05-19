@@ -3,6 +3,7 @@ package websocket_rw
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"sync"
 
@@ -35,7 +36,7 @@ func NewWebsocketRW(con *websocket.Conn) *WebsocketRW {
 func (rw *WebsocketRW) getNextReader() (io.Reader, error) {
 	msg_type, r, err := rw.con.NextReader()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get next websocket reader: %w", err)
 	}
 	if msg_type != websocket.TextMessage {
 		return nil, errors.New("expected text message")
@@ -70,7 +71,7 @@ func (rw *WebsocketRW) Read(p []byte) (int, error) {
 	var msg Message
 	err := json.NewDecoder(rw.cur_reader).Decode(&msg)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("got invalid json message: %w", err)
 	}
 
 	if msg.Eof {
@@ -96,7 +97,7 @@ func (rw *WebsocketRW) writeMsg(msg ws_msg, n int) (int, error) {
 	if rw.curWriter == nil {
 		w, err := rw.con.NextWriter(websocket.TextMessage)
 		if err != nil {
-			return 0, err
+			return 0, fmt.Errorf("error getting next websocket writer: %w", err)
 		}
 		rw.curWriter = w
 	}

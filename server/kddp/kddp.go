@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
@@ -130,16 +131,31 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	}
 
 	done := make(chan error)
+	is_done := atomic.Bool{}
 
 	go func() {
-		done <- cmd.Wait()
+		err := cmd.Wait()
+		is_done.Store(true)
+		done <- err
 	}()
 
 	go func() {
+		isBadReadErr := func(err error) bool {
+			if err == nil {
+				return false
+			}
+			// ErrCloseSent is only a true error, if the program was still running when the error occured
+			if errors.Is(err, websocket.ErrCloseSent) {
+				return !is_done.Load()
+			}
+			return !websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway)
+		}
+
 		if _, err := io.Copy(stdin_pipe, stdin); isBadReadErr(err) {
 			logger.Warn("error copying stdin to process", "err", err)
 			cancel()
 		}
+		logger.Info("closing stdin pipe")
 		stdin_pipe.Close()
 	}()
 
@@ -151,15 +167,10 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 			err = errors.New("Das Programm hat die Frist überschritten")
 		case context.Canceled:
 			logger.Info("program cancelled")
-			err = fmt.Errorf("Das Programm wurde abgebrochen: %w", cerr.Error())
+			err = fmt.Errorf("Das Programm wurde abgebrochen: %w", cerr)
 		default:
 			err = cerr
 		}
 	}
 	return cmd.ProcessState.ExitCode(), err
-}
-
-// helper function to check for websocket read errors
-func isBadReadErr(err error) bool {
-	return err != nil && !websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway)
 }
