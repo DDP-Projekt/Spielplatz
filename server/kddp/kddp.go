@@ -136,8 +136,8 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	}()
 
 	go func() {
-		if _, err := io.Copy(stdin_pipe, stdin); err != nil && !websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-			logger.Info("error copying stdin to process", "err", err)
+		if _, err := io.Copy(stdin_pipe, stdin); isBadReadErr(err) {
+			logger.Warn("error copying stdin to process", "err", err)
 			cancel()
 		}
 		stdin_pipe.Close()
@@ -157,4 +157,9 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 		}
 	}
 	return cmd.ProcessState.ExitCode(), err
+}
+
+// helper function to check for websocket read errors
+func isBadReadErr(err error) bool {
+	return err != nil && !websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway)
 }

@@ -24,6 +24,9 @@ Inspiriert von anderen Sprachen wie [Go](https://go.dev/play/), [Rust](https://p
 Um das Programm zu starten führt man `run.sh` aus.
 Das Makefile sollte dann alle Abhängigkeiten automatisch installieren (eventuell muss das sudo Passwort angegeben werden).
 
+Wahrscheinlich benötigt `run.sh` root permissions. In diesem Fall müssen auch Umgebungsvariablen angegeben werden:
+`sudo PATH="$PATH" DDPPATH="$DDPPATH" ./run.sh`
+
 ## Via Docker Ausführen
 ### Vorraussetzungen
 

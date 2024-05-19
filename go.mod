@@ -1,15 +1,15 @@
 module github.com/DDP-Projekt/Spielplatz
 
-go 1.21
-
-toolchain go1.21.0
+go 1.22.2
 
 require (
-	github.com/DDP-Projekt/DDPLS v0.2.1-0.20240503164353-ce2702239447
+	github.com/DDP-Projekt/DDPLS v0.3.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-contrib/requestid v1.0.2
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gorilla/websocket v1.5.1
+	github.com/lmittmann/tint v1.0.4
+	github.com/mattn/go-isatty v0.0.20
 	github.com/spf13/viper v1.18.2
 	github.com/tliron/commonlog v0.2.8
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
@@ -17,7 +17,7 @@ require (
 )
 
 require (
-	github.com/DDP-Projekt/Kompilierer v0.2.0-alpha.0.20240427065541-8b31e87740a0 // indirect
+	github.com/DDP-Projekt/Kompilierer v0.3.0-alpha // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -39,7 +39,6 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

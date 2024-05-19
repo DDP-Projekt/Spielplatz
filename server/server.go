@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 	"runtime"
 	"strconv"
 	"time"
@@ -18,9 +19,21 @@ import (
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/lmittmann/tint"
+	"github.com/mattn/go-isatty"
 	"github.com/spf13/viper"
 	lslogging "github.com/tliron/commonlog"
 )
+
+func setup_logger() {
+	const time_fmt = time.DateTime + ".000"
+	slog.SetDefault(slog.New(
+		tint.NewHandler(os.Stderr, &tint.Options{
+			TimeFormat: time_fmt,
+			NoColor:    !isatty.IsTerminal(os.Stderr.Fd()),
+		}),
+	))
+}
 
 func fatal(msg string, args ...any) {
 	// see https://pkg.go.dev/log/slog#example-package-Wrapping
@@ -70,6 +83,7 @@ func setup_config() {
 }
 
 func main() {
+	setup_logger()
 	setup_config()
 
 	if err := kddp.InitializeSemaphore(viper.GetInt64("max_concurrent_processes")); err != nil {
@@ -148,7 +162,7 @@ var upgrader = websocket.Upgrader{}
 // serves the /ls endpoint
 func serve_ls(c *gin.Context) {
 	logger := getLogger(c)
-	logger.Info("new connection")
+	logger.Info("new language server connection")
 	// upgrade the connection to a websocket connection
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -249,12 +263,14 @@ func serve_run(c *gin.Context) {
 		ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "invalid token"))
 		return
 	}
+	logger = logger.With("exe_path", exe_path)
+
 	args, _ := c.GetQueryArray("args")
 	websocket_rw := wsrw.NewWebsocketRW(ws)
 	// run the executable
 	defer executables.RemoveExecutableFile(token, exe_path)
 
-	logger.Info("running executable")
+	logger.Info("running executable", "args", args)
 	exitStatus, err := kddp.RunExecutable(exe_path, websocket_rw, websocket_rw.StdoutWriter(), websocket_rw.StderrWriter(), args, logger)
 	if err != nil {
 		logger.Error("failed to run executable", "err", err)

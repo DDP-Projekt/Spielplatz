@@ -5,7 +5,6 @@ package execsmanager
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
 	"math/rand"
 	"os"
