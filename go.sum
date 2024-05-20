@@ -2,8 +2,8 @@ github.com/DDP-Projekt/DDPLS v0.3.0 h1:PKG7rjY6LpPbB9CYYiiXG2IHZTCz5qssbWn4IIn0m
 github.com/DDP-Projekt/DDPLS v0.3.0/go.mod h1:0Uu4Xudq8GMjWu8ryifaAJmxankErfWPt5ICnTQzUr4=
 github.com/DDP-Projekt/DDPLS v0.3.1-0.20240520110902-e51a5fbc01ac h1:y6lGoHRnb9l8E69D6c3rwX9+4Vj1DMzHGnk1IThMwuY=
 github.com/DDP-Projekt/DDPLS v0.3.1-0.20240520110902-e51a5fbc01ac/go.mod h1:1XJewM/lOH6Xb34cxnjbQp2cyFf0PtnXVWYWceUVelU=
-github.com/DDP-Projekt/Kompilierer v0.3.0-alpha h1:w/k3DeSuNKcUUP1C8zZg1rLHIx6A2UQ5CzQjeLCADK4=
-github.com/DDP-Projekt/Kompilierer v0.3.0-alpha/go.mod h1:TQzKKQuclk2+fn9dGZ+XqyoZER8eZLr4iWGD1bXZVTg=
+github.com/DDP-Projekt/DDPLS v0.3.1-0.20240520112244-adaf3728c522 h1:NwgZahzbD0DvEuO5L3fYXuXPwvOkzGbAVZCsIImarhg=
+github.com/DDP-Projekt/DDPLS v0.3.1-0.20240520112244-adaf3728c522/go.mod h1:1XJewM/lOH6Xb34cxnjbQp2cyFf0PtnXVWYWceUVelU=
 github.com/DDP-Projekt/Kompilierer v0.3.0-alpha.0.20240512103324-cb73f1d38da8 h1:Zw9GFBVVqeQx+KzyShLNNGHj0hDHW6EyzdXp5oRrPAM=
 github.com/DDP-Projekt/Kompilierer v0.3.0-alpha.0.20240512103324-cb73f1d38da8/go.mod h1:TQzKKQuclk2+fn9dGZ+XqyoZER8eZLr4iWGD1bXZVTg=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
