@@ -6,7 +6,7 @@ monaco.editor.defineTheme('ddp-theme-dark', {
 	colors: {},
 	rules: [
 		{ token: 'keyword.control', foreground: 'C586C0' },
-		{ token: 'string.invalid', foreground: 'F44640' },
+		{ token: 'invalid', foreground: 'F44640' },
 		{ token: 'string.escape', foreground: 'D7BA7D' },
 		{ token: 'keyword.controlFlow', foreground: 'C586C0' },
 		{ token: 'variable', foreground: '9CDCFE' },
@@ -26,7 +26,7 @@ monaco.editor.defineTheme('ddp-theme-light', {
 	colors: {},
 	rules: [
 		{ token: 'keyword.control', foreground: 'AF00DB' },
-		{ token: 'string.invalid', foreground: 'F44640' },
+		{ token: 'invalid', foreground: 'F44640' },
 		{ token: 'string.escape', foreground: 'D7BA7D' },
 		{ token: 'keyword.controlFlow', foreground: 'AF00DB' },
 		{ token: 'variable', foreground: '0070C1' },
@@ -105,7 +105,7 @@ monaco.languages.setLanguageConfiguration('ddp', {
 //https://raw.githubusercontent.com/DDP-Projekt/vscode-ddp/main/syntaxes/ddp.tmLanguage.json
 
 monaco.languages.setMonarchTokensProvider('ddp', {
-	escapes: /\\(?:[nrbta\\"'])/,
+	escapes: /\\(?:[nrbta\\])/,
 
 	tokenizer: {
 		root: [
@@ -138,6 +138,11 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 			// strings
 			[/"([^"\\]|\\.)*$/, 'string.invalid' ],  // non-teminated string
 			[/"/,  { token: 'string.quote', bracket: '@open', next: '@string' } ],
+			
+			// chars
+			[/'[^'\n\\]'/, 'string'],
+			[/'(@escapes|\\')'/, 'string.escape'],
+			[/'[^'\n]{2,}'|''/, 'invalid']
 		],
 		comment: [
 			[/[^\[\]]+/, 'comment'],
@@ -147,8 +152,8 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 		],
 		string: [
 			[/[^\\"]+/,  'string'],
-			[/@escapes/, 'string.escape'],
-			[/\\./,      'string.invalid'],
+			[/@escapes|\\"/, 'string.escape'],
+			[/\\./,      'invalid'],
 			[/"/,        { token: 'string.quote', bracket: '@close', next: '@pop' } ]
 		],
 		whitespace: [

@@ -43,6 +43,10 @@ document.addEventListener("keydown", function (e) {
 	}
 }, false);
 
+function toggleSettings() {
+	document.getElementById('settings-panel').toggleAttribute('hidden');
+}
+
 function clearOutput() {
 	document.getElementById('outputText').innerHTML = '';
 }
@@ -103,12 +107,12 @@ function spacerDrag(ev) {
 
 	if (main.hasAttribute('horizontal')) {
 		let y = ev.clientY / ev.view.innerHeight;
-		if (y < 0.2 || y > 0.8) return;
+		if (y < 0.1 || y > 0.85) return;
 		root.style.setProperty('--editor-container-size', y * 100 + '%');
 	}
 	else {
 		let x = ev.clientX / ev.view.innerWidth;
-		if (x < 0.2 || x > 0.8) return;
+		if (x < 0.3 || x > 0.8) return;
 		root.style.setProperty('--editor-container-size', x * 100 + '%');
 	}
 }

@@ -45,14 +45,16 @@
 						<a href="https://ddp.le0n.dev/" target="_blank"><img src="static/img/ddp-logo.svg" alt="ddp-logo" width="24px" title="DDP Homepage"></a>
 						<img onclick="runProgram(editor.getValue())" src="static/img/play-outline.svg" alt="run" title="Ausführen" width="24px" height="24px" class="btn" id="run-btn">
 						<img hidden onclick="stopProgram()" src="static/img/close-octagon-outline.svg" alt="stop" title="Stop" width="24px" height="24px" class="btn" id="stop-btn">
-						
-						<label for="args"><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
-						<input id="args" type="text" name="args" autocomplete="off"></input>
+						<img onclick="toggleSettings()" src="static/img/cog.svg" alt="settings" title="Einstellungen" width="22px" height="22px" class="btn" id="settings-btn">
+
+						<div id="settings-panel" hidden>
+							<label for="args"><abbr title="Eine mit Punktstrich getrennte liste (z.B.: 123;4;Hallo;wahr)">Argumente</abbr>:</label>
+							<input id="args" type="text" name="args" autocomplete="off"></input>
+						</div>
 					</div>
 					<div class="controls1">
-						<label for="example-select">Beispiele:</label>
 						<select id="example-select" onchange="loadExample(this.value)">
-							<option value=""></option>
+							<option hidden value="">Beispiele</option>
 							<option value="HalloWelt">Hallo Welt</option>
 							<option value="Brainfuck">Brainfuck</option>
 							<option value="Fibonacci">Fibonacci</option>

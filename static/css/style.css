@@ -138,12 +138,26 @@ img[active] {
     background-color: var(--input-background-color);
     border-radius: 2rem;
 	border: var(--input-border-color) solid var(--input-border-width);
-	margin: 1rem;
+	margin: 0 1rem;
 	color: var(--text-color);
+	text-overflow: ellipsis;
+	width: 100%;
+	max-width: 100px;
+	min-width: 20px;
+	flex: 1;
+	box-sizing: border-box;
 }
 
-#args {
-	margin: 1rem;
+#settings-panel {
+	position: absolute;
+	background-color: var(--controls-background-color);
+	top: calc(var(--controls-height) - 1px);
+	left: calc(22px * 3);
+	padding: 1rem;
+	z-index: 1;
+	border: 1px solid var(--input-background-color);
+	border-top: none;
+	border-radius: 0 0 1rem 1rem;
 }
 
 .container {
