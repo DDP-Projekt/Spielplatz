@@ -58,6 +58,7 @@ RUN git config --global url."https://".insteadOf git://
 ENV GIN_MODE=release
 EXPOSE 8001
 CMD  cd /Kompilierer && \
+	git reset --hard && \
 	git pull origin master && \
 	go mod tidy && \
 	make LLVM_CONFIG=llvm-config && \
