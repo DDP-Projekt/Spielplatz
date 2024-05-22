@@ -123,7 +123,6 @@ function copyOutput() {
 
 function copyCode() {
 	navigator.clipboard.writeText(editor.getValue());
-	alert("In die Zwischenablage kopiert.")
 }
 
 function share() {
@@ -131,6 +130,7 @@ function share() {
 
 	const newUrl = `${window.location.origin}${window.location.pathname}?code=${encodeURIComponent(lzCode)}`;
 	navigator.clipboard.writeText(newUrl);
+	alert("Link in die Zwischenablage kopiert.")
 }
 
 function toggleDarkMode() {
