@@ -48,6 +48,7 @@ abbr {
 
 :root {
 	color: var(--text-color);
+	--input-height: 20px;
 	--input-border-width: 1px;
 
 	--controls-height: 2rem;
@@ -83,7 +84,9 @@ input {
 	outline: none;
 	border: var(--input-border-color) solid var(--input-border-width);
 	font-family: monospace;
-	color: var(--text-color)
+	color: var(--text-color);
+	height: var(--input-height);
+	padding: 0;
 }
 
 main {
@@ -151,12 +154,12 @@ img[active] {
 #settings-panel {
 	position: absolute;
 	background-color: var(--controls-background-color);
-	top: calc(var(--controls-height) - 1px);
-	left: calc(22px * 3);
+	top: var(--controls-height);
+	left: 68px;
 	padding: 1rem;
 	z-index: 1;
 	border: 1px solid var(--input-background-color);
-	border-top: none;
+	border-top-color: var(--controls-background-color);
 	border-radius: 0 0 1rem 1rem;
 }
 
@@ -196,7 +199,12 @@ img[active] {
 #output-container label {
 	float: left;
 	text-align: center;
+	align-content: center;
 	width: var(--output-text-padding);
+	height: var(--input-height);
+	border: var(--input-border-width) solid transparent;
+	border-left: none;
+	border-right: none;
 }
 
 #output {
@@ -222,7 +230,7 @@ span.sysmsg { color: var(--sysmsg-color); }
 }
 
 #output-container input {
-	width: calc(100% - var(--output-text-padding) - 3px);
+	width: calc(100% - var(--output-text-padding));
 }
 
 /*-- Scrollbar --*/
