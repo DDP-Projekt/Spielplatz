@@ -95,7 +95,9 @@ function loadExample(val) {
 const root = document.documentElement;
 
 function spacerDragStart(ev) {
-	ev.dataTransfer.setDragImage(document.createElement('br'), 0, 0);
+	if (ev instanceof DragEvent) {
+		ev.dataTransfer.setDragImage(document.createElement('br'), 0, 0);
+	}
 
 	root.style.setProperty('--none-if-dragging', 'none');
 }
@@ -105,15 +107,21 @@ function spacerDragEnd() {
 }
 
 function spacerDrag(ev) {
+	// for mobile touch support
+	let ev2 = ev
+	if (ev instanceof TouchEvent) {
+    	ev2 = ev.touches[0]
+    }
+
 	const main = document.getElementById('main');
 
 	if (main.hasAttribute('horizontal')) {
-		let y = ev.clientY / ev.view.innerHeight;
+		let y = ev2.clientY / ev.view.innerHeight;
 		if (y < 0.1 || y > 0.85) return;
 		root.style.setProperty('--editor-container-size', y * 100 + '%');
 	}
 	else {
-		let x = ev.clientX / ev.view.innerWidth;
+		let x = ev2.clientX / ev.view.innerWidth;
 		if (x < 0.3 || x > 0.8) return;
 		root.style.setProperty('--editor-container-size', x * 100 + '%');
 	}

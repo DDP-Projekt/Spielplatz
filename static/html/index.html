@@ -74,7 +74,14 @@
 				</div>
 				<div id="editor"></div>
 			</div>
-			<div id="spacer" draggable="true" ondragstart="spacerDragStart(event)" ondragend="spacerDragEnd()" ondrag="spacerDrag(event)">
+			<div id="spacer" draggable="true" 
+				ondragstart="spacerDragStart(event)" 
+				ondragend="spacerDragEnd()" 
+				ondrag="spacerDrag(event)" 
+				ontouchstart="spacerDragStart(event)" 
+				ontouchend="spacerDragEnd()"
+				ontouchmove="spacerDrag(event)"
+			>
 				<span>⣿</span>
 			</div>
 			<div id="output-container" class="container">
