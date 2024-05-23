@@ -155,7 +155,6 @@ img[active] {
 	position: absolute;
 	background-color: var(--controls-background-color);
 	top: var(--controls-height);
-	left: 68px;
 	padding: 1rem;
 	z-index: 1;
 	border: 1px solid var(--input-background-color);

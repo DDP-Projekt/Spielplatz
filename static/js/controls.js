@@ -44,7 +44,9 @@ document.addEventListener("keydown", function (e) {
 }, false);
 
 function toggleSettings() {
-	document.getElementById('settings-panel').toggleAttribute('hidden');
+	const panel = document.getElementById('settings-panel')
+	panel.style.left = editor.getLayoutInfo().contentLeft + "px";
+	panel.toggleAttribute('hidden');
 }
 
 function clearOutput() {
