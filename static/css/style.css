@@ -181,10 +181,12 @@ img[active] {
     align-items: center;
 	cursor: col-resize;
 	background-color: var(--spacer-background-color);
+	overscroll-behavior: contain;
 }
 
 #spacer[horizontal] {
 	cursor: row-resize;
+	overscroll-behavior: contain;
 }
 
 #spacer[horizontal] span {
