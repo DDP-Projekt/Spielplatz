@@ -3,18 +3,16 @@
 document.addEventListener("DOMContentLoaded", () => {
 	const splitBtn = document.getElementById("split-btn");
 	const main = document.getElementById("main");
-	const editorContainer = document.getElementById("editor-container");
-	const outputContainer = document.getElementById("output-container");
-	const argsContainer = document.getElementById("args");
 
 	if (splitBtn && window.localStorage.getItem("vertical") === "false") {
-		main.setAttribute('horizontal', 'true');
-		editorContainer.setAttribute('horizontal', 'true');
-		outputContainer.setAttribute('horizontal', 'true');
-		splitBtn.setAttribute('src', 'static/img/view-split-vertical.svg');
-		document.getElementById("spacer").setAttribute('horizontal', 'true');
+		setHorizontal();
 
 		window.localStorage.setItem("vertical", "false");
+	}
+
+	if (splitBtn && window.innerWidth <= 600) {
+		splitBtn.setAttribute('hidden', 'true')
+		setHorizontal()
 	}
 
 	const exampleSelect = document.getElementById("example-select")
@@ -22,12 +20,25 @@ document.addEventListener("DOMContentLoaded", () => {
 		exampleSelect.value = "HalloWelt";
 	}
 
+	const argsContainer = document.getElementById("args");
 	const args = window.localStorage.getItem("args");
 	if (args !== null) {
 		argsContainer.value = args;
 	}
 
 	main.style.visibility = "";
+});
+
+window.addEventListener("resize", (event) => {
+	const splitBtn = document.getElementById("split-btn");
+
+	if (splitBtn && event.target.innerWidth <= 600) {
+		setHorizontal();
+		splitBtn.setAttribute('hidden', 'true')
+	}
+	else {
+		splitBtn.removeAttribute('hidden');
+	}
 });
 
 let saveCount = 0;
@@ -42,6 +53,20 @@ document.addEventListener("keydown", function (e) {
 		alert('BRUDER HAT VERSUCHT ZU SPEICHERN \uD83D\uDC80\uD83D\uDC80\uD83D\uDC80')
 	}
 }, false);
+
+function setHorizontal() {
+	const splitBtn = document.getElementById("split-btn");
+	const main = document.getElementById("main");
+	const editorContainer = document.getElementById("editor-container");
+	const outputContainer = document.getElementById("output-container");
+	const spacer = document.getElementById("spacer");
+
+	main.setAttribute('horizontal', 'true');
+	editorContainer.setAttribute('horizontal', 'true');
+	outputContainer.setAttribute('horizontal', 'true');
+	splitBtn.setAttribute('src', 'static/img/view-split-vertical.svg');
+	spacer.setAttribute('horizontal', 'true');
+}
 
 function toggleSettings() {
 	const panel = document.getElementById('settings-panel')
