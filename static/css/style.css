@@ -95,7 +95,7 @@ main {
 	display: grid;
 	grid-template-columns: var(--editor-container-size) var(--spacer-width) calc(100% - var(--editor-container-size) - var(--spacer-width));
 	grid-template-rows: 100%;
-	overscroll-behavior: contain;
+	overscroll-behavior: none;
 }
 
 main[horizontal] {

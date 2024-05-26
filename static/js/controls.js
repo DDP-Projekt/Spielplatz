@@ -134,7 +134,7 @@ function spacerDragEnd() {
 function spacerDrag(ev) {
 	// for mobile touch support
 	let ev2 = ev
-	if (ev instanceof TouchEvent) {
+	if (window.TouchEvent && ev instanceof TouchEvent) {
     	ev2 = ev.touches[0]
     }
 
