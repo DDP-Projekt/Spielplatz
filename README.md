@@ -35,7 +35,7 @@ Wahrscheinlich benötigt `run.sh` root permissions. In diesem Fall müssen auch 
 ### Installieren
 
 1. Das Spielplatz Repository klonen
-2. Die entsprechende LLVM Versin von https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0 herunterladen 
+2. Die entsprechende LLVM Version von https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0 herunterladen 
 3. Docker starten
 4. `./docker-build.sh <llvm_archive>` auführen, wobei `<llvm_archive>` der Pfad zur heruntergeladenen LLVM Version ist
 
