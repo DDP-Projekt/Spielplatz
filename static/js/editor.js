@@ -54,11 +54,7 @@ if (urlParams.has("code")) {
 let editorTheme = 'ddp-theme-dark';
 if (window.localStorage.getItem("dark-mode") === 'false' || urlParams.has('light')) {
 	editorTheme = "ddp-theme-light";
-	document.getElementById('dark').media = 'not all';
-	document.getElementById('light').media = 'all';
-} else {
-	document.getElementById('dark').media = 'all';
-	document.getElementById('light').media = 'not all';
+	document.querySelector('html').setAttribute('light', '')
 }
 
 const isReadOnly = urlParams.has("readonly");

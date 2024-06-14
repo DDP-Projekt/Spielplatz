@@ -169,16 +169,13 @@ function share() {
 }
 
 function toggleDarkMode() {
-	let isDark = document.getElementById('dark').media === 'all';
-	if (isDark) {
-		document.getElementById('dark').media = 'not all';
-		document.getElementById('light').media = 'all';
+	document.querySelector('html').toggleAttribute('light')
+
+	if (document.querySelector('html').hasAttribute('light')) {
 		monaco.editor.setTheme("ddp-theme-light");
 		window.localStorage.setItem("dark-mode", "false");
 	}
 	else {
-		document.getElementById('dark').media = 'all';
-		document.getElementById('light').media = 'not all';
 		monaco.editor.setTheme("ddp-theme-dark");
 		window.localStorage.setItem("dark-mode", "true");
 	}
