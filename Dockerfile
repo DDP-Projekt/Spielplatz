@@ -1,68 +1,56 @@
-FROM golang:1.22.2
+FROM golang:bookworm as build
 WORKDIR /
 
 # install dependencies
-RUN apt-get update && apt-get install -y git \
+RUN apt-get update && apt-get install -y \
 	npm \
 	build-essential \
+	libseccomp-dev
+
+ARG DDP_VERSION
+
+ADD https://github.com/DDP-Projekt/Kompilierer/releases/latest/download/DDP-$DDP_VERSION-linux-amd64.tar.gz ./DDP.tar.gz
+RUN mkdir /DDP
+RUN tar -xzf ./DDP.tar.gz -C DDP --strip-components 1
+
+ENV DDPPATH=/DDP
+ENV CGO_ENABLED=1
+
+COPY ./ /
+RUN make
+
+FROM debian:bookworm-slim as run
+
+WORKDIR /
+
+RUN apt-get update && apt-get install -y \
 	libseccomp-dev \
-	libpcre2-dev \
-	locales \
-	libncurses5 \
-	libz-dev \
+	gcc \
 	libtinfo-dev \
-	libxml2-dev
+	libpcre2-dev \
+	locales
 
 RUN echo "de_DE.UTF-8 UTF-8" > /etc/locale.gen
 RUN echo "LANG=de_DE.UTF-8" > /etc/default/locale
 RUN locale-gen de_DE.UTF-8
 
-# install llvm
-WORKDIR /llvm
-ARG llvm_archive
-COPY ${llvm_archive} ./
-RUN tar -xvf *.tar.* -C ./ --strip-components 1
-RUN rm *.tar.*
-ENV PATH=/llvm/bin:${PATH}
+COPY --from=build /DDP /DDP
+WORKDIR /DDP
+RUN chmod +x ./ddp-setup
+RUN ./ddp-setup --force
 
-# clone the Kompilierer repo
-WORKDIR /
-RUN git clone https://github.com/DDP-Projekt/Kompilierer.git --depth=1
-ENV DDPPATH=/Kompilierer/build/DDP
-ENV PATH=/Kompilierer/build/DDP/bin:${PATH}
+ENV PATH=/DDP/bin:$PATH
+ENV DDPPATH=/DDP
 
-# install ddp
-WORKDIR /Kompilierer
-RUN go mod tidy
-RUN make LLVM_CONFIG=llvm-config
+COPY --from=build Spielplatz seccomp_exec seccomp_main.o /app/
+COPY --from=build /node_modules /app/node_modules
+COPY --from=build /static/ /app/static
 
-# clone the repo
+COPY ./entrypoint.sh /
+RUN chmod +x /entrypoint.sh
+
 WORKDIR /app
-RUN git clone https://github.com/DDP-Projekt/Spielplatz.git --depth=1
-WORKDIR /app/Spielplatz
-RUN npm install
-RUN go mod tidy
 
-# clone the config
-COPY config.json ./
-ARG certpath
-ARG keypath
-COPY ${certpath} ./
-COPY ${keypath} ./
-
-# configure git to use https instead of ssh
-RUN git config --global url."https://github.com/".insteadOf git@github.com:
-RUN git config --global url."https://".insteadOf git://
-
-# run the app
 ENV GIN_MODE=release
 EXPOSE 8001
-CMD  cd /Kompilierer && \
-	git reset --hard && \
-	git pull origin master && \
-	go mod tidy && \
-	make LLVM_CONFIG=llvm-config && \
-	cd /app/Spielplatz && \
-	git pull origin main && \
-	go mod tidy && \
-	./run.sh
+CMD [ "/app/Spielplatz" ]

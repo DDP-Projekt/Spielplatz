@@ -7,6 +7,8 @@ BIN_DIR = seccomp_main/
 CFLAGS = -Wall -Wextra -Wno-format -O2 -std=c11 -pedantic
 CPPFLAGS = -I$(DDPPATH)/lib/
 
+INSTALL=apt-get install
+
 seccomp_main.o: $(BIN_DIR)seccomp_main.c
 	$(CC) $(CFLAGS) -c $(CPPFLAGS) $< -o $@
 
@@ -24,4 +26,4 @@ node_modules:
 	npm install
 
 install-dependencies: node_modules
-	apt-get install libseccomp-dev
+	$(INSTALL) libseccomp-dev
