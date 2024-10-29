@@ -25,12 +25,13 @@ import (
 	lslogging "github.com/tliron/commonlog"
 )
 
-func setup_logger() {
+func setup_logger(level slog.Level) {
 	const time_fmt = time.DateTime + ".000"
 	slog.SetDefault(slog.New(
 		tint.NewHandler(os.Stderr, &tint.Options{
 			TimeFormat: time_fmt,
 			NoColor:    !isatty.IsTerminal(os.Stderr.Fd()),
+			Level:      level,
 		}),
 	))
 }
@@ -66,6 +67,15 @@ func setup_config() {
 	viper.SetDefault("certPath", "")
 	viper.SetDefault("keyPath", "")
 	viper.SetDefault("pprof", false)
+	viper.SetDefault("log_level", "INFO")
+
+	var level slog.Level
+	if err := level.UnmarshalText(
+		[]byte(viper.GetString("log_level")),
+	); err != nil {
+		panic(err)
+	}
+	setup_logger(level)
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
@@ -83,7 +93,7 @@ func setup_config() {
 }
 
 func main() {
-	setup_logger()
+	setup_logger(slog.LevelInfo)
 	setup_config()
 
 	if err := kddp.InitializeSemaphore(viper.GetInt64("max_concurrent_processes")); err != nil {
