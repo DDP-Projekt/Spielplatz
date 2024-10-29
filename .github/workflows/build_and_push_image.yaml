@@ -33,4 +33,4 @@ jobs:
           push: true
           tags: bafto/hetzner:FindFavouriteSong
           build-args:
-            DDP_VERSION: ${{ inputs.ddp_version }}
+            - DDP_VERSION: ${{ inputs.ddp_version }}
