@@ -46,8 +46,7 @@ COPY --from=build Spielplatz seccomp_exec seccomp_main.o /app/
 COPY --from=build /node_modules /app/node_modules
 COPY --from=build /static/ /app/static
 
-COPY ./entrypoint.sh /
-RUN chmod +x /entrypoint.sh
+RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 WORKDIR /app
 
