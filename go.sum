@@ -1,7 +1,11 @@
 github.com/DDP-Projekt/DDPLS v0.4.0 h1:DPdzcYIk1OtwEh2tLmM0QV2/f0xNM4/LKH+mrcaWuF0=
 github.com/DDP-Projekt/DDPLS v0.4.0/go.mod h1:yxSvL81QLMHuruKkJO+anuMKQ/kYYnSnuqZcoS/TJ7Q=
+github.com/DDP-Projekt/DDPLS v0.5.0 h1:yalSzjZXagcxYqR2Cb+f1b8H3BM7xkrEfqHz644U590=
+github.com/DDP-Projekt/DDPLS v0.5.0/go.mod h1:xeAVwQe2ipGbZPyp2nnfTMBKSIOGrYGu33pan3lVq9o=
 github.com/DDP-Projekt/Kompilierer v0.3.0-alpha.0.20240711175141-cc381ec1c755 h1:m2csO1dxsKYuyp4+fCdbH4Pg2DyGJhXzRmXyDGfQbwU=
 github.com/DDP-Projekt/Kompilierer v0.3.0-alpha.0.20240711175141-cc381ec1c755/go.mod h1:wIQjgAVockUlLS3bRd2WSuJlPUFC+ZTZizIQ1rsEeP4=
+github.com/DDP-Projekt/Kompilierer v0.4.0-alpha.0.20241102131659-4a448417a968 h1:dZ8KbwnwHPsJ8Q2kCoErg/kZFLUhrl/1iA+Sty22Tqg=
+github.com/DDP-Projekt/Kompilierer v0.4.0-alpha.0.20241102131659-4a448417a968/go.mod h1:vp0zj11n6rP/B+o7BIXmUhhjrpZNO1c7/pf+VPSHIzM=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1/go.mod h1:uYgXzlJ7ZpABp8OJ+exZzJJhRNQ2ASbcXHWsFqH8hp8=
 github.com/bytedance/sonic v1.11.6 h1:oUp34TzMlL+OY1OUWxHqsdkgC/Zfc85zGqw9siXjrc0=
