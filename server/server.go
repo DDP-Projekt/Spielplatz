@@ -25,6 +25,8 @@ import (
 	lslogging "github.com/tliron/commonlog"
 )
 
+var DDPVERSION = "undefined"
+
 func setup_logger(level slog.Level) {
 	const time_fmt = time.DateTime + ".000"
 	slog.SetDefault(slog.New(
@@ -125,7 +127,7 @@ func main() {
 	g.StaticFS("/img", http.Dir("img"))
 
 	g.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
+		c.HTML(http.StatusOK, "index.html", DDPVERSION)
 	})
 
 	g.GET("/embed", func(c *gin.Context) {
