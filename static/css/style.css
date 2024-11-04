@@ -114,6 +114,7 @@ html[light] {
 }
 
 input {
+	appearance: none;
 	background-color: var(--input-background-color);
 	outline: none;
 	border: var(--input-border-color) solid var(--input-border-width);
@@ -158,7 +159,8 @@ img[active] {
 
 .controls img {
 	transition: background-color linear 200ms;
-	margin: 5px;
+	padding: 2px;
+	margin: 3px;
 }
 
 .controls img.btn {
@@ -172,6 +174,7 @@ img[active] {
 }
 
 .controls select {
+	appearance: none;
 	outline: none;
 	background-color: var(--input-background-color);
 	border-radius: 2rem;
@@ -184,6 +187,7 @@ img[active] {
 	min-width: 20px;
 	flex: 1;
 	box-sizing: border-box;
+	padding: 2px 5px;
 }
 
 #settings-panel {
