@@ -3,7 +3,7 @@ module github.com/DDP-Projekt/Spielplatz
 go 1.22.2
 
 require (
-	github.com/DDP-Projekt/DDPLS v0.4.0
+	github.com/DDP-Projekt/DDPLS v0.5.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-contrib/requestid v1.0.2
 	github.com/gin-gonic/gin v1.9.1
@@ -17,7 +17,7 @@ require (
 )
 
 require (
-	github.com/DDP-Projekt/Kompilierer v0.3.0-alpha.0.20240711175141-cc381ec1c755 // indirect
+	github.com/DDP-Projekt/Kompilierer v0.4.0-alpha.0.20241102131659-4a448417a968 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
