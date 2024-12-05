@@ -1,7 +1,7 @@
 # Spielplatz
 
 Ein online-Spielplatz um [DDP](https://github.com/DDP-Projekt/Kompilierer) auszuprobieren.\
-Erreichbar unter https://ddp.le0n.dev/Spielplatz
+Erreichbar unter https://spiel.ddp.im
 
 Inspiriert von anderen Sprachen wie [Go](https://go.dev/play/), [Rust](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021) und [Dart](https://dartpad.dev/?).
 
@@ -48,7 +48,7 @@ wget https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/clang
 ### Ausführen
 
 Das Docker Image kann mit `docker run -p 8080:8080 ddp-spielplatz` als container gestartet werden.
-Der Spielplatz sollte jetzt unter http://localhost:8080/Spielplatz erreicht werden können.
+Der Spielplatz sollte jetzt unter http://localhost:8080/ erreicht werden können.
 
 ### Konfiguration
 Man kann im root des Projektes eine `config.json` Datei erstellen um das Programm einszustellen.

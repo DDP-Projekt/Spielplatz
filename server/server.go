@@ -118,32 +118,30 @@ func main() {
 	// load html files as template
 	r.LoadHTMLGlob("static/html/*")
 
-	g := r.Group("/Spielplatz")
-
 	// serve node_modules/monaco-editor as /monaco-editor
-	g.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
+	r.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
 	// serve the static folder
-	g.StaticFS("/static", http.Dir("static"))
-	g.StaticFS("/img", http.Dir("img"))
+	r.StaticFS("/static", http.Dir("static"))
+	r.StaticFS("/img", http.Dir("img"))
 
-	g.GET("/", func(c *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", DDPVERSION)
 	})
 
-	g.GET("/embed", func(c *gin.Context) {
+	r.GET("/embed", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "embed.html", nil)
 	})
 
 	// websocket endpoint to connect to the language server
 	lslogging.Configure(1, nil)
-	g.GET("/ls", serve_ls)
+	r.GET("/ls", serve_ls)
 
 	// endpoint to compile a ddp program
-	g.POST("/compile", serve_compile)
-	g.GET("/run", serve_run)
+	r.POST("/compile", serve_compile)
+	r.GET("/run", serve_run)
 
 	if viper.GetString("pprof") != "" {
-		gin_pprof.Register(r, "/Spielplatz/debug/pprof")
+		gin_pprof.Register(r, "/debug/pprof")
 	}
 
 	// run the server

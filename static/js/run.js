@@ -47,7 +47,7 @@ async function runProgram(code) {
 
 	// connect to the /run endpoint using the websocket api with token as query parameter
 	let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
-	run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/Spielplatz/run?token=${token}${argsString}`)
+	run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/run?token=${token}${argsString}`)
 	if (!run_ws){
 		console.error('websocket (run) connection failed')
 		return;

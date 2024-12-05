@@ -59,7 +59,7 @@ if (window.localStorage.getItem("dark-mode") === 'false' || urlParams.has('light
 
 const isReadOnly = urlParams.has("readonly");
 const editorDiv = document.getElementById('editor');
-const file_uri = monaco.Uri.parse('inmemory://Spielplatz/Spielplatz');
+const file_uri = monaco.Uri.parse('inmemory://Spielplatz');
 const editor = monaco.editor.create(editorDiv, {
 	theme: editorTheme,
 	'semanticHighlighting.enabled': true,
@@ -162,7 +162,7 @@ monaco.languages.setMonarchTokensProvider('ddp', {
 
 // connect to a websocket on the /ls endpoint
 let ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
-const ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/Spielplatz/ls`);
+const ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/ls`);
 ls_socket.onerror = (error) => {
 	console.error('WebSocket error:', error);
 };
