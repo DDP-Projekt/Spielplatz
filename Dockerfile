@@ -17,7 +17,7 @@ ENV DDPPATH=/DDP
 ENV CGO_ENABLED=1
 
 COPY ./ /
-RUN make
+RUN make DDPVERSION=${DDP_VERSION}
 
 FROM debian:bookworm-slim as run
 
