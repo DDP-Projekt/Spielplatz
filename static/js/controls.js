@@ -31,8 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.addEventListener("resize", (event) => {
 	const splitBtn = document.getElementById("split-btn");
+	if (!splitBtn) return;
 
-	if (splitBtn && event.target.innerWidth <= 600) {
+	if (event.target.innerWidth <= 600) {
 		setHorizontal();
 		splitBtn.setAttribute('hidden', 'true')
 	}
