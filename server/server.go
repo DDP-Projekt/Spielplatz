@@ -140,6 +140,8 @@ func main() {
 	r.POST("/compile", serve_compile)
 	r.GET("/run", serve_run)
 
+	r.GET("/health", serve_health)
+
 	if viper.GetString("pprof") != "" {
 		gin_pprof.Register(r, "/debug/pprof")
 	}

@@ -174,3 +174,29 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	}
 	return cmd.ProcessState.ExitCode(), err
 }
+
+// CompilerResult is the result of a compilation
+// and will be sent to the client
+type VersionResult struct {
+	ReturnCode int    `json:"returnCode"`
+	Stdout     string `json:"stdout"`
+}
+
+func GetKDDPVersion() (VersionResult, error) {
+	cmd := exec.Command("kddp", "version")
+	stderr := &strings.Builder{}
+	stdout := &strings.Builder{}
+	cmd.Stderr = stderr
+	cmd.Stdout = stdout
+
+	err := cmd.Run()
+
+	if err != nil && stderr.String() != "" {
+		err = fmt.Errorf(stderr.String())
+	}
+
+	return VersionResult{
+		ReturnCode: cmd.ProcessState.ExitCode(),
+		Stdout:     stdout.String(),
+	}, err
+}
