@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func healthcheckHandler(c *gin.Context) {
+func serve_health(c *gin.Context) {
 	logger := getLogger(c)
 
 	logger.Debug("starting healthcheck")
