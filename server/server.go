@@ -141,6 +141,7 @@ func main() {
 	r.GET("/run", serve_run)
 
 	r.GET("/health", serve_health)
+	r.HEAD("/health", serve_health)
 
 	if viper.GetString("pprof") != "" {
 		gin_pprof.Register(r, "/debug/pprof")
