@@ -28,7 +28,8 @@ RUN apt-get update && apt-get install -y \
 	gcc \
 	libtinfo-dev \
 	libpcre2-dev \
-	locales
+	locales \
+	wget
 
 RUN echo "de_DE.UTF-8 UTF-8" > /etc/locale.gen
 RUN echo "LANG=de_DE.UTF-8" > /etc/default/locale
