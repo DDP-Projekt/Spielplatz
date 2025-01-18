@@ -70,6 +70,7 @@ func setup_config() {
 	viper.SetDefault("keyPath", "")
 	viper.SetDefault("pprof", false)
 	viper.SetDefault("log_level", "INFO")
+	viper.SetDefault("max_source_code_log_length", 100)
 
 	var level slog.Level
 	if err := level.UnmarshalText(
@@ -210,7 +211,7 @@ func serve_compile(c *gin.Context) {
 	}
 
 	src_code := bytes.NewBufferString(req.Src)
-	logger.Info("compiling the program")
+	logger.Info("compiling the program", "source-code", truncString(req.Src, viper.GetInt("max_source_code_log_length")))
 	// compile the program
 	result, exe_path, err := kddp.CompileDDPProgram(src_code, token, exe_path, logger)
 	if err != nil {
@@ -295,4 +296,11 @@ func serve_run(c *gin.Context) {
 	logger.Info("executable ran successfully")
 	websocket_rw.Close()
 	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("Das Programm wurde mit Code %d beendet", exitStatus)))
+}
+
+func truncString(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+	return s[:max] + "..."
 }
