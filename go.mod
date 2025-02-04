@@ -3,7 +3,7 @@ module github.com/DDP-Projekt/Spielplatz
 go 1.22.2
 
 require (
-	github.com/DDP-Projekt/DDPLS v0.5.0
+	github.com/DDP-Projekt/DDPLS v0.5.1-0.20250204153947-c4f12c9a005c
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-contrib/requestid v1.0.2
 	github.com/gin-gonic/gin v1.9.1
@@ -13,11 +13,11 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/tliron/commonlog v0.2.8
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
-	golang.org/x/sync v0.7.0
+	golang.org/x/sync v0.10.0
 )
 
 require (
-	github.com/DDP-Projekt/Kompilierer v0.4.0-alpha.0.20241102131659-4a448417a968 // indirect
+	github.com/DDP-Projekt/Kompilierer v0.5.0-alpha.0.20250204153322-22e1c6b046b9 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -63,11 +63,11 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/term v0.21.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/term v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/protobuf v1.34.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

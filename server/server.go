@@ -231,6 +231,7 @@ func serve_compile(c *gin.Context) {
 			logger.Info("executable was unused for cache  duration, deleting it",
 				"exe_path", exe_path,
 				"cache_curation", dur,
+				"token", token,
 			)
 			executables.RemoveExecutableFile(token, exe_path)
 		}
