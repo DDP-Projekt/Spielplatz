@@ -1,23 +1,23 @@
 module github.com/DDP-Projekt/Spielplatz
 
-go 1.22.2
+go 1.24.1
 
 require (
-	github.com/DDP-Projekt/DDPLS v0.5.1-0.20250204153947-c4f12c9a005c
+	github.com/DDP-Projekt/DDPLS v1.0.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-contrib/requestid v1.0.2
 	github.com/gin-gonic/gin v1.9.1
-	github.com/gorilla/websocket v1.5.1
+	github.com/gorilla/websocket v1.5.3
 	github.com/lmittmann/tint v1.0.4
 	github.com/mattn/go-isatty v0.0.20
 	github.com/spf13/viper v1.18.2
-	github.com/tliron/commonlog v0.2.8
+	github.com/tliron/commonlog v0.2.18
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/sync v0.10.0
 )
 
 require (
-	github.com/DDP-Projekt/Kompilierer v0.5.0-alpha.0.20250204153322-22e1c6b046b9 // indirect
+	github.com/DDP-Projekt/Kompilierer v1.0.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -50,6 +50,7 @@ require (
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.1 // indirect
+	github.com/segmentio/ksuid v1.0.4 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/sourcegraph/jsonrpc2 v0.2.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
@@ -57,18 +58,20 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tliron/glsp v0.2.2-0.20240309182338-ab78d718ad7d // indirect
-	github.com/tliron/kutil v0.3.13 // indirect
+	github.com/tliron/kutil v0.3.25 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
-	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/term v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/protobuf v1.34.0 // indirect
+	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/tliron/glsp v0.2.2-0.20240309182338-ab78d718ad7d => github.com/DDP-Projekt/glsp v0.0.0-20250316162922-69bd2a0d2242

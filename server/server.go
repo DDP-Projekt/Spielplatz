@@ -185,8 +185,9 @@ func serve_ls(c *gin.Context) {
 	}
 	defer ws.Close()
 
-	ls := ddpls.NewDDPLS()
-	ls.Server.ServeWebSocket(ws)
+	ls := ddpls.NewDDPLS(context.Background())
+	lsLogger := lslogging.GetLogger("ddp.ddpls")
+	ls.Server.ServeWebSocket(ws, lsLogger)
 	logger.Info("language server connection closed")
 }
 
