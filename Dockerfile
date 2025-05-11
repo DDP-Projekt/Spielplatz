@@ -19,7 +19,7 @@ ENV CGO_ENABLED=1
 COPY ./ /
 RUN make DDPVERSION=${DDP_VERSION}
 
-FROM debian:bookworm-20250428-slim as run
+FROM ubuntu:latest as run
 
 WORKDIR /
 
