@@ -3,7 +3,7 @@ module github.com/DDP-Projekt/Spielplatz
 go 1.24.1
 
 require (
-	github.com/DDP-Projekt/DDPLS v1.0.0
+	github.com/DDP-Projekt/DDPLS v1.0.1-0.20251205101923-cb3592570e36
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-contrib/requestid v1.0.2
 	github.com/gin-gonic/gin v1.9.1
