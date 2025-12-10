@@ -9,6 +9,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/DDP-Projekt/DDPLS/ddpls"
@@ -46,7 +47,7 @@ func fatal(msg string, args ...any) {
 	r.Add(args...)
 
 	slog.Default().Handler().Handle(context.Background(), r)
-	panic(fmt.Errorf(msg))
+	panic(fmt.Errorf("%s", msg))
 }
 
 func getLogger(c *gin.Context) *slog.Logger {
@@ -212,7 +213,7 @@ func serve_compile(c *gin.Context) {
 	}
 
 	src_code := bytes.NewBufferString(req.Src)
-	logger.Info("compiling the program", "source-code", truncString(req.Src, viper.GetInt("max_source_code_log_length")))
+	logger.Info("compiling the program", "source-code", truncSourceString(req.Src, viper.GetInt("max_source_code_log_length")))
 	// compile the program
 	result, exe_path, err := kddp.CompileDDPProgram(src_code, token, exe_path, logger)
 	if err != nil {
@@ -300,9 +301,17 @@ func serve_run(c *gin.Context) {
 	ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("Das Programm wurde mit Code %d beendet", exitStatus)))
 }
 
-func truncString(s string, max int) string {
-	if len(s) <= max {
+func truncSourceString(s string, max_len int) string {
+	if len(s) <= max_len {
 		return s
 	}
-	return s[:max] + "..."
+
+	start := ""
+	start_index := 0
+	for strings.HasPrefix(s[start_index:], "Binde") {
+		start = "..."
+		start_index = max(start_index, min(strings.IndexByte(s[start_index:], '\n')+1, len(s)-1))
+	}
+
+	return start + s[start_index:start_index+max_len] + "..."
 }
