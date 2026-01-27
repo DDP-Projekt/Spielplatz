@@ -310,7 +310,7 @@ func truncSourceString(s string, max_len int) string {
 	start_index := 0
 	for strings.HasPrefix(s[start_index:], "Binde") {
 		start = "..."
-		start_index = max(start_index, min(strings.IndexByte(s[start_index:], '\n')+1, len(s)-1))
+		start_index = min(strings.IndexByte(s[start_index:], '\n')+1+start_index, len(s)-1)
 	}
 
 	return start + s[start_index:start_index+max_len] + "..."
