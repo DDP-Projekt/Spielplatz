@@ -23,7 +23,7 @@ import (
 
 func fatal(msg string, args ...any) {
 	slog.Log(context.Background(), slog.LevelError+4, msg, args...)
-	panic(fmt.Errorf(msg))
+	panic(fmt.Errorf("%s", msg))
 }
 
 func init() {
@@ -192,7 +192,7 @@ func GetKDDPVersion() (VersionResult, error) {
 	err := cmd.Run()
 
 	if err != nil && stderr.String() != "" {
-		err = fmt.Errorf(stderr.String())
+		err = fmt.Errorf("%s", stderr.String())
 	}
 
 	return VersionResult{

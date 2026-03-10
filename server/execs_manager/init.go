@@ -17,7 +17,7 @@ func fatal(msg string, args ...any) {
 	r.Add(args...)
 
 	slog.Default().Handler().Handle(context.Background(), r)
-	panic(fmt.Errorf(msg))
+	panic(fmt.Errorf("%s", msg))
 }
 
 const Exe_Dir = "playground_executables"
