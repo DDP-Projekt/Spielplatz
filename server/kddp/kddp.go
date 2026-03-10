@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync/atomic"
 
@@ -64,7 +65,13 @@ type ProgramResult[TokenType tokenType] struct {
 // the path to the executable,
 // and an error if one occurred
 func CompileDDPProgram[TokenType tokenType](src io.Reader, token TokenType, exe_path string, logger *slog.Logger) (ProgramResult[TokenType], string, error) {
-	cmd := exec.Command("kddp", "kompiliere", "-o", exe_path, "--main", "seccomp_main.o", "--gcc_optionen=-lseccomp -static -no-pie")
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("kddp", "kompiliere", "-o", exe_path, "--main", "unsec_main.o")
+	} else {
+		cmd = exec.Command("kddp", "kompiliere", "-o", exe_path, "--main", "seccomp_main.o", "--gcc_optionen=-lseccomp -static -no-pie")
+	}
+
 	cmd.Stdin = src
 	stderr := &strings.Builder{}
 	stdout := &strings.Builder{}
@@ -116,7 +123,13 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 
 	args = append([]string{exe_path}, args...)
 
-	cmd := exec.CommandContext(ctx, "./seccomp_exec", args...)
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.CommandContext(ctx, exe_path, args...)
+	} else {
+		cmd = exec.CommandContext(ctx, "./seccomp_exec", args...)
+	}
+
 	cmd.Stderr = stderr
 	cmd.Stdout = stdout
 	stdin_pipe, err := cmd.StdinPipe()

@@ -1,0 +1,4 @@
+CompileFlags:
+  Add:
+    - -I${DDPPATH}/lib
+  Compiler: C:/ProgramData/mingw64/mingw64/bin/gcc.exe

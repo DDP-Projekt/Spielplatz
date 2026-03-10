@@ -1,0 +1,9 @@
+{
+  "clangd.arguments": [
+    "--query-driver=C:/ProgramData/mingw64/mingw64/bin/*",
+    "--log=verbose"
+  ],
+  "clangd.fallbackFlags": [
+    "-I${env:DDPPATH}/lib"
+  ]
+}
