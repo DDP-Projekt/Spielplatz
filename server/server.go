@@ -311,5 +311,5 @@ func truncSourceString(s string, max_len int) string {
 		start_index = min(strings.IndexByte(s[start_index:], '\n')+1+start_index, len(s)-1)
 	}
 
-	return start + s[start_index:start_index+max_len] + "..."
+	return start + s[start_index:min(start_index+max_len, len(s)-1)] + "..."
 }
