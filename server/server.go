@@ -83,6 +83,7 @@ func setup_config() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	viper.AddConfigPath(".")
+	viper.SafeWriteConfig()
 	if err := viper.ReadInConfig(); err != nil {
 		fatal("Error reading config file", "err", err)
 	}
@@ -117,21 +118,18 @@ func main() {
 	)
 
 	// load html files as template
-	r.LoadHTMLGlob("static/html/*")
+	r.LoadHTMLGlob("site/build/*.html")
 
-	// serve node_modules/monaco-editor as /monaco-editor
-	r.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
-	// serve the static folder
-	r.StaticFS("/static", http.Dir("static"))
-	r.StaticFS("/img", http.Dir("img"))
+	// serve the app folder
+	r.StaticFS("/_app", http.Dir("site/build/_app"))
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", DDPVERSION)
 	})
 
-	r.GET("/embed", func(c *gin.Context) {
+	/*r.GET("/embed", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "embed.html", nil)
-	})
+	})*/
 
 	// websocket endpoint to connect to the language server
 	lslogging.Configure(1, nil)
