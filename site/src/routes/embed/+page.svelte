@@ -12,6 +12,7 @@
 
     import ImgButton from "$lib/components/common/ImgButton.svelte";
     import RunButton from "$lib/components/core/RunButton.svelte";
+    import SettingsComponent from "$lib/components/core/SettingsComponent.svelte";
 
     let editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined = $state()
     let editorSettings: EditorDisplaySettings | undefined = $state();
@@ -72,6 +73,7 @@
         <ControlsHeader>
             {#snippet leftControls()}
                 <RunButton bind:run_ws {args} {editor} autoClear={true} {clearOutput} {pushOutputMessage} />
+                <SettingsComponent bind:args />
             {/snippet}
     
             {#snippet rightControls()}
@@ -86,7 +88,7 @@
             theme={editorTheme}
         />
     </div>
-    
+
     {#if output.length !== 0}
         <Seperator
             bind:dragging={seperatorDragging} 
