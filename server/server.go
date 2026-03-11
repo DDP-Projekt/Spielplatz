@@ -124,7 +124,8 @@ func main() {
 	r.LoadHTMLFiles(siteRoot+"index.html", siteRoot+"embed.html")
 
 	// serve the app folder
-	r.StaticFS("/_app", http.Dir(siteRoot+"_app"))
+	r.Static("/_app", siteRoot+"static/_app")
+	r.Static("/static", siteRoot+"static/static")
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{"DDPVersion": DDPVERSION})

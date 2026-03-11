@@ -6,7 +6,6 @@
     import loader from "@monaco-editor/loader";
     import type * as MonacoEditor from "monaco-editor";
 
-
     export type EditorDisplaySettings = {
         readOnly: boolean,
         nolines: boolean,
@@ -16,7 +15,7 @@
 
     type EditorProps = {
         editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined,
-        initialContent: string | null,
+        initialContent: string | undefined,
         settings: EditorDisplaySettings,
         theme: "ddp-theme-dark" | "ddp-theme-light",
     }
@@ -31,7 +30,13 @@
     let editorDiv: HTMLElement | undefined;
     let model: MonacoEditor.editor.ITextModel;
     let monaco: typeof MonacoEditor;
-    let editorPromise = $state<Promise<void>>(new Promise(() => {}));
+    let editorPromise = $state<Promise<void>>(new Promise(() => {}))
+
+    // language server WebSocket
+    let ls_socket: WebSocket | undefined = $state()
+    
+    // holds callback promises for expected responses
+    let response_queue: ((resp: any) => void)[] = $state([]);
 
     $effect(() => {
         if (editor) {
@@ -39,15 +44,72 @@
         }
     });
 
-    async function initEditor() {
-        monaco = await loader.init();
+    onMount(() => {
+        editorPromise = initEditor();
+    });
 
-        // Configure base web worker for Monaco (only need editor.worker for custom language)
+    onDestroy(() => {
+        editor?.dispose();
+        model?.dispose();
+
+        send({
+            method: 'shutdown',
+            params: {},
+        });
+        push_response_handler().then((resp) => {
+            // send a language server protocol exit notification
+            send({
+                method: 'exit',
+                params: {},
+            });
+            // close the websocket
+            ls_socket?.close();
+        });
+    })
+
+    //a function that takes a javascript object and sends it to the language server
+    function send(msg: any) {
+        // return if the socket is not able to send
+        if (ls_socket?.readyState !== WebSocket.OPEN) {
+            return;
+        }
+
+        // send the msg to the language server and add basic jsonrpc fields
+        ls_socket.send(JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            ...msg,
+        }));
+    }
+
+    function push_response_handler() {
+        // return a promise that is fullfilled when socket.onmessage calls resp_handler
+        return new Promise((resolve) => {
+            response_queue.push(resolve);
+        });
+    }
+
+    function pull_response_handler() {
+        let resp = response_queue[0];
+        response_queue = response_queue.slice(1);
+        return resp;
+    }
+
+    function discard_response(resp: any) {
+        //console.log('discarding response', resp);
+    }
+
+    async function initEditor() {
+        // Must be imported and set BEFORE loader.init() so Monaco can find the worker during loading.
+        // Using Vite's ?worker suffix ensures the worker is properly bundled as a separate chunk.
+        const { default: EditorWorker } = await import('monaco-editor/esm/vs/editor/editor.worker?worker');
         self.MonacoEnvironment = {
-            getWorkerUrl: function () {
-                return new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url).href;
+            getWorker(_moduleId: string, _label: string): Worker {
+                return new EditorWorker();
             }
         };
+
+        monaco = await loader.init();
 
         monaco.editor.defineTheme('ddp-theme-dark', {
             base: 'vs-dark',
@@ -64,7 +126,7 @@
         });
 
         let value = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
-        if (initialContent !== null && !settings.embedded) {
+        if (initialContent !== undefined && !settings.embedded) {
             value = initialContent;
         }
 
@@ -92,13 +154,9 @@
             scrollbar: {
                 vertical: settings.noscroll ? "hidden" : undefined,	
                 handleMouseWheel: !settings.noscroll
-            }
+            },
+            value: initialContent
         });
-
-        /*new ResizeObserver(function (mutations) {
-            console.log("resize")
-            editor?.layout();
-        }).observe(editorDiv!);*/
 
         // add a new language called ddp to the editor
         monaco.languages.register({ id: 'ddp' });
@@ -168,50 +226,16 @@
         });
 
         // connect to a websocket on the /ls endpoint
-        let ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
-        const ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/ls`);
+        const ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
+        ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/ls`);
         ls_socket.onerror = (error) => {
             console.error('WebSocket error:', error);
         };
         let initialized = false;
 
-        //a function that takes a javascript object and sends it to the language server
-        function send(msg: any) {
-            // return if the socket is not able to send
-            if (ls_socket.readyState !== WebSocket.OPEN) {
-                return;
-            }
-            // send the msg to the language server and add basic jsonrpc fields
-            ls_socket.send(JSON.stringify({
-                jsonrpc: '2.0',
-                id: 1,
-                ...msg,
-            }));
-        }
-
         ls_socket.onclose = () => {
             console.log('disconnected from /ls');
         };
-
-        // holds callback promises for expected responses
-        let response_queue: ((resp: any) => void)[] = [];
-
-        function push_response_handler() {
-            // return a promise that is fullfilled when socket.onmessage calls resp_handler
-            return new Promise((resolve) => {
-                response_queue.push(resolve);
-            });
-        }
-
-        function pull_response_handler() {
-            let resp = response_queue[0];
-            response_queue = response_queue.slice(1);
-            return resp;
-        }
-
-        function discard_response(resp: any) {
-            //console.log('discarding response', resp);
-        }
 
         ls_socket.onmessage = (event) => {
             // handle langue server protocol messages
@@ -345,6 +369,7 @@
         let semantic_tokens_lengend: MonacoEditor.languages.SemanticTokensLegend = { tokenTypes: [], tokenModifiers: [] };
         let cached_readonly_semantic_tokens: any = null;
         let last_completion_request_timestamp = new Date().getTime();
+        
         function handleInitializeResponse(resp: any) {
             initialized = true;
 
@@ -396,7 +421,7 @@
                         // and can then close the websocket connection to safe resources on the server
                         if (settings.readOnly) {
                             cached_readonly_semantic_tokens = tokens;
-                            ls_socket.close();
+                            ls_socket?.close();
                         }
                         return tokens;
                     });
@@ -627,42 +652,7 @@
             });
             push_response_handler().then(discard_response);
         }
-
-        // when the website is closed, send a shutdown request to the language server
-        window.onbeforeunload = () => {
-            send({
-                method: 'shutdown',
-                params: {},
-            });
-            push_response_handler().then((resp) => {
-                // send a language server protocol exit notification
-                send({
-                    method: 'exit',
-                    params: {},
-                });
-                // close the websocket
-                ls_socket.close();
-            });
-
-            if (!settings.embedded) {
-                window.localStorage.setItem("content", editor!.getValue());
-            }
-
-            const argsContainer = document.getElementById("args") as HTMLInputElement | null;
-            if (argsContainer?.value) {
-                window.localStorage.setItem("args", argsContainer.value);
-            }
-        }
     }
-
-    onMount(() => {
-        editorPromise = initEditor();
-    });
-
-    onDestroy(() => {
-        editor?.dispose();
-        model?.dispose();
-    })
 
     let saveCount = $state(0);
     function funny(e: KeyboardEvent) {

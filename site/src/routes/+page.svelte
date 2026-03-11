@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { onMount, tick } from "svelte";
+    import { onDestroy, onMount, tick } from "svelte";
     import type * as MonacoEditor from "monaco-editor";
 
     import logoImg from "$lib/assets/ddp-logo.svg";
@@ -22,6 +22,7 @@
     let editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined = $state()
     let editorSettings: EditorDisplaySettings | undefined = $state();
     let editorTheme: "ddp-theme-dark" | "ddp-theme-light" = $state("ddp-theme-dark");
+    let initialContent: string | undefined = $state()
     
     let seperatorDragging = $state(false)
     let seperatorStart = $state(70)
@@ -47,10 +48,25 @@
             embedded: false
         }
 
-        lightMode = localStorage.getItem("dark-mode") === "false"
+        initialContent = localStorage.getItem("content") || undefined
+        lightMode = localStorage.getItem("dark-mode") === "false" || urlParams.has('light')
         vertical = localStorage.getItem("vertical") === "true"
+        args = localStorage.getItem("args")?.split(";") || []
+
         editorTheme = lightMode ? "ddp-theme-light" : "ddp-theme-dark"
     })
+
+    function onbeforeunload() {
+        if (editor) {
+            localStorage.setItem("content", editor.getValue());
+        }
+
+        if (args.length !== 0) {
+            localStorage.setItem("args", args.join(";"));
+        } else {
+            localStorage.removeItem("args")
+        }
+    }
 
     function onThemeChange() {
         localStorage.setItem("dark-mode", !lightMode + "")
@@ -90,7 +106,7 @@
     }
 </script>
 
-<svelte:window onresize={autoLayout} />
+<svelte:window onresize={autoLayout} {onbeforeunload} />
 
 <main style:--editor-container-size="{seperatorStart}%" data-vertical={vertical} data-dragging={seperatorDragging}>
     <div class="container">
@@ -123,7 +139,7 @@
 
         <EditorComponent 
             bind:editor
-            initialContent={null}
+            {initialContent}
             settings={editorSettings!}
             theme={editorTheme}
         />
