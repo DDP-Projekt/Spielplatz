@@ -663,10 +663,23 @@
         editor?.dispose();
         model?.dispose();
     })
+
+    let saveCount = $state(0);
+    function funny(e: KeyboardEvent) {
+        if (e.key == "s" && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+            e.preventDefault();
+            saveCount++;
+            if (saveCount > 1) {
+                alert('NOCHMAL \uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D')
+                return;
+            }
+            alert('BRUDER HAT VERSUCHT ZU SPEICHERN \uD83D\uDC80\uD83D\uDC80\uD83D\uDC80')
+        }
+    }
 </script>
 
 <div id="editor-container">
-    <div id="editor" bind:this={editorDiv}></div>
+    <div id="editor" bind:this={editorDiv} role="textbox" tabindex="0" onkeydown={funny}></div>
     {#await editorPromise}
         <div class="loading-overlay">
             <div class="spinner"></div>

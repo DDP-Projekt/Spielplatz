@@ -82,7 +82,15 @@
     function clearOutput() {
         output = []
     }
+
+    function autoLayout(event: Event) {
+        if ((event.target as Window)?.innerWidth <= 768) {
+            vertical = true
+        }
+    }
 </script>
+
+<svelte:window onresize={autoLayout} />
 
 <main style:--editor-container-size="{seperatorStart}%" data-vertical={vertical} data-dragging={seperatorDragging}>
     <div class="container">
