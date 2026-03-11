@@ -36,6 +36,7 @@
 
     let run_ws: WebSocket | null = $state(null);
     let outputElement: HTMLDivElement | undefined = $state();
+    const ddpVersion = typeof window !== "undefined" ? (window.__DDPVersion || "") : "";
 
     onMount(() => {
         const urlParams = page.url.searchParams;
@@ -144,8 +145,7 @@
         </ControlsHeader>
 
         <OutputComponent bind:outputElement bind:output {run_ws} {pushOutputMessage} >
-            <!-- mustaches get filled server side -->
-            <span class="sysmsg">Kompilierer Version: {"{{ . }}"}</span>
+            <span class="sysmsg">Kompilierer Version: {ddpVersion}</span>
         </OutputComponent>
     </div>
 </main>

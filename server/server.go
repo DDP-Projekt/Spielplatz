@@ -100,6 +100,7 @@ func setup_config() {
 func main() {
 	setup_logger(slog.LevelInfo)
 	setup_config()
+	slog.Info("Starting server with DDPVERSION=" + DDPVERSION)
 
 	if err := kddp.InitializeSemaphore(viper.GetInt64("max_concurrent_processes")); err != nil {
 		fatal("failed to initialize semaphore", "err", err)
@@ -118,18 +119,19 @@ func main() {
 		},
 	)
 
+	siteRoot := "site/build/"
 	// load html files as template
-	r.LoadHTMLGlob("site/build/*.html")
+	r.LoadHTMLFiles(siteRoot+"index.html", siteRoot+"embed.html")
 
 	// serve the app folder
-	r.StaticFS("/_app", http.Dir("site/build/_app"))
+	r.StaticFS("/_app", http.Dir(siteRoot+"_app"))
 
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", DDPVERSION)
+		c.HTML(http.StatusOK, "index.html", gin.H{"DDPVersion": DDPVERSION})
 	})
 
 	r.GET("/embed", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "embed.html", nil)
+		c.HTML(http.StatusOK, "embed.html", gin.H{"DDPVersion": DDPVERSION})
 	})
 
 	// websocket endpoint to connect to the language server
