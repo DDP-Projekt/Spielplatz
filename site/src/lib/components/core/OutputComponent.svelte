@@ -1,17 +1,15 @@
 <script lang="ts">
-    import { tick } from "svelte";
-
-    let { output, scrollLock, run_ws } = $props()
-
-    let outputElement: HTMLDivElement | undefined;
-    export async function pushOutput(message: OutputMessage) {
-        output.push(message)
-
-        if (!scrollLock && outputElement) {
-            await tick();
-            outputElement.scrollTop = outputElement.scrollHeight;
-        }
+    type OutputComponentProps = {
+        children?: any,
+        outputElement: HTMLDivElement | undefined
+        output: OutputMessage[],
+        run_ws: WebSocket | null,
+        pushOutputMessage: (m: OutputMessage) => Promise<void>
     }
+    
+    let {
+        children, outputElement = $bindable(), output = $bindable([]), run_ws, pushOutputMessage
+    }: OutputComponentProps = $props()
 
     async function inputEnter(ev: KeyboardEvent) {
         if (!ev.target) return;
@@ -28,7 +26,7 @@
         }
         
         ev.preventDefault();
-        await pushOutput({msg, type: 'stdin'})
+        await pushOutputMessage({msg, type: 'stdin'})
         if (run_ws) {
             run_ws.send(JSON.stringify({ msg: msg, eof: eof }));
         }
@@ -39,8 +37,7 @@
 <div id="output-container">
     <div id="output" bind:this={outputElement}>
         <pre id="outputText">
-            <!-- mustaches get filled server side -->
-            <span class="sysmsg">Kompilierer Version: {"{{ . }}"}</span>
+            {@render children?.()}
             {#each output as msg}
                 <span class={msg.type}>{msg.msg}</span>
             {/each}
@@ -75,9 +72,11 @@
     }
 
     #outputText span { display: block; }
-    span.stdin { color: var(--stdin-color); }
-    span.stderr { color: var(--stderr-color); }
-    span.sysmsg { color: var(--sysmsg-color); }
+    :global {
+        #outputText span.stdin { color: var(--stdin-color); }
+        #outputText span.stderr { color: var(--stderr-color); }
+        #outputText span.sysmsg { color: var(--sysmsg-color); }
+    }
 
     #input-container {
         display: flex;

@@ -1,10 +1,10 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
     import type * as MonacoEditor from "monaco-editor";
 
     import logoImg from "$lib/assets/ddp-logo.svg";
-    import { mdiArrowVerticalLock, mdiClipboardOutline, mdiCloseOctagonOutline, mdiDeleteClockOutline, mdiGithub, mdiHelpCircleOutline, mdiPlayOutline, mdiShare, mdiTrashCanOutline, mdiViewSplitHorizontal, mdiViewSplitVertical, mdiWeatherNight, mdiWeatherSunny } from "@mdi/js";
+    import { mdiArrowVerticalLock, mdiClipboardOutline, mdiDeleteClockOutline, mdiGithub, mdiHelpCircleOutline, mdiShare, mdiTrashCanOutline, mdiViewSplitHorizontal, mdiViewSplitVertical, mdiWeatherNight, mdiWeatherSunny } from "@mdi/js";
 
     import ControlsHeader from "$lib/components/core/ControlsHeader.svelte";
     import Seperator from "$lib/components/core/Seperator.svelte";
@@ -17,6 +17,7 @@
     import ImgToggleButton from "$lib/components/common/ImgToggleButton.svelte";
     import SettingsComponent from "$lib/components/core/SettingsComponent.svelte";
     import ExampleSelect from "$lib/components/core/ExampleSelect.svelte";
+    import RunButton from "$lib/components/core/RunButton.svelte";
 
     let editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined = $state()
     let editorSettings: EditorDisplaySettings | undefined = $state();
@@ -32,15 +33,9 @@
 
     let args = $state<string[]>([])
     let output = $state<OutputMessage[]>([])
-    let outputComponent: { pushOutput: (message: OutputMessage) => Promise<void> } | undefined = $state();
 
-    async function pushOutputMessage(msg: string, target: OutputMessage["type"]) {
-        await outputComponent?.pushOutput({ msg, type: target });
-    }
-
-    function toggleBtnVisibility() {
-        // Kept as a compatibility shim until run/stop buttons are wired.
-    }
+    let run_ws: WebSocket | null = $state(null);
+    let outputElement: HTMLDivElement | undefined = $state();
 
     onMount(() => {
         const urlParams = page.url.searchParams;
@@ -74,104 +69,17 @@
         await navigator.clipboard.writeText(output.map(x => x.msg).join('\n'))
     }
 
+    async function pushOutputMessage(message: OutputMessage) {
+        output.push(message)
+
+        if (!scrollLock && outputElement) {
+            await tick();
+            outputElement.scrollTop = outputElement.scrollHeight;
+        }
+    }
+
     function clearOutput() {
         output = []
-    }
-
-
-    let run_ws: WebSocket | null = $state(null);
-    let compiling = $state(false);
-
-    async function runProgram() {
-        const code = editor?.getValue()
-
-        if (run_ws) {
-            pushOutputMessage('Programm läuft bereits.', 'stderr');
-            return;
-        } else if (compiling) {
-            pushOutputMessage('Programm wird gerade kompiliert.', 'stderr');
-            return;
-        }
-
-        if (autoClear) {
-            clearOutput();
-        }
-
-        toggleBtnVisibility();
-
-        compiling = true;
-        // send a request to the /compile endpoint using the fetch api
-        const compile_result = await fetch('compile', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ src: code }),
-        }).then(response => response.json())
-
-        if (compile_result.error) {
-            pushOutputMessage("Kompilier Fehler: " + compile_result.error, 'stderr');
-            pushOutputMessage(" ", 'stderr');
-            pushOutputMessage(compile_result.stderr, 'stderr');
-
-            compiling = false;
-            toggleBtnVisibility();
-            return
-        }
-
-        const token = compile_result.token
-        let argsString = ""
-        for (let arg of args) {
-            argsString += "&args=" + arg;
-        }
-
-        // connect to the /run endpoint using the websocket api with token as query parameter
-        let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
-        run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/run?token=${token}${argsString}`)
-        if (!run_ws){
-            console.error('websocket (run) connection failed')
-            return;
-        } 
-        
-        // focus input
-        //document.getElementById('input').focus();
-
-        run_ws.onopen = () => {
-            //console.log('websocket (run) connection opened')
-        }
-
-        run_ws.onmessage = (event) => {
-            let msg = JSON.parse(event.data)
-            pushOutputMessage(msg.msg, msg.isStderr ? 'stderr' : 'stdout');
-        }
-
-        run_ws.onclose = (event) => {
-            //console.log('websocket (run) connection closed: ', event)
-            pushOutputMessage(" ", 'sysmsg')
-            pushOutputMessage(event.reason, event.code !== 1000 ? 'stderr' : 'sysmsg')
-            run_ws = null;
-            compiling = false;
-
-            toggleBtnVisibility();
-        }
-
-        run_ws.onerror = () => {
-            console.error('websocket (run) error')
-            pushOutputMessage('websocket (run) error', 'stderr');
-
-            toggleBtnVisibility();
-        }
-    }
-
-    function stopProgram() {
-        if (!run_ws) {
-            return;
-        }
-
-        pushOutputMessage("Das Programm wurde abgebrochen", 'sysmsg');
-        run_ws.send(JSON.stringify({ msg: "EOF", eof: true }));
-        run_ws = null;
-        compiling = false;
     }
 </script>
 
@@ -182,9 +90,9 @@
                 <a href="https://ddp.im/" target="_blank">
                     <img src={logoImg} alt="ddp-logo" width="24px" height="24px" title="DDP Homepage">
                 </a>
-                <ImgButton title="Ausführen" onclick={runProgram} path={mdiPlayOutline} offset={{x: -2, y: 0}} />
-                <ImgButton title="Stop" onclick={stopProgram} path={mdiCloseOctagonOutline} />
-                <SettingsComponent bind:args={args} />
+
+                <RunButton bind:run_ws {args} {editor} {autoClear} {clearOutput} {pushOutputMessage} />
+                <SettingsComponent bind:args />
             {/snippet}
     
             {#snippet rightControls()}
@@ -205,7 +113,7 @@
         </ControlsHeader>
 
         <EditorComponent 
-            bind:editor={editor}
+            bind:editor
             initialContent={null}
             settings={editorSettings!}
             theme={editorTheme}
@@ -235,7 +143,10 @@
             {/snippet}
         </ControlsHeader>
 
-        <OutputComponent bind:this={outputComponent} {output} {scrollLock} {run_ws} />
+        <OutputComponent bind:outputElement bind:output {run_ws} {pushOutputMessage} >
+            <!-- mustaches get filled server side -->
+            <span class="sysmsg">Kompilierer Version: {"{{ . }}"}</span>
+        </OutputComponent>
     </div>
 </main>
 

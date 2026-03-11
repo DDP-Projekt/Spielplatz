@@ -121,12 +121,11 @@ func RunExecutable(exe_path string, stdin io.Reader, stdout, stderr io.Writer, a
 	}
 	logger = logger.With("exe_path", exe_path)
 
-	args = append([]string{exe_path}, args...)
-
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
 		cmd = exec.CommandContext(ctx, exe_path, args...)
 	} else {
+		args = append([]string{exe_path}, args...)
 		cmd = exec.CommandContext(ctx, "./seccomp_exec", args...)
 	}
 

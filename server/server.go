@@ -128,9 +128,9 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", DDPVERSION)
 	})
 
-	/*r.GET("/embed", func(c *gin.Context) {
+	r.GET("/embed", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "embed.html", nil)
-	})*/
+	})
 
 	// websocket endpoint to connect to the language server
 	lslogging.Configure(1, nil)

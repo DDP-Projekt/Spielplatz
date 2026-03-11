@@ -84,5 +84,10 @@
         color: var(--text-color);
         border-radius: 0.25rem;
         border: var(--input-border-color) solid var(--input-border-width);
+
+        &:disabled {
+            color: rgb(from var(--text-color) r g b / 0.6);
+            border-color: rgb(from var(--input-border-color) r g b / 0.6);
+        }
     }
 </style>
