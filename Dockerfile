@@ -1,4 +1,4 @@
-FROM golang:bookworm as build
+FROM golang:bookworm AS build
 WORKDIR /
 
 # install dependencies
@@ -16,10 +16,12 @@ RUN tar -xzf ./DDP.tar.gz -C DDP --strip-components 1
 ENV DDPPATH=/DDP
 ENV CGO_ENABLED=1
 
+RUN npm install -g n
+
 COPY ./ /
 RUN make DDPVERSION=${DDP_VERSION}
 
-FROM ubuntu:latest as run
+FROM ubuntu:latest AS run
 
 WORKDIR /
 
@@ -43,9 +45,8 @@ RUN ./ddp-setup --force
 ENV PATH=/DDP/bin:$PATH
 ENV DDPPATH=/DDP
 
-COPY --from=build Spielplatz seccomp_exec seccomp_main.o /app/
-COPY --from=build /node_modules /app/node_modules
-COPY --from=build /static/ /app/static
+COPY --from=build Spielplatz seccomp_exec seccomp_main.o ddpdict /app/
+COPY --from=build site/build /app/site/build
 
 RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 

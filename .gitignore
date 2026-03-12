@@ -6,3 +6,4 @@ Spielplatz
 seccomp_exec
 *.tar.*
 *.pem
+*.exe

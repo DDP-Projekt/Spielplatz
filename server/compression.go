@@ -40,8 +40,6 @@ func serve_compress(c *gin.Context) {
 	}
 
 	encoded := zstdEncoder.EncodeAll([]byte(code), nil)
-
-	// base64 encode the compressed data
 	encodedStr := base64.StdEncoding.EncodeToString(encoded)
 	encodedStr = url.QueryEscape(encodedStr)
 	c.JSON(http.StatusOK, gin.H{"compressed": encodedStr})

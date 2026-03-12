@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
@@ -142,6 +144,8 @@ func main() {
 	r.GET("/compress", serve_compress)
 	r.GET("/decompress", serve_decompress)
 
+	r.GET("/generate_share_link", serve_generate_share_link)
+
 	// websocket endpoint to connect to the language server
 	lslogging.Configure(1, nil)
 	r.GET("/ls", serve_ls)
@@ -178,6 +182,52 @@ func main() {
 			fatal("failed to run server", "err", err)
 		}
 	}
+}
+
+func serve_generate_share_link(c *gin.Context) {
+	logger := getLogger(c)
+	link, exists := c.GetQuery("link")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing link parameter"})
+		return
+	}
+
+	req, err := http.NewRequest("POST", "https://s.ddp.im/api/links", bytes.NewBufferString("{\"target\": \""+link+"\"}"))
+	if err != nil {
+		logger.Error("failed to create request", "err", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate share link"})
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-KEY", viper.GetString("kutt_api_key"))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		logger.Error("failed to send request", "err", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate share link"})
+		return
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated {
+		body, _ := io.ReadAll(resp.Body)
+		logger.Error("non-201 response from link generation service", "status", resp.StatusCode, "body", string(body))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate share link"})
+		return
+	}
+	type LinkResponse struct {
+		Link string `json:"link"`
+	}
+
+	var linkResp LinkResponse
+	if err := json.NewDecoder(resp.Body).Decode(&linkResp); err != nil {
+		logger.Error("failed to decode response", "err", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate share link"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"share_link": linkResp.Link})
 }
 
 var upgrader = websocket.Upgrader{}

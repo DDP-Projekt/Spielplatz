@@ -85,8 +85,13 @@
     async function shareCode() {
         if (!editor) return;
 
-        const resp: {compressed: string} = await (await fetch(withQuery("/compress", { code: editor.getValue() }))).json()
-        console.log(resp.compressed, resp.compressed.length)
+        const compressResp: {compressed: string} = await (await fetch(withQuery("/compress", { code: editor.getValue() }))).json()
+        const shareResp: {share_link: string} = await (
+            await fetch(
+                withQuery("/generate_share_link", { link:`https://spiel.ddp.im?code=${compressResp.compressed}` })
+            )).json()
+
+        prompt("Share link", shareResp.share_link)
     }
 
     async function copyCode() {
