@@ -3,11 +3,9 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"os"
 	"runtime"
 	"strconv"
@@ -22,7 +20,6 @@ import (
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/klauspost/compress/zstd"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/viper"
@@ -109,6 +106,8 @@ func main() {
 		fatal("failed to initialize semaphore", "err", err)
 	}
 
+	initCompression()
+
 	r := gin.New()
 	r.Use(
 		gin.Recovery(),
@@ -140,8 +139,8 @@ func main() {
 	})
 
 	// compression endpoints
-	r.GET("/compress", compress)
-	r.GET("/decompress", decompress)
+	r.GET("/compress", serve_compress)
+	r.GET("/decompress", serve_decompress)
 
 	// websocket endpoint to connect to the language server
 	lslogging.Configure(1, nil)
@@ -179,46 +178,6 @@ func main() {
 			fatal("failed to run server", "err", err)
 		}
 	}
-}
-
-var zstdEncoder, _ = zstd.NewWriter(nil)
-var zstdDecoder, _ = zstd.NewReader(nil)
-
-func compress(c *gin.Context) {
-	code, exists := c.GetQuery("code")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No code parameter present"})
-		return
-	}
-
-	encoded := zstdEncoder.EncodeAll([]byte(code), nil)
-
-	// base64 encode the compressed data
-	encodedStr := base64.StdEncoding.EncodeToString(encoded)
-	encodedStr = url.QueryEscape(encodedStr)
-	c.JSON(http.StatusOK, gin.H{"compressed": encodedStr})
-}
-
-func decompress(c *gin.Context) {
-	encodedStr, exists := c.GetQuery("code")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No code parameter present"})
-		return
-	}
-
-	encoded, err := base64.StdEncoding.DecodeString(encodedStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 input"})
-		return
-	}
-
-	decompressed, err := zstdDecoder.DecodeAll(encoded, nil)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid compressed data"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"code": string(decompressed)})
 }
 
 var upgrader = websocket.Upgrader{}
