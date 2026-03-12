@@ -1,9 +1,20 @@
 <script lang="ts">
     import { mdiCloseOctagonOutline, mdiPlayOutline } from "@mdi/js";
     import ImgButton from "../common/ImgButton.svelte";
+    import type { OutputMessage } from "$lib";
 
-    type RunButtonProps = { run_ws: WebSocket | null, args: string[], editor: any, autoClear: boolean, clearOutput: () => void, pushOutputMessage: (m: OutputMessage) => Promise<void> }
-    let { run_ws = $bindable(), args, editor, autoClear, clearOutput, pushOutputMessage } : RunButtonProps = $props()
+    type RunButtonProps = {
+        run_ws: WebSocket | null,
+        args: string[],
+        editor: any,
+        autoClear: boolean,
+        clearOutput: () => void,
+        pushOutputMessage: (m: OutputMessage) => Promise<void>
+    }
+
+    let {
+        run_ws = $bindable(), args, editor, autoClear, clearOutput, pushOutputMessage
+    } : RunButtonProps = $props()
 
     let compiling = $state(false);
 

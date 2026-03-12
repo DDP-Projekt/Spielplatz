@@ -13,10 +13,10 @@
     import ImgButton from "$lib/components/common/ImgButton.svelte";
     import RunButton from "$lib/components/core/RunButton.svelte";
     import SettingsComponent from "$lib/components/core/SettingsComponent.svelte";
+    import { withQuery, type OutputMessage } from "$lib";
 
     let editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined = $state()
     let editorSettings: EditorDisplaySettings | undefined = $state();
-    let editorTheme: "ddp-theme-dark" | "ddp-theme-light" = $state("ddp-theme-dark");
     
     let seperatorDragging = $state(false)
     let seperatorStart = $state(70)
@@ -30,17 +30,25 @@
     let run_ws: WebSocket | null = $state(null);
     let outputElement: HTMLDivElement | undefined = $state();
 
-    onMount(() => {
+    onMount(async () => {
         const urlParams = page.url.searchParams;
+        
+        lightMode = localStorage.getItem("dark-mode") === "false" || urlParams.has('light')
+        args = localStorage.getItem("args")?.split(";") || []
+
         editorSettings = {
+            initialContent: localStorage.getItem("content") || undefined,
+            theme: lightMode ? "ddp-theme-light" : "ddp-theme-dark",
             readOnly: urlParams.has("readonly"),
             nolines: urlParams.has("nolines"),
             noscroll: urlParams.has("noscroll"),
-            embedded: true
+            embedded: false
         }
 
-        lightMode = localStorage.getItem("dark-mode") === "false"
-        editorTheme = lightMode ? "ddp-theme-light" : "ddp-theme-dark"
+        if (urlParams.has("code")) {
+            const resp: {code: string} = await (await fetch(withQuery("/decompress", { code: urlParams.get("code")! }))).json()
+            editorSettings.initialContent = resp.code
+        }
     })
 
     async function copyCode() {
@@ -83,9 +91,7 @@
 
         <EditorComponent 
             bind:editor
-            initialContent={null}
             settings={editorSettings!}
-            theme={editorTheme}
         />
     </div>
 

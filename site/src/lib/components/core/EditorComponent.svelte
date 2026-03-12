@@ -7,6 +7,8 @@
     import type * as MonacoEditor from "monaco-editor";
 
     export type EditorDisplaySettings = {
+        initialContent?: string,
+        theme: "ddp-theme-dark" | "ddp-theme-light",
         readOnly: boolean,
         nolines: boolean,
         noscroll: boolean,
@@ -15,16 +17,12 @@
 
     type EditorProps = {
         editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined,
-        initialContent: string | undefined,
         settings: EditorDisplaySettings,
-        theme: "ddp-theme-dark" | "ddp-theme-light",
     }
 
     let { 
         editor = $bindable(),
-        initialContent,
-        settings,
-        theme = "ddp-theme-dark"
+        settings
     }: EditorProps = $props()
 
     let editorDiv: HTMLElement | undefined;
@@ -40,7 +38,7 @@
 
     $effect(() => {
         if (editor) {
-            monaco.editor.setTheme(theme);
+            monaco.editor.setTheme(settings.theme);
         }
     });
 
@@ -126,16 +124,12 @@
         });
 
         let value = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
-        if (initialContent !== undefined && !settings.embedded) {
-            value = initialContent;
+        if (settings.initialContent !== undefined && !settings.embedded) {
+            value = settings.initialContent;
         }
 
-        /*if (code !== null) {
-            value = decodeURIComponent(LZUTF8.decompress(code, { inputEncoding: "Base64" }));
-        }*/
-
         const themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-        const initialTheme = theme || (themeMediaQuery.matches ? "ddp-theme-dark" : "ddp-theme-light");
+        const initialTheme = settings.theme || (themeMediaQuery.matches ? "ddp-theme-dark" : "ddp-theme-light");
         themeMediaQuery.addEventListener('change', (ev) => {
             monaco.editor.setTheme(ev.matches ? "ddp-theme-dark" : "ddp-theme-light")
         })
@@ -154,8 +148,7 @@
             scrollbar: {
                 vertical: settings.noscroll ? "hidden" : undefined,	
                 handleMouseWheel: !settings.noscroll
-            },
-            value: initialContent
+            }
         });
 
         // add a new language called ddp to the editor

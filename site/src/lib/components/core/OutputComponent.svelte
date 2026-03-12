@@ -1,4 +1,6 @@
 <script lang="ts">
+    import type { OutputMessage } from "$lib";
+
     type OutputComponentProps = {
         children?: any,
         outputElement: HTMLDivElement | undefined

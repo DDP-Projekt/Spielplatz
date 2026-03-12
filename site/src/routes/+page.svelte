@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { onDestroy, onMount, tick } from "svelte";
+    import { onMount, tick } from "svelte";
     import type * as MonacoEditor from "monaco-editor";
 
     import logoImg from "$lib/assets/ddp-logo.svg";
@@ -18,11 +18,10 @@
     import SettingsComponent from "$lib/components/core/SettingsComponent.svelte";
     import ExampleSelect from "$lib/components/core/ExampleSelect.svelte";
     import RunButton from "$lib/components/core/RunButton.svelte";
+    import { withQuery, type OutputMessage } from "$lib";
 
     let editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined = $state()
     let editorSettings: EditorDisplaySettings | undefined = $state();
-    let editorTheme: "ddp-theme-dark" | "ddp-theme-light" = $state("ddp-theme-dark");
-    let initialContent: string | undefined = $state()
     
     let seperatorDragging = $state(false)
     let seperatorStart = $state(70)
@@ -39,21 +38,26 @@
     let outputElement: HTMLDivElement | undefined = $state();
     const ddpVersion = typeof window !== "undefined" ? (window.__DDPVersion || "") : "";
 
-    onMount(() => {
+    onMount(async () => {
         const urlParams = page.url.searchParams;
+        
+        lightMode = localStorage.getItem("dark-mode") === "false" || urlParams.has('light')
+        vertical = localStorage.getItem("vertical") === "true"
+        args = localStorage.getItem("args")?.split(";") || []
+
         editorSettings = {
+            initialContent: localStorage.getItem("content") || undefined,
+            theme: lightMode ? "ddp-theme-light" : "ddp-theme-dark",
             readOnly: urlParams.has("readonly"),
             nolines: urlParams.has("nolines"),
             noscroll: urlParams.has("noscroll"),
             embedded: false
         }
 
-        initialContent = localStorage.getItem("content") || undefined
-        lightMode = localStorage.getItem("dark-mode") === "false" || urlParams.has('light')
-        vertical = localStorage.getItem("vertical") === "true"
-        args = localStorage.getItem("args")?.split(";") || []
-
-        editorTheme = lightMode ? "ddp-theme-light" : "ddp-theme-dark"
+        if (urlParams.has("code")) {
+            const resp: {code: string} = await (await fetch(withQuery("/decompress", { code: urlParams.get("code")! }))).json()
+            editorSettings.initialContent = resp.code
+        }
     })
 
     function onbeforeunload() {
@@ -70,12 +74,19 @@
 
     function onThemeChange() {
         localStorage.setItem("dark-mode", !lightMode + "")
-        editorTheme = lightMode ? "ddp-theme-light" : "ddp-theme-dark"
+        editorSettings!.theme = lightMode ? "ddp-theme-light" : "ddp-theme-dark"
     }
 
     function onViewChange() {
         localStorage.setItem("vertical", vertical + "")
         editor?.layout()
+    }
+
+    async function shareCode() {
+        if (!editor) return;
+
+        const resp: {compressed: string} = await (await fetch(withQuery("/compress", { code: editor.getValue() }))).json()
+        console.log(resp.compressed, resp.compressed.length)
     }
 
     async function copyCode() {
@@ -122,7 +133,7 @@
     
             {#snippet rightControls()}
                 <ExampleSelect onSelect={(code) => editor?.setValue(code) } />
-                <ImgButton onclick={""} path={mdiShare} title="Code teilen" />
+                <ImgButton onclick={shareCode} path={mdiShare} title="Code teilen" />
                 <ImgButton onclick={copyCode} path={mdiClipboardOutline} title="Code kopieren" />
                 <ImgLink href="https://github.com/DDP-Projekt/Spielplatz" path={mdiGithub} title="Spielplatz GitHub" />
 
@@ -139,9 +150,7 @@
 
         <EditorComponent 
             bind:editor
-            {initialContent}
             settings={editorSettings!}
-            theme={editorTheme}
         />
     </div>
 
