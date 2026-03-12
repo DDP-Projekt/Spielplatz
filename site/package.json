@@ -1,7 +1,8 @@
 {
 	"name": "site",
 	"private": true,
-	"version": "0.0.1",
+	"version": "1.0.0",
+	"author": "NotLe0n",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
