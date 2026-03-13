@@ -220,7 +220,7 @@
 
         // connect to a websocket on the /ls endpoint
         const ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
-        ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/ls`);
+        ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/api/ls`);
         ls_socket.onerror = (error) => {
             console.error('WebSocket error:', error);
         };

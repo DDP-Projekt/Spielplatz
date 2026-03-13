@@ -3,9 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"os"
@@ -24,6 +22,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/viper"
 	lslogging "github.com/tliron/commonlog"
 )
@@ -63,6 +62,7 @@ func getLogger(c *gin.Context) *slog.Logger {
 func setup_config() {
 	viper.SetDefault("exe_cache_duration", time.Second*60)
 	viper.SetDefault("run_timeout", time.Second*60)
+	viper.SetDefault("share_db_path", "./share_links.db")
 	viper.SetDefault("port", "8080")
 	viper.SetDefault("memory_limit_bytes", 4*(2<<29)) // 4 GiB
 	viper.SetDefault("cpu_limit_percent", 50)
@@ -109,6 +109,10 @@ func main() {
 	}
 
 	initCompression()
+	if err := initShareLinksStorage(viper.GetString("share_db_path")); err != nil {
+		fatal("failed to initialize share links database", "err", err)
+	}
+	defer closeShareLinksStorage()
 
 	r := gin.New()
 	r.Use(
@@ -123,36 +127,19 @@ func main() {
 		},
 	)
 
-	siteRoot := "site/build/"
-	// load html files as template
-	r.LoadHTMLFiles(siteRoot+"index.html", siteRoot+"embed.html")
-
-	// serve the app folder
-	r.Static("/_app", siteRoot+"static/_app")
-	r.Static("/static", siteRoot+"static/static")
-
-	// HTML endpoints
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{"DDPVersion": DDPVERSION})
-	})
-
-	r.GET("/embed", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "embed.html", gin.H{"DDPVersion": DDPVERSION})
-	})
+	api := r.Group("/api")
 
 	// compression endpoints
-	r.GET("/compress", serve_compress)
-	r.GET("/decompress", serve_decompress)
-
-	r.GET("/generate_share_link", serve_generate_share_link)
+	api.POST("/create_share_code", serve_create_share_code)
+	api.GET("/get_share_data", serve_get_share_data)
 
 	// websocket endpoint to connect to the language server
 	lslogging.Configure(1, nil)
-	r.GET("/ls", serve_ls)
+	api.GET("/ls", serve_ls)
 
 	// endpoint to compile a ddp program
-	r.POST("/compile", serve_compile)
-	r.GET("/run", serve_run)
+	api.POST("/compile", serve_compile)
+	api.GET("/run", serve_run)
 
 	r.GET("/health", serve_health)
 	r.HEAD("/health", serve_health)
@@ -182,52 +169,6 @@ func main() {
 			fatal("failed to run server", "err", err)
 		}
 	}
-}
-
-func serve_generate_share_link(c *gin.Context) {
-	logger := getLogger(c)
-	link, exists := c.GetQuery("link")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing link parameter"})
-		return
-	}
-
-	req, err := http.NewRequest("POST", "https://s.ddp.im/api/links", bytes.NewBufferString("{\"target\": \""+link+"\"}"))
-	if err != nil {
-		logger.Error("failed to create request", "err", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate share link"})
-		return
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-KEY", viper.GetString("kutt_api_key"))
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		logger.Error("failed to send request", "err", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate share link"})
-		return
-	}
-
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusCreated {
-		body, _ := io.ReadAll(resp.Body)
-		logger.Error("non-201 response from link generation service", "status", resp.StatusCode, "body", string(body))
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate share link"})
-		return
-	}
-	type LinkResponse struct {
-		Link string `json:"link"`
-	}
-
-	var linkResp LinkResponse
-	if err := json.NewDecoder(resp.Body).Decode(&linkResp); err != nil {
-		logger.Error("failed to decode response", "err", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate share link"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"share_link": linkResp.Link})
 }
 
 var upgrader = websocket.Upgrader{}

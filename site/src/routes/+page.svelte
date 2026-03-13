@@ -36,7 +36,6 @@
 
     let run_ws: WebSocket | null = $state(null);
     let outputElement: HTMLDivElement | undefined = $state();
-    const ddpVersion = typeof window !== "undefined" ? (window.__DDPVersion || "") : "";
 
     onMount(async () => {
         const urlParams = page.url.searchParams;
@@ -54,8 +53,8 @@
             embedded: false
         }
 
-        if (urlParams.has("code")) {
-            const resp: {code: string} = await (await fetch(withQuery("/decompress", { code: urlParams.get("code")! }))).json()
+        if (urlParams.has("share")) {
+            const resp: {code: string} = await (await fetch(withQuery("/api/get_share_data", { code: urlParams.get("share")! }))).json()
             editorSettings.initialContent = resp.code
         }
     })
@@ -85,13 +84,20 @@
     async function shareCode() {
         if (!editor) return;
 
-        const compressResp: {compressed: string} = await (await fetch(withQuery("/compress", { code: editor.getValue() }))).json()
-        const shareResp: {share_link: string} = await (
-            await fetch(
-                withQuery("/generate_share_link", { link:`https://spiel.ddp.im?code=${compressResp.compressed}` })
-            )).json()
+        const shareResp: { share_code: string } = await fetch('/api/create_share_code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code: editor.getValue() }),
+        }).then(response => response.json())
 
-        prompt("Share link", shareResp.share_link)
+        if (!shareResp.share_code) {
+            alert("Fehler beim Erstellen des Share-Links.")
+            return;
+        }
+
+        prompt("Share link", `${window.location.origin}/?share=${shareResp.share_code}`)
     }
 
     async function copyCode() {
@@ -183,7 +189,7 @@
         </ControlsHeader>
 
         <OutputComponent bind:outputElement bind:output {run_ws} {pushOutputMessage} >
-            <span class="sysmsg">Kompilierer Version: {ddpVersion}</span>
+            <span class="sysmsg">Kompilierer Version: v1.0.0</span>
         </OutputComponent>
     </div>
 </main>

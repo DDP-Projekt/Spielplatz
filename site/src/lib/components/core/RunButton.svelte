@@ -35,7 +35,7 @@
 
         compiling = true;
         // send a request to the /compile endpoint using the fetch api
-        const compile_result = await fetch('compile', {
+        const compile_result = await fetch('/api/compile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -49,22 +49,18 @@
             return
         }
 
-        const token = compile_result.token
-        let argsString = ""
+        var runParams = new URLSearchParams({token: compile_result.token})
         for (let arg of args) {
-            argsString += "&args=" + arg;
+            runParams.append("args", arg)
         }
 
         // connect to the /run endpoint using the websocket api with token as query parameter
         let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
-        run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/run?token=${token}${argsString}`)
+        run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/api/run?${runParams.toString()}`)
         if (!run_ws) {
             await pushOutputMessage({msg: 'Websocket (run) Verbindungsfehler', type: "stderr"})
             return;
-        } 
-        
-        // focus input
-        //document.getElementById('input').focus();
+        }
 
         run_ws.onopen = (ev) => {
             //console.log('websocket (run) connection opened')
