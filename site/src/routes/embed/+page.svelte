@@ -36,18 +36,21 @@
         lightMode = localStorage.getItem("dark-mode") === "false" || urlParams.has('light')
         args = localStorage.getItem("args")?.split(";") || []
 
+        let editorContent: string | undefined;
+        if (urlParams.has("share")) {
+            const resp: {code: string} = await (await fetch(withQuery("/api/get_share_data", { code: urlParams.get("share")! }))).json()
+            editorContent = resp.code
+        } else {
+            editorContent = localStorage.getItem("content") || undefined
+        }
+
         editorSettings = {
-            initialContent: localStorage.getItem("content") || undefined,
+            initialContent: editorContent,
             theme: lightMode ? "ddp-theme-light" : "ddp-theme-dark",
             readOnly: urlParams.has("readonly"),
             nolines: urlParams.has("nolines"),
             noscroll: urlParams.has("noscroll"),
             embedded: true
-        }
-        
-        if (urlParams.has("share")) {
-            const resp: {code: string} = await (await fetch(withQuery("/api/get_share_data", { code: urlParams.get("share")! }))).json()
-            editorSettings.initialContent = resp.code
         }
     })
 
