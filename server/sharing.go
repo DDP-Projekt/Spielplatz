@@ -35,8 +35,14 @@ func initCompression() {
 	ddpdict, err := os.ReadFile("ddpdict")
 	if err != nil {
 		slog.Warn("failed to read ddpdict file. Using default dictionary.", "err", err)
-		zstdEncoder, _ = zstd.NewWriter(nil)
-		zstdDecoder, _ = zstd.NewReader(nil)
+		zstdEncoder, err = zstd.NewWriter(nil)
+		if err != nil {
+			fatal("failed to create zstd encoder", "err", err)
+		}
+		zstdDecoder, err = zstd.NewReader(nil)
+		if err != nil {
+			fatal("failed to create zstd decoder", "err", err)
+		}
 	} else {
 		zstdEncoder, err = zstd.NewWriter(nil, zstd.WithEncoderDict(ddpdict))
 		if err != nil {

@@ -41,7 +41,10 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ src: code }),
-        }).then(response => response.json())
+        }).then(response => response.json()).catch(async () => {
+            await pushOutputMessage({msg: 'Fehler beim Kompilieren (Netzwerkfehler)', type: 'stderr'});
+            compiling = false;
+        })
 
         if (compile_result.error) {
             await pushOutputMessage({msg: `Kompilier Fehler: ${compile_result.error}\n${compile_result.stderr}`, type: 'stderr'});
@@ -55,10 +58,13 @@
         }
 
         // connect to the /run endpoint using the websocket api with token as query parameter
-        let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
-        run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/api/run?${runParams.toString()}`)
-        if (!run_ws) {
+        try {
+            let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
+            run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/api/run?${runParams.toString()}`)
+        }
+        catch (e) {
             await pushOutputMessage({msg: 'Websocket (run) Verbindungsfehler', type: "stderr"})
+            compiling = false;
             return;
         }
 

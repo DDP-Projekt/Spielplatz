@@ -219,15 +219,22 @@
         });
 
         // connect to a websocket on the /ls endpoint
-        const ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
-        ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/api/ls`);
+        try {
+            const ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
+            ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/api/ls`);
+        }
+        catch (e) {
+            console.error('WebSocket (ls) Verbindungsfehler', e);
+            return;
+        }
+        
         ls_socket.onerror = (error) => {
             console.error('WebSocket error:', error);
         };
         let initialized = false;
 
         ls_socket.onclose = () => {
-            console.log('disconnected from /ls');
+            console.log('disconnected from language server');
         };
 
         ls_socket.onmessage = (event) => {
@@ -241,6 +248,10 @@
 
             if (msg.result !== undefined) {
                 let resolve = pull_response_handler()
+                if (!resolve) {
+                    console.error('unexpected message from language server', msg);
+                    return;
+                }
                 resolve(msg);
                 return;
             }
@@ -270,7 +281,7 @@
         };
 
         ls_socket.onopen = () => {
-            console.log('connected to /ls');
+            console.log('connected to language server');
             // send a language server protocol initialize request
             send({
                 method: 'initialize',
@@ -651,12 +662,18 @@
     function funny(e: KeyboardEvent) {
         if (e.key == "s" && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
             e.preventDefault();
-            saveCount++;
-            if (saveCount > 1) {
-                alert('NOCHMAL \uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D')
-                return;
+            switch (saveCount) {
+                case 0:
+                    alert('BRUDER HAT VERSUCHT ZU SPEICHERN \uD83D\uDC80\uD83D\uDC80\uD83D\uDC80')
+                    saveCount++;
+                    break;
+                case 1:
+                    alert('NOCHMAL \uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D')
+                    saveCount++;
+                    break;
+                default:
+                    break;
             }
-            alert('BRUDER HAT VERSUCHT ZU SPEICHERN \uD83D\uDC80\uD83D\uDC80\uD83D\uDC80')
         }
     }
 </script>
