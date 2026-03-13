@@ -178,7 +178,19 @@ func main() {
 	}
 }
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header.Get("Origin")
+
+		allowed := map[string]bool{
+			"http://localhost:5173": true,
+			"http://127.0.0.1:5173": true,
+			"https://spiel.dpp.im":  true,
+		}
+
+		return allowed[origin]
+	},
+}
 
 // serves the /ls endpoint
 func serve_ls(c *gin.Context) {
@@ -187,7 +199,7 @@ func serve_ls(c *gin.Context) {
 	// upgrade the connection to a websocket connection
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		logger.Error("failed to initialize websocket connection")
+		logger.Error("failed to initialize websocket connection", "err", err.Error())
 		return
 	}
 	defer ws.Close()
@@ -255,7 +267,7 @@ func serve_run(c *gin.Context) {
 	// upgrade the connection to a websocket connection
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		logger.Error("failed to initialize websocket connection")
+		logger.Error("failed to initialize websocket connection", "err", err.Error())
 		return
 	}
 	defer ws.Close()

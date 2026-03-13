@@ -1,26 +1,26 @@
-
-## Directory structure
+## Verzeichnisstruktur
 ```
 site/
 ├─ src/
 │  ├─ lib/
-│  │  ├─ assets/    - Assets and favicon
+│  │  ├─ assets/    - Assets und Favicon
 │  │  ├─ components/
-│  │  │  ├─ common/    - Components which are used by other components
-│  │  │  └─ core/      - Complex Components used by the playground
-│  │  └─ data/      - Monaco-Editor configuration data
-│  ├─ routes/     - Filesystem based routing
-│  └─ app.html    - Base html file. Contains css reset and variables
-└─ static/    - Other static data, like webmanifest and robots.txt
+│  │  │  ├─ common/    - Komponenten, die von anderen Komponenten verwendet werden
+│  │  │  └─ core/      - Komplexe Komponenten für den Playground
+│  │  └─ data/      - Konfigurationsdaten für den Monaco-Editor
+│  ├─ routes/     - Dateisystembasiertes Routing
+│  └─ app.html    - Basis-HTML-Datei. Enthält CSS-Reset und Variablen
+└─ static/    - Weitere statische Daten, z. B. Webmanifest und robots.txt
 ```
 
-## Running and Building
-Prerequisites: 
-- Install packages `npm install`
-- Generate cloudflare types: `npm run cf-typegen` (prevents error is tsconfig)
-- The backend needs to be running
+## Ausführen und Bauen
+Voraussetzungen: 
+- Pakete installieren: `npm install`
+- Cloudflare-Typen generieren: `npm run cf-typegen` (verhindert Fehler in der tsconfig)
+- Eine `.env` Datei mit der Variable `PUBLIC_BACKEND_HOST` erstellen und auf Host+Port (oder Domain) des Backends setzen (z. B. `PUBLIC_BACKEND_HOST = localhost:8080`)
+- Das Backend muss laufen
 
 
-To debug locally: `npm run dev`\
-To build the output files: `npm run build`
+Für lokales Debugging: `npm run dev`\
+Zum Bauen der Ausgabedateien: `npm run build`
 

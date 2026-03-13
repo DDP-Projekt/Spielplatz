@@ -2,6 +2,7 @@
     import { mdiCloseOctagonOutline, mdiPlayOutline } from "@mdi/js";
     import ImgButton from "../common/ImgButton.svelte";
     import type { OutputMessage } from "$lib";
+    import { PUBLIC_BACKEND_HOST } from "$env/static/public";
 
     type RunButtonProps = {
         run_ws: WebSocket | null,
@@ -34,22 +35,33 @@
         }
 
         compiling = true;
-        // send a request to the /compile endpoint using the fetch api
-        const compile_result = await fetch('/api/compile', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ src: code }),
-        }).then(response => response.json()).catch(async () => {
+        type CompileResponse = {
+            returnCode: number,
+            error?: string,
+            stderr?: string,
+            token: string
+        }
+
+        let compile_result: CompileResponse;
+        try {
+            compile_result = await fetch('/api/compile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ src: code }),
+            }).then(response => response.json())
+        }
+        catch (e) {
             await pushOutputMessage({msg: 'Fehler beim Kompilieren (Netzwerkfehler)', type: 'stderr'});
             compiling = false;
-        })
+            return;
+        }
 
         if (compile_result.error) {
             await pushOutputMessage({msg: `Kompilier Fehler: ${compile_result.error}\n${compile_result.stderr}`, type: 'stderr'});
             compiling = false;
-            return
+            return;
         }
 
         var runParams = new URLSearchParams({token: compile_result.token})
@@ -60,7 +72,7 @@
         // connect to the /run endpoint using the websocket api with token as query parameter
         try {
             let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
-            run_ws = new WebSocket(`${ws_protocol}://${window.location.host}/api/run?${runParams.toString()}`)
+            run_ws = new WebSocket(`${ws_protocol}://${PUBLIC_BACKEND_HOST}/api/run?${runParams.toString()}`)
         }
         catch (e) {
             await pushOutputMessage({msg: 'Websocket (run) Verbindungsfehler', type: "stderr"})

@@ -14,7 +14,8 @@ Inspiriert von anderen Sprachen wie [Go](https://go.dev/play/), [Rust](https://p
 1. Die Spielplatz und [Kompilierer](https://github.com/DDP-Projekt/Kompilierer) Repositories klonen
 2. Den Kompilierer bauen
 3. (auf Linux) `make install-dependencies` ausführen. (auf Windows) `make unsec_main.o`
-4. Frontend-Abhängigkeiten installieren: `npm --prefix site install`
+4. Frontend-Abhängigkeiten installieren: `npm --prefix site install` und `npm --prefix site run cf-typegen`
+5. `site/.env` Datei mit der Variable `PUBLIC_BACKEND_HOST` erstellen und auf Host+Port (oder Domain) des Backends setzen (z. B. `PUBLIC_BACKEND_HOST = localhost:8080`)
 
 ### Ausführen
 Backend und Frontend laufen lokal getrennt:
@@ -25,12 +26,7 @@ Backend und Frontend laufen lokal getrennt:
 2. Frontend starten:
 `npm --prefix site run dev`
 
-Das Frontend läuft standardmäßig auf `http://localhost:5173` und leitet `/api` an das Backend (`http://127.0.0.1:8080`) weiter.
-
-Optional kann das Backend-Ziel für das Frontend gesetzt werden:
-`VITE_BACKEND_URL=http://127.0.0.1:8080 npm --prefix site run dev` (bash)
-
-`$env:VITE_BACKEND_URL="http://127.0.0.1:8080"; npm --prefix site run dev` (PowerShell)
+Das Frontend läuft standardmäßig auf `http://localhost:5173` und leitet `/api` an das Backend (`PUBLIC_BACKEND_HOST`) weiter.
 
 ## Backend via Docker Ausführen
 ### Vorraussetzungen

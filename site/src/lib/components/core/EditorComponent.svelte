@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
+    import { PUBLIC_BACKEND_HOST } from '$env/static/public';
     import ddpThemeData from "$lib/data/ddp-theme-data.json";
     import ddpLanguageConfig from "$lib/data/ddp-language-config.json";
 
@@ -225,7 +226,7 @@
         // connect to a websocket on the /ls endpoint
         try {
             const ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
-            ls_socket = new WebSocket(`${ws_protocol}://${window.location.host}/api/ls`);
+            ls_socket = new WebSocket(`${ws_protocol}://${PUBLIC_BACKEND_HOST}/api/ls`);
         }
         catch (e) {
             console.error('WebSocket (ls) Verbindungsfehler', e);
