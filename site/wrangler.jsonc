@@ -14,5 +14,8 @@
   "preview_urls": true,
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "PUBLIC_BACKEND_HOST": "api.spiel.ddp.im"
   }
 }
