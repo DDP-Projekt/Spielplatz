@@ -1,11 +1,11 @@
-FROM golang:bookworm as build
+FROM golang:bookworm AS build
 WORKDIR /
 
 # install dependencies
 RUN apt-get update && apt-get install -y \
-	npm \
 	build-essential \
-	libseccomp-dev
+	libseccomp-dev \
+ 	libsqlite3-dev
 
 ARG DDP_VERSION
 
@@ -19,12 +19,13 @@ ENV CGO_ENABLED=1
 COPY ./ /
 RUN make DDPVERSION=${DDP_VERSION}
 
-FROM ubuntu:latest as run
+FROM ubuntu:latest AS run
 
 WORKDIR /
 
 RUN apt-get update && apt-get install -y \
 	libseccomp-dev \
+	libsqlite3-0 \
 	gcc \
 	libtinfo-dev \
 	libpcre2-dev \
@@ -43,9 +44,7 @@ RUN ./ddp-setup --force
 ENV PATH=/DDP/bin:$PATH
 ENV DDPPATH=/DDP
 
-COPY --from=build Spielplatz seccomp_exec seccomp_main.o /app/
-COPY --from=build /node_modules /app/node_modules
-COPY --from=build /static/ /app/static
+COPY --from=build Spielplatz seccomp_exec seccomp_main.o ddpdict /app/
 
 RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 

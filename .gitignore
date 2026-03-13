@@ -1,4 +1,3 @@
-node_modules/
 playground_executables/
 config.json
 *.o
@@ -7,3 +6,5 @@ Spielplatz
 seccomp_exec
 *.tar.*
 *.pem
+*.exe
+*.db

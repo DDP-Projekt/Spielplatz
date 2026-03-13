@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<style>
+			/*
+			Josh's Custom CSS Reset
+			https://www.joshwcomeau.com/css/custom-css-reset/
+			*/
+
+			*, *::before, *::after {
+				box-sizing: border-box;
+			}
+
+			*:not(dialog) {
+				margin: 0;
+			}
+
+			@media (prefers-reduced-motion: no-preference) {
+				html {
+					interpolate-size: allow-keywords;
+				}
+			}
+
+			body {
+				line-height: 1.5;
+				-webkit-font-smoothing: antialiased;
+			}
+
+			img, picture, video, canvas, svg {
+				display: block;
+				max-width: 100%;
+			}
+
+			input, button, textarea, select {
+				font: inherit;
+			}
+
+			p, h1, h2, h3, h4, h5, h6 {
+				overflow-wrap: break-word;
+			}
+
+			p {
+				text-wrap: pretty;
+			}
+			h1, h2, h3, h4, h5, h6 {
+				text-wrap: balance;
+			}
+
+			:root {
+				color-scheme: dark light;
+
+				&:has(#theme-switch:checked) {
+					color-scheme: light;
+				}
+				
+				color: var(--text-color);
+
+				--text-color: light-dark(#1f2937, #f5f5f5);
+				--background-color: light-dark(#f7f8fb, #1e1e1e);
+
+				--input-background-color: light-dark(#ffffff, #383838);
+				--input-border-color: light-dark(#c6d1df, #5c5c5c);
+
+				--output-background-color: light-dark(#fcfdff, #1a1a1a);
+
+				--controls-background-color: light-dark(#e8edf5, #292929);
+				--controls-btn-hover-color: light-dark(#d2dbe8, #6b6b6b);
+				--controls-btn-active-color: light-dark(#bac8dc, #b1b1b1);
+
+				--separator-background-color: light-dark(#c5d1e0, #3c3c3c);
+
+				--input-height: 20px;
+				--input-border-width: 1px;
+
+				--controls-height: 2.5rem;
+
+				--separator-width: 15px;
+
+				--scrollbar-size: 14px;
+				--scrollbar-outline-size: 0.3px;
+				--scrollbar-outline-color: #5c5c5c;
+				--scrollbarSlider-background: rgba(121, 121, 121, 0.4);
+				--scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
+				--scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
+
+				--stdin-color: light-dark(#0b5cab, lightblue);
+				--stderr-color: light-dark(#b42318, lightcoral);
+				--sysmsg-color: light-dark(#5b6575, gray);
+			}
+
+			html, body {
+				height: 100svh;
+				background-color: var(--background-color);
+				font-family: Arial, Helvetica, sans-serif;
+				overscroll-behavior-y: contain;
+			}
+		</style>
+
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

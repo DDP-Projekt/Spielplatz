@@ -5,29 +5,30 @@ Erreichbar unter https://spiel.ddp.im
 
 Inspiriert von anderen Sprachen wie [Go](https://go.dev/play/), [Rust](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021) und [Dart](https://dartpad.dev/?).
 
-| dark mode | light mode |
-|---|---|
-|![showcase-dark](static/img/showcase-dark.png)|![showcase-light](static/img/showcase-light.png)|
-
 ## Lokal Ausführen
 ### Vorraussetzungen
-* Ein Linux Betriebssystem (das Linux-exklusive seccomp feature wird benutzt)
-* [Go](https://go.dev/doc/install) (mindestens version 1.22.2)
+* [Go](https://go.dev/doc/install) (mindestens version 1.26.1)
 * npm
 
 ### Installieren
 1. Die Spielplatz und [Kompilierer](https://github.com/DDP-Projekt/Kompilierer) Repositories klonen
 2. Den Kompilierer bauen
-3. `make install-dependencies` ausführen
+3. (auf Linux) `make install-dependencies` ausführen. (auf Windows) `make unsec_main.o`
+4. Frontend-Abhängigkeiten installieren: `npm --prefix site install` und `npm --prefix site run cf-typegen`
+5. `site/.env` Datei mit der Variable `PUBLIC_BACKEND_HOST` erstellen und auf Host+Port (oder Domain) des Backends setzen (z. B. `PUBLIC_BACKEND_HOST = localhost:8080`)
 
 ### Ausführen
-Um das Programm zu starten führt man `run.sh` aus.
-Das Makefile sollte dann alle Abhängigkeiten automatisch installieren (eventuell muss das sudo Passwort angegeben werden).
+Backend und Frontend laufen lokal getrennt:
 
-Wahrscheinlich benötigt `run.sh` root permissions. In diesem Fall müssen auch Umgebungsvariablen angegeben werden:
-`sudo PATH="$PATH" DDPPATH="$DDPPATH" ./run.sh`
+1. Backend starten:
+`go run -ldflags "-X main.DDPVERSION=dev" ./server/`
 
-## Via Docker Ausführen
+2. Frontend starten:
+`npm --prefix site run dev`
+
+Das Frontend läuft standardmäßig auf `http://localhost:5173` und leitet `/api` an das Backend (`PUBLIC_BACKEND_HOST`) weiter.
+
+## Backend via Docker Ausführen
 ### Vorraussetzungen
 
 * [Docker](https://docs.docker.com/get-docker/)
@@ -48,24 +49,26 @@ wget https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/clang
 ### Ausführen
 
 Das Docker Image kann mit `docker run -p 8080:8080 ddp-spielplatz` als container gestartet werden.
-Der Spielplatz sollte jetzt unter http://localhost:8080/ erreicht werden können.
+Der Spielplatz Backend sollte jetzt unter http://localhost:8080/ erreicht werden können.
 
-### Konfiguration
-Man kann im root des Projektes eine `config.json` Datei erstellen um das Programm einszustellen.
+## Konfiguration
+Der Backend lässt sich über eine `config.json` Datei einstellen.
 Die standart Konfigurationsdatei sieht so aus.
 ```json
 {
-	"port": "8080",
-	"exe_cache_duration": "1m",
-	"run_timeout": "30s",
-	"memory_limit_bytes": 4294967296,
+	"certpath": "",
 	"cpu_limit_percent": 50,
+	"exe_cache_duration": 60000000000,
+	"keypath": "",
+	"log_level": "INFO",
 	"max_concurrent_processes": 50,
-	"process_aquire_timeout": "3s",
-	"useHTTPS": false,
-	"certPath": "",
-	"keyPath": "",
+	"max_source_code_log_length": 100,
+	"memory_limit_bytes": 4294967296,
+	"port": "8080",
 	"pprof": false,
-    "log_level": "INFO"
+	"process_aquire_timeout": 3000000000,
+	"run_timeout": 60000000000,
+	"share_db_path": "./share_links.db",
+	"usehttps": false
 }
 ```

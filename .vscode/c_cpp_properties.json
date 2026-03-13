@@ -4,7 +4,14 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${DDPPATH}/lib/"
+                "${env:DDPPATH}/lib/"
+            ]
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env:DDPPATH}/lib/"
             ]
         }
     ],

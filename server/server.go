@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -22,6 +23,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/viper"
 	lslogging "github.com/tliron/commonlog"
 )
@@ -61,6 +63,7 @@ func getLogger(c *gin.Context) *slog.Logger {
 func setup_config() {
 	viper.SetDefault("exe_cache_duration", time.Second*60)
 	viper.SetDefault("run_timeout", time.Second*60)
+	viper.SetDefault("share_db_path", "./share_links.db")
 	viper.SetDefault("port", "8080")
 	viper.SetDefault("memory_limit_bytes", 4*(2<<29)) // 4 GiB
 	viper.SetDefault("cpu_limit_percent", 50)
@@ -84,6 +87,13 @@ func setup_config() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	viper.AddConfigPath(".")
+	if err := viper.SafeWriteConfig(); err != nil {
+		var cfgExists viper.ConfigFileAlreadyExistsError
+		if !errors.As(err, &cfgExists) {
+			fatal("Error writing default config file", "err", err)
+		}
+	}
+
 	if err := viper.ReadInConfig(); err != nil {
 		fatal("Error reading config file", "err", err)
 	}
@@ -99,10 +109,17 @@ func setup_config() {
 func main() {
 	setup_logger(slog.LevelInfo)
 	setup_config()
+	slog.Info("Starting server with DDPVERSION=" + DDPVERSION)
 
 	if err := kddp.InitializeSemaphore(viper.GetInt64("max_concurrent_processes")); err != nil {
 		fatal("failed to initialize semaphore", "err", err)
 	}
+
+	initCompression()
+	if err := initShareLinksStorage(viper.GetString("share_db_path")); err != nil {
+		fatal("failed to initialize share links database", "err", err)
+	}
+	defer closeShareLinksStorage()
 
 	r := gin.New()
 	r.Use(
@@ -117,30 +134,19 @@ func main() {
 		},
 	)
 
-	// load html files as template
-	r.LoadHTMLGlob("static/html/*")
+	api := r.Group("/api")
 
-	// serve node_modules/monaco-editor as /monaco-editor
-	r.StaticFS("/monaco-editor", http.Dir("node_modules/monaco-editor"))
-	// serve the static folder
-	r.StaticFS("/static", http.Dir("static"))
-	r.StaticFS("/img", http.Dir("img"))
-
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", DDPVERSION)
-	})
-
-	r.GET("/embed", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "embed.html", nil)
-	})
+	// compression endpoints
+	api.POST("/create_share_code", serve_create_share_code)
+	api.GET("/get_share_data", serve_get_share_data)
 
 	// websocket endpoint to connect to the language server
 	lslogging.Configure(1, nil)
-	r.GET("/ls", serve_ls)
+	api.GET("/ls", serve_ls)
 
 	// endpoint to compile a ddp program
-	r.POST("/compile", serve_compile)
-	r.GET("/run", serve_run)
+	api.POST("/compile", serve_compile)
+	api.GET("/run", serve_run)
 
 	r.GET("/health", serve_health)
 	r.HEAD("/health", serve_health)
@@ -172,7 +178,19 @@ func main() {
 	}
 }
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header.Get("Origin")
+
+		allowed := map[string]bool{
+			"http://localhost:5173": true,
+			"http://127.0.0.1:5173": true,
+			"https://spiel.dpp.im":  true,
+		}
+
+		return allowed[origin]
+	},
+}
 
 // serves the /ls endpoint
 func serve_ls(c *gin.Context) {
@@ -181,7 +199,7 @@ func serve_ls(c *gin.Context) {
 	// upgrade the connection to a websocket connection
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		logger.Error("failed to initialize websocket connection")
+		logger.Error("failed to initialize websocket connection", "err", err.Error())
 		return
 	}
 	defer ws.Close()
@@ -249,7 +267,7 @@ func serve_run(c *gin.Context) {
 	// upgrade the connection to a websocket connection
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		logger.Error("failed to initialize websocket connection")
+		logger.Error("failed to initialize websocket connection", "err", err.Error())
 		return
 	}
 	defer ws.Close()
@@ -308,10 +326,15 @@ func truncSourceString(s string, max_len int) string {
 
 	start := ""
 	start_index := 0
+
 	for strings.HasPrefix(s[start_index:], "Binde") {
 		start = "..."
-		start_index = min(strings.IndexByte(s[start_index:], '\n')+1+start_index, len(s)-1)
+		newlineIndex := strings.IndexByte(s[start_index:], '\n')
+		if newlineIndex == -1 {
+			break
+		}
+		start_index = min(start_index+newlineIndex+1, len(s))
 	}
 
-	return start + s[start_index:start_index+max_len] + "..."
+	return start + s[start_index:min(start_index+max_len, len(s))] + "..."
 }

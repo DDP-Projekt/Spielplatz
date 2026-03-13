@@ -1,0 +1,20 @@
+{
+    "name": "DDP Spielplatz",
+    "short_name": "Spielplatz",
+    "icons": [
+        {
+            "src": "android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": ".",
+    "theme_color": "white",
+    "background_color": "#14437f",
+    "display": "standalone"
+}

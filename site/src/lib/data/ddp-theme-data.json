@@ -1,0 +1,30 @@
+{
+  "dark": [
+    { "token": "keyword.control",       "foreground": "C586C0" },
+    { "token": "invalid",               "foreground": "F44640" },
+    { "token": "string.escape",         "foreground": "D7BA7D" },
+    { "token": "keyword.controlFlow",   "foreground": "C586C0" },
+    { "token": "variable",              "foreground": "9CDCFE" },
+    { "token": "parameter",             "foreground": "9CDCFE" },
+    { "token": "property",              "foreground": "9CDCFE" },
+    { "token": "support.function",      "foreground": "DCDCAA" },
+    { "token": "function",              "foreground": "DCDCAA" },
+    { "token": "member",                "foreground": "4FC1FF" },
+    { "token": "variable.constant",     "foreground": "4FC1FF" },
+    { "token": "typeParameter",         "foreground": "4EC9B0" }
+  ],
+  "light": [
+    { "token": "keyword.control",       "foreground": "AF00DB" },
+    { "token": "invalid",               "foreground": "F44640" },
+    { "token": "string.escape",         "foreground": "D7BA7D" },
+    { "token": "keyword.controlFlow",   "foreground": "AF00DB" },
+    { "token": "variable",              "foreground": "0070C1" },
+    { "token": "parameter",             "foreground": "9CDCFE" },
+    { "token": "property",              "foreground": "9CDCFE" },
+    { "token": "support.function",      "foreground": "795E26" },
+    { "token": "function",              "foreground": "795E26" },
+    { "token": "member",                "foreground": "4FC1FF" },
+    { "token": "variable.constant",     "foreground": "4FC1FF" },
+    { "token": "typeParameter",         "foreground": "4EC9B0" }
+  ]
+}
