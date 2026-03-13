@@ -29,7 +29,7 @@
     let autoClear = $state(false)
     let scrollLock = $state(false)
     let lightMode = $state(false)
-    let vertical = $state(false)
+    let vertical = $state(true)
 
     let args = $state<string[]>([])
     let output = $state<OutputMessage[]>([])
@@ -41,7 +41,7 @@
         const urlParams = page.url.searchParams;
         
         lightMode = localStorage.getItem("dark-mode") === "false" || urlParams.has('light')
-        vertical = localStorage.getItem("vertical") === "true"
+        vertical = localStorage.getItem("vertical") === "true" || window.innerWidth <= 768
         args = localStorage.getItem("args")?.split(";") || []
 
         editorSettings = {
@@ -120,15 +120,9 @@
     function clearOutput() {
         output = []
     }
-
-    function autoLayout(event: Event) {
-        if ((event.target as Window)?.innerWidth <= 768) {
-            vertical = true
-        }
-    }
 </script>
 
-<svelte:window onresize={autoLayout} {onbeforeunload} />
+<svelte:window {onbeforeunload} />
 
 <main style:--editor-container-size="{separatorStart}%" data-vertical={vertical} data-dragging={separatorDragging}>
     <div class="container">
