@@ -3,7 +3,6 @@ WORKDIR /
 
 # install dependencies
 RUN apt-get update && apt-get install -y \
-	npm \
 	build-essential \
 	libseccomp-dev
 
@@ -15,8 +14,6 @@ RUN tar -xzf ./DDP.tar.gz -C DDP --strip-components 1
 
 ENV DDPPATH=/DDP
 ENV CGO_ENABLED=1
-
-RUN npm install -g n
 
 COPY ./ /
 RUN make DDPVERSION=${DDP_VERSION}
@@ -46,7 +43,6 @@ ENV PATH=/DDP/bin:$PATH
 ENV DDPPATH=/DDP
 
 COPY --from=build Spielplatz seccomp_exec seccomp_main.o ddpdict /app/
-COPY --from=build site/build /app/site/build
 
 RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
