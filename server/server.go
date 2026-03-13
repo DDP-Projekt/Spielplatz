@@ -185,7 +185,7 @@ var upgrader = websocket.Upgrader{
 		allowed := map[string]bool{
 			"http://localhost:5173": true,
 			"http://127.0.0.1:5173": true,
-			"https://spiel.dpp.im":  true,
+			"https://spiel.ddp.im":  true,
 		}
 
 		return allowed[origin]
