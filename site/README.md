@@ -1,42 +1,26 @@
-# sv
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
+## Directory structure
+```
+site/
+├─ src/
+│  ├─ lib/
+│  │  ├─ assets/    - Assets and favicon
+│  │  ├─ components/
+│  │  │  ├─ common/    - Components which are used by other components
+│  │  │  └─ core/      - Complex Components used by the playground
+│  │  └─ data/      - Monaco-Editor configuration data
+│  ├─ routes/     - Filesystem based routing
+│  └─ app.html    - Base html file. Contains css reset and variables
+└─ static/    - Other static data, like webmanifest and robots.txt
 ```
 
-To recreate this project with the same configuration:
+## Running and Building
+Prerequisites: 
+- Install packages `npm install`
+- Generate cloudflare types: `npm run cf-typegen` (prevents error is tsconfig)
+- The backend needs to be running
 
-```sh
-# recreate this project
-npx sv@0.12.5 create --template minimal --types ts --install npm site
-```
 
-## Developing
+To debug locally: `npm run dev`\
+To build the output files: `npm run build`
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
