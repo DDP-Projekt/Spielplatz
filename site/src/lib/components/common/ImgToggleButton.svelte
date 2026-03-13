@@ -42,7 +42,7 @@
         padding: 2px;
         border: 1px solid transparent;
         cursor: pointer;
-        color: light-dark(black, white);
+        color: var(--text-color);
 
         &:hover {
             background-color: var(--controls-btn-hover-color);

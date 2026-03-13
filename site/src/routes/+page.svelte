@@ -175,10 +175,12 @@
             {/snippet}
 
             {#snippet rightControls()}
-                <ImgToggleButton title="Sicht ändern"
-                    bind:checked={vertical} onchange={onViewChange} 
-                    onPath={mdiViewSplitVertical} offPath={mdiViewSplitHorizontal} 
-                />
+                <div id="view-toggle-container">
+                    <ImgToggleButton title="Sicht ändern"
+                        bind:checked={vertical} onchange={onViewChange} 
+                        onPath={mdiViewSplitVertical} offPath={mdiViewSplitHorizontal} 
+                    />
+                </div>
             {/snippet}
         </ControlsHeader>
 
@@ -221,5 +223,11 @@
     .container {
         display: grid;
         grid-template-rows: var(--controls-height) 1fr;
+    }
+
+    @media (max-width: 768px) {
+        #view-toggle-container {
+            display: none;
+        }
     }
 </style>
