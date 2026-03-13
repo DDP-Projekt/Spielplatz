@@ -4,7 +4,8 @@ WORKDIR /
 # install dependencies
 RUN apt-get update && apt-get install -y \
 	build-essential \
-	libseccomp-dev
+	libseccomp-dev \
+ 	libsqlite3-dev
 
 ARG DDP_VERSION
 
@@ -24,6 +25,7 @@ WORKDIR /
 
 RUN apt-get update && apt-get install -y \
 	libseccomp-dev \
+	libsqlite3-0 \
 	gcc \
 	libtinfo-dev \
 	libpcre2-dev \

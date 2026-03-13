@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -86,7 +87,13 @@ func setup_config() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	viper.AddConfigPath(".")
-	viper.SafeWriteConfig()
+	if err := viper.SafeWriteConfig(); err != nil {
+		var cfgExists viper.ConfigFileAlreadyExistsError
+		if !errors.As(err, &cfgExists) {
+			fatal("Error writing default config file", "err", err)
+		}
+	}
+
 	if err := viper.ReadInConfig(); err != nil {
 		fatal("Error reading config file", "err", err)
 	}
@@ -302,15 +309,25 @@ func serve_run(c *gin.Context) {
 
 func truncSourceString(s string, max_len int) string {
 	if len(s) <= max_len {
+		fmt.Println("1")
 		return s
 	}
 
+	fmt.Println("2")
+
 	start := ""
 	start_index := 0
+
 	for strings.HasPrefix(s[start_index:], "Binde") {
+		fmt.Println("3")
 		start = "..."
-		start_index = min(strings.IndexByte(s[start_index:], '\n')+1+start_index, len(s)-1)
+		newlineIndex := strings.IndexByte(s[start_index:], '\n')
+		if newlineIndex == -1 {
+			break
+		}
+		start_index = min(start_index+newlineIndex+1, len(s))
 	}
 
-	return start + s[start_index:min(start_index+max_len, len(s)-1)] + "..."
+	fmt.Println("4")
+	return start + s[start_index:min(start_index+max_len, len(s))] + "..."
 }

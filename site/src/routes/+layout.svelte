@@ -16,7 +16,7 @@
 	<link rel="icon" type="image/png" sizes="16x16" href={favicon_small}>
 	<link rel="apple-touch-icon" sizes="180x180" href={apple}>
 	<link rel="mask-icon" href={safari} color={themeColor}>
-	<link rel="manifest" href="static/site.webmanifest">
+	<link rel="manifest" href="/static/site.webmanifest">
 	<meta name="msapplication-TileColor" content={themeColor}>
 	<meta name="theme-color" content={themeColor}>
 </svelte:head>

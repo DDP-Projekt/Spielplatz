@@ -15,4 +15,8 @@ func TestTruncateSource(t *testing.T) {
 	assert.Equal("...test...", truncSourceString("Binde\ntest", 4))
 	assert.Equal("...test...",
 		truncSourceString("Binde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\nBinde\ntest", 4))
+
+	// test newlineIndex == -1 break
+	assert.Equal("...Bind...",
+		truncSourceString("Binde \"Duden/Ausgabe\" ein.Binde \"Duden/Eingabe\" ein.test", 4))
 }

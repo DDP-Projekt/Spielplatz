@@ -124,7 +124,7 @@
         });
 
         let value = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
-        if (settings.initialContent !== undefined && !settings.embedded) {
+        if (settings.initialContent !== undefined) {
             value = settings.initialContent;
         }
 

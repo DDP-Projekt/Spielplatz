@@ -44,6 +44,7 @@
             noscroll: urlParams.has("noscroll"),
             embedded: true
         }
+        
         if (urlParams.has("share")) {
             const resp: {code: string} = await (await fetch(withQuery("/api/get_share_data", { code: urlParams.get("share")! }))).json()
             editorSettings.initialContent = resp.code

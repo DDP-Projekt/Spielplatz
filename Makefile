@@ -26,4 +26,4 @@ clean:
 	rm -f seccomp_main.o seccomp_exec Spielplatz
 
 install-dependencies:
-	$(INSTALL) libseccomp-dev
+	$(INSTALL) libseccomp-dev libsqlite3-dev
