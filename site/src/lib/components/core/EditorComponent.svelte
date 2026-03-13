@@ -35,6 +35,7 @@
     
     // holds callback promises for expected responses
     let response_queue: ((resp: any) => void)[] = $state([]);
+    let change_interval: NodeJS.Timeout | undefined = $state();
 
     $effect(() => {
         if (editor) {
@@ -49,6 +50,9 @@
     onDestroy(() => {
         editor?.dispose();
         model?.dispose();
+        if (change_interval) {
+            clearInterval(change_interval);
+        }
 
         send({
             method: 'shutdown',
@@ -600,7 +604,7 @@
             changes: [] as MonacoEditor.editor.IModelContentChange[],
         };
         // update the language server every 250ms even if there was only a single change
-        setInterval(() => {
+        change_interval = setInterval(() => {
             if (cached_changes.changes.length > 0) {
                 doChangeRequest(cached_changes.changes);
                 cached_changes.length = 0;
