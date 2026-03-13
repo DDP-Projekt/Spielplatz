@@ -16,6 +16,6 @@
     "enabled": true
   },
   "vars": {
-    "PUBLIC_BACKEND_HOST": "api.spiel.ddp.im"
+    "PUBLIC_BACKEND_HOST": "api.ddp.im"
   }
 }
