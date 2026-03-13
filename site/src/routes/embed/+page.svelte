@@ -6,7 +6,7 @@
     import { mdiClipboardOutline } from "@mdi/js";
 
     import ControlsHeader from "$lib/components/core/ControlsHeader.svelte";
-    import Seperator from "$lib/components/core/Seperator.svelte";
+    import Separator from "$lib/components/core/Separator.svelte";
     import EditorComponent, { type EditorDisplaySettings } from "$lib/components/core/EditorComponent.svelte";
     import OutputComponent from "$lib/components/core/OutputComponent.svelte";
 
@@ -18,8 +18,8 @@
     let editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined = $state()
     let editorSettings: EditorDisplaySettings | undefined = $state();
     
-    let seperatorDragging = $state(false)
-    let seperatorStart = $state(70)
+    let separatorDragging = $state(false)
+    let separatorStart = $state(70)
 
     let scrollLock = $state(false)
     let lightMode = $state(false)
@@ -42,7 +42,7 @@
             readOnly: urlParams.has("readonly"),
             nolines: urlParams.has("nolines"),
             noscroll: urlParams.has("noscroll"),
-            embedded: false
+            embedded: true
         }
 
         if (urlParams.has("code")) {
@@ -69,7 +69,7 @@
     }
 </script>
 
-<main style:--editor-container-size="{seperatorStart}%" data-vertical={true} data-dragging={seperatorDragging}>
+<main style:--editor-container-size="{separatorStart}%" data-vertical={true} data-dragging={separatorDragging}>
     {#if output.length === 0}
         <style>
             main {
@@ -96,9 +96,9 @@
     </div>
 
     {#if output.length !== 0}
-        <Seperator
-            bind:dragging={seperatorDragging} 
-            bind:start={seperatorStart} 
+        <Separator
+            bind:dragging={separatorDragging} 
+            bind:start={separatorStart} 
             vertical={true}
         />
 
@@ -113,8 +113,8 @@
 
         --grid-template: 
             var(--editor-container-size) 
-            var(--seperator-width) 
-            calc(100% - var(--editor-container-size) - var(--seperator-width));
+            var(--separator-width) 
+            calc(100% - var(--editor-container-size) - var(--separator-width));
         display: grid;
         grid-template-columns: var(--grid-template);
         grid-template-rows: 100%;

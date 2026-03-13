@@ -17,7 +17,7 @@
 <div id="settings-panel" popover>
     <div id="arg-header">
         <p>Befehlszeilenargumente</p>
-        <ImgButton title="Argument hinzufügen" path={mdiPlusBoxOutline} size=20px onclick={addArg} />
+        <ImgButton title="Argument hinzufügen" path={mdiPlusBoxOutline} size={"20px"} onclick={addArg} />
     </div>
     <div id="arg-list">
         <div class="arg">
@@ -29,7 +29,7 @@
             <div class="arg">
                 <label for="arg-{i+2}">{i+2}:</label>
                 <input type="text" id="arg-{i+2}" autocomplete="off" bind:value={args[i]}>
-                <ImgButton title="Argument entfernen" path={mdiMinusBoxOutline} size=20px onclick={() => removeArg(i)} />
+                <ImgButton title="Argument entfernen" path={mdiMinusBoxOutline} size={"20px"} onclick={() => removeArg(i)} />
             </div>
         {/each}
     </div>

@@ -1,15 +1,15 @@
 <script lang="ts">
 let { dragging = $bindable(false), start = $bindable(0), vertical, ondrag = undefined } = $props()
 
-function seperatorMouseDown() {
+function separatorMouseDown() {
     dragging = true;
 }
 
-function seperatorMouseUp() {
+function separatorMouseUp() {
     dragging = false;
 }
 
-function seperatorMouseMove(ev: MouseEvent) {
+function separatorMouseMove(ev: MouseEvent) {
     if (!dragging) return;
     
     if (vertical) {
@@ -26,7 +26,7 @@ function seperatorMouseMove(ev: MouseEvent) {
     ondrag?.();
 }
 
-function seperatorKeyDown(ev: KeyboardEvent) {
+function separatorKeyDown(ev: KeyboardEvent) {
     const step = 2;
     if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') {
         ev.preventDefault();
@@ -39,7 +39,7 @@ function seperatorKeyDown(ev: KeyboardEvent) {
     }
 }
 
-function seperatorTouchMove(ev: TouchEvent) {
+function separatorTouchMove(ev: TouchEvent) {
     if (!dragging) return;
     let touch = ev.touches[0];
 
@@ -58,32 +58,32 @@ function seperatorTouchMove(ev: TouchEvent) {
 
 </script>
 
-<svelte:window onmousemove={seperatorMouseMove} onmouseup={seperatorMouseUp} />
+<svelte:window onmousemove={separatorMouseMove} onmouseup={separatorMouseUp} />
 
 <div 
-    id="seperator" 
+    id="separator" 
     role="slider"
     tabindex="0"
     aria-label="Resize separator"
     aria-valuenow={Math.round(start)}
     aria-valuemin="30"
     aria-valuemax="80"
-    onmousedown={seperatorMouseDown}
-    ontouchstart={seperatorMouseDown}
-    ontouchend={seperatorMouseUp}
-    onkeydown={seperatorKeyDown}
-    ontouchmove={seperatorTouchMove}
+    onmousedown={separatorMouseDown}
+    ontouchstart={separatorMouseDown}
+    ontouchend={separatorMouseUp}
+    onkeydown={separatorKeyDown}
+    ontouchmove={separatorTouchMove}
     data-vertical={vertical}
 >
 </div>
 
 <style>
-    #seperator {
+    #separator {
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: col-resize;
-        background-color: var(--seperator-background-color);
+        background-color: var(--separator-background-color);
 
         &:focus-visible {
             outline: 2px solid var(--focus-color, #4A90E2);
@@ -95,7 +95,7 @@ function seperatorTouchMove(ev: TouchEvent) {
         }
     }
 
-    #seperator[data-vertical=true] {
+    #separator[data-vertical=true] {
         cursor: row-resize;
 
         &::before {
