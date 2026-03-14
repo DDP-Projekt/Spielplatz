@@ -25,7 +25,7 @@
 
 				document.documentElement.dataset.theme = lightMode ? 'light' : 'dark';
 				window.matchMedia('(prefers-color-scheme: light)').addEventListener("change", (ev) => {
-					document.documentElement.dataset.theme = ev.matches
+					document.documentElement.dataset.theme = ev.matches ? "true" : "false"
 				})
 			})();
 		</script>

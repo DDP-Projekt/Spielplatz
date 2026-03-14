@@ -1,6 +1,5 @@
 <script lang="ts">
     import { browser } from "$app/environment";
-    import { page } from "$app/state";
     import { onMount, tick } from "svelte";
     import type * as MonacoEditor from "monaco-editor";
 
@@ -44,7 +43,7 @@
     })
 
     function getEditorSettings() {
-        const urlParams = page.url.searchParams;
+        const urlParams = browser ? new URLSearchParams(window.location.search) : new URLSearchParams()
 
         const settings: EditorDisplaySettings = {
             initialContent: getInitialContent(urlParams),
