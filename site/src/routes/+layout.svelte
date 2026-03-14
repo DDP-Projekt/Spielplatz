@@ -10,6 +10,8 @@
 </script>
 
 <svelte:head>
+	<meta name="description" content="Probiere DDP direkt in deinem Browser aus!">
+
 	<!--favicon-->
 	<link rel="shortcut icon" href={favicon_ico}>
 	<link rel="icon" type="image/png" sizes="32x32" href={favicon_medium}>
