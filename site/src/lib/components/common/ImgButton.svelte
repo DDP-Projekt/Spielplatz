@@ -1,5 +1,5 @@
 <script module>
-    let counter = 0;
+    let counter = 0; /* counter to generate unique css anchors */
 </script>
 
 <script lang="ts">
@@ -73,8 +73,7 @@
         font-size: 0.85rem;
         pointer-events: none;
 
-        /* for fade out */
-        opacity: 0;
+        opacity: 0; /* for fade out */
         transition: 
             display 0.5s allow-discrete,
             overlay 0.5s allow-discrete, /* brower support bad */
