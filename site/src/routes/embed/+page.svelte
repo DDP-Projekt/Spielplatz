@@ -36,12 +36,13 @@
         lightMode = localStorage.getItem("dark-mode") === "false" || urlParams.has('light')
         args = localStorage.getItem("args")?.split(";") || []
 
-        let editorContent: string | undefined;
+        let editorContent = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
+        const storedContent = localStorage.getItem("content")
         if (urlParams.has("share")) {
             const resp: {code: string} = await (await fetch(withQuery("/api/get_share_data", { code: urlParams.get("share")! }))).json()
             editorContent = resp.code
-        } else {
-            editorContent = localStorage.getItem("content") || undefined
+        } else if (storedContent) {
+            editorContent = storedContent
         }
 
         editorSettings = {

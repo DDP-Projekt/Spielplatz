@@ -8,7 +8,7 @@
     import type * as MonacoEditor from "monaco-editor";
 
     export type EditorDisplaySettings = {
-        initialContent?: string,
+        initialContent: string,
         theme: "ddp-theme-dark" | "ddp-theme-light",
         readOnly: boolean,
         nolines: boolean,
@@ -128,11 +128,6 @@
             rules: ddpThemeData.light as MonacoEditor.editor.ITokenThemeRule[]
         });
 
-        let value = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
-        if (settings.initialContent !== undefined) {
-            value = settings.initialContent;
-        }
-
         const themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
         const initialTheme = settings.theme || (themeMediaQuery.matches ? "ddp-theme-dark" : "ddp-theme-light");
         themeMediaQuery.addEventListener('change', (ev) => {
@@ -140,7 +135,7 @@
         })
 
         const file_uri = monaco.Uri.parse('inmemory://Spielplatz');
-        model = monaco.editor.createModel(value, 'ddp', file_uri);
+        model = monaco.editor.createModel(settings.initialContent, 'ddp', file_uri);
         editor = monaco.editor.create(editorDiv!, {
             theme: initialTheme,
             'semanticHighlighting.enabled': true,
