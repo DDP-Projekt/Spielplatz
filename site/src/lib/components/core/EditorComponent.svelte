@@ -8,7 +8,7 @@
     import { getWebSocketAddr } from "$lib";
 
     export type EditorDisplaySettings = {
-        initialContent: string,
+        initialContent: () => Promise<string>,
         theme: "ddp-theme-dark" | "ddp-theme-light",
         readOnly: boolean,
         nolines: boolean,
@@ -135,7 +135,7 @@
         })
 
         const file_uri = monaco.Uri.parse('inmemory://Spielplatz');
-        model = monaco.editor.createModel(settings.initialContent, 'ddp', file_uri);
+        model = monaco.editor.createModel(await settings.initialContent(), 'ddp', file_uri);
         editor = monaco.editor.create(editorDiv!, {
             theme: initialTheme,
             'semanticHighlighting.enabled': true,

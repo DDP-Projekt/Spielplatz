@@ -4,6 +4,32 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
+		<script>
+			(() => {
+				const params = new URLSearchParams(window.location.search);
+				let lightMode = null;
+
+				try {
+					if (params.has('light')) {
+						lightMode = params.get('light') !== 'false'
+					}
+					else if (localStorage.getItem('dark-mode') !== null) {
+						lightMode = localStorage.getItem('dark-mode') !== 'true';
+					}
+				} catch {
+				}
+
+				if (lightMode === null) {
+					lightMode = window.matchMedia('(prefers-color-scheme: light)').matches;
+				}
+
+				document.documentElement.dataset.theme = lightMode ? 'light' : 'dark';
+				window.matchMedia('(prefers-color-scheme: light)').addEventListener("change", (ev) => {
+					document.documentElement.dataset.theme = ev.matches
+				})
+			})();
+		</script>
+
 		<style>
 			/*
 			Josh's Custom CSS Reset
@@ -52,7 +78,11 @@
 			:root {
 				color-scheme: dark light;
 
-				&:has(#theme-switch:checked) {
+				&[data-theme="dark"] {
+					color-scheme: dark;
+				}
+
+				&[data-theme="light"] {
 					color-scheme: light;
 				}
 				

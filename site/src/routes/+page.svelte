@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { browser } from "$app/environment";
     import { page } from "$app/state";
     import { onMount, tick } from "svelte";
     import type * as MonacoEditor from "monaco-editor";
@@ -18,50 +19,43 @@
     import SettingsComponent from "$lib/components/core/SettingsComponent.svelte";
     import ExampleSelect from "$lib/components/core/ExampleSelect.svelte";
     import RunButton from "$lib/components/core/RunButton.svelte";
-    import { withQuery, type OutputMessage } from "$lib";
+    import { getInitialContent, type OutputMessage } from "$lib";
 
-    let editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined = $state()
-    let editorSettings: EditorDisplaySettings | undefined = $state();
-    
-    let separatorDragging = $state(false)
-    let separatorStart = $state(70)
+    const initLightMode = browser ? document.documentElement.dataset.theme === "light" : false
 
     let autoClear = $state(false)
     let scrollLock = $state(false)
-    let lightMode = $state(false)
     let vertical = $state(true)
 
+    let separatorDragging = $state(false)
+    let separatorStart = $state(70)
+
+    let editor: MonacoEditor.editor.IStandaloneCodeEditor | undefined = $state()
+    let editorSettings: EditorDisplaySettings = $state(getEditorSettings());
     let args = $state<string[]>([])
     let output = $state<OutputMessage[]>([])
 
     let run_ws: WebSocket | null = $state(null);
     let outputElement: HTMLDivElement | undefined = $state();
 
-    onMount(async () => {
-        const urlParams = page.url.searchParams;
-        
-        lightMode = localStorage.getItem("dark-mode") === "false" || urlParams.has('light')
-        vertical = localStorage.getItem("vertical") === "true" || window.innerWidth <= 768
+    onMount(() => {        
+        vertical = localStorage.getItem("vertical") !== "false" || window.innerWidth <= 768
         args = localStorage.getItem("args")?.split(";") || []
+    })
 
-        let editorContent = 'Binde "Duden/Ausgabe" ein.\nSchreibe "Hallo Welt".';
-        const storedContent = localStorage.getItem("content")
-        if (urlParams.has("share")) {
-            const resp: {code: string} = await (await fetch(withQuery("/api/get_share_data", { code: urlParams.get("share")! }))).json()
-            editorContent = resp.code
-        } else if (storedContent) {
-            editorContent = storedContent
-        }
+    function getEditorSettings() {
+        const urlParams = page.url.searchParams;
 
-        editorSettings = {
-            initialContent: editorContent,
-            theme: lightMode ? "ddp-theme-light" : "ddp-theme-dark",
+        const settings: EditorDisplaySettings = {
+            initialContent: getInitialContent(urlParams),
+            theme: initLightMode ? "ddp-theme-light" : "ddp-theme-dark",
             readOnly: urlParams.has("readonly"),
             nolines: urlParams.has("nolines"),
             noscroll: urlParams.has("noscroll"),
             embedded: false
         }
-    })
+        return settings
+    }
 
     function onbeforeunload() {
         if (editor) {
@@ -75,9 +69,11 @@
         }
     }
 
-    function onThemeChange() {
-        localStorage.setItem("dark-mode", !lightMode + "")
-        editorSettings!.theme = lightMode ? "ddp-theme-light" : "ddp-theme-dark"
+    function onThemeChange(ev: Event) {
+        const checked = (ev.target as HTMLInputElement)?.checked
+        localStorage.setItem("dark-mode", !checked + "")
+        document.documentElement.dataset.theme = checked ? "light" : "dark"
+        editorSettings.theme = checked ? "ddp-theme-light" : "ddp-theme-dark"
     }
 
     function onViewChange() {
@@ -164,7 +160,7 @@
                 <ImgToggleButton id="theme-switch"
                     title="Hell-/Dunkelmodus umschalten"
                     onPath={mdiWeatherNight} offPath={mdiWeatherSunny} 
-                    bind:checked={lightMode} onchange={onThemeChange} 
+                    checked={initLightMode} onchange={onThemeChange} 
                 />
 
                 <ImgLink href="https://doku.ddp.im" path={mdiHelpCircleOutline} title="Bedienungsanleitung öffnen" />
@@ -173,7 +169,7 @@
 
         <EditorComponent 
             bind:editor
-            settings={editorSettings!}
+            settings={editorSettings}
         />
     </div>
 
