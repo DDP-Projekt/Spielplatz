@@ -124,6 +124,20 @@
     function clearOutput() {
         output = []
     }
+
+    async function getDDPVersion() {
+        type HealthCheckResponse = {
+            healty: boolean,
+            'kddp-status': {
+                healthy: boolean,
+                version: string,
+                "exit-status": number
+            }
+        }
+
+        const health: HealthCheckResponse = await fetch("/api/health").then(x => x.json())
+        return "Kompilierer Version: " + health["kddp-status"].version.trim()
+    }
 </script>
 
 <svelte:window {onbeforeunload} />
@@ -189,7 +203,11 @@
         </ControlsHeader>
 
         <OutputComponent bind:outputElement bind:output {run_ws} {pushOutputMessage} >
-            <span class="sysmsg">Kompilierer Version: v1.0.0</span>
+            {#await getDDPVersion() then version}
+                <span class="sysmsg">{version}</span>
+            {:catch}
+                <span class="stderr">Kompilierer nicht verbunden!</span>
+            {/await}
         </OutputComponent>
     </div>
 </main>

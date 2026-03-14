@@ -134,7 +134,7 @@ func main() {
 		},
 	)
 
-	api := r.Group("/api")
+	api := r.Group("/spielplatz")
 
 	// compression endpoints
 	api.POST("/create_share_code", serve_create_share_code)
@@ -148,8 +148,8 @@ func main() {
 	api.POST("/compile", serve_compile)
 	api.GET("/run", serve_run)
 
-	r.GET("/health", serve_health)
-	r.HEAD("/health", serve_health)
+	api.GET("/health", serve_health)
+	api.HEAD("/health", serve_health)
 
 	if viper.GetString("pprof") != "" {
 		gin_pprof.Register(r, "/debug/pprof")
@@ -183,8 +183,8 @@ var upgrader = websocket.Upgrader{
 		origin := r.Header.Get("Origin")
 
 		allowed := map[string]bool{
-			"http://localhost:5173": true,
-			"http://127.0.0.1:5173": true,
+			"http://localhost:5173": gin.IsDebugging(),
+			"http://127.0.0.1:5173": gin.IsDebugging(),
 			"https://spiel.ddp.im":  true,
 		}
 

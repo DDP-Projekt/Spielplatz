@@ -1,8 +1,7 @@
 <script lang="ts">
     import { mdiCloseOctagonOutline, mdiPlayOutline } from "@mdi/js";
     import ImgButton from "../common/ImgButton.svelte";
-    import type { OutputMessage } from "$lib";
-    import { PUBLIC_BACKEND_HOST } from "$env/static/public";
+    import { getWebSocketAddr, type OutputMessage } from "$lib";
 
     type RunButtonProps = {
         run_ws: WebSocket | null,
@@ -71,8 +70,7 @@
 
         // connect to the /run endpoint using the websocket api with token as query parameter
         try {
-            let ws_protocol = location.protocol === 'https:' ? "wss": "ws"
-            run_ws = new WebSocket(`${ws_protocol}://${PUBLIC_BACKEND_HOST}/api/run?${runParams.toString()}`)
+            run_ws = new WebSocket(`${getWebSocketAddr()}/run?${runParams.toString()}`)
         }
         catch (e) {
             await pushOutputMessage({msg: 'Websocket (run) Verbindungsfehler', type: "stderr"})

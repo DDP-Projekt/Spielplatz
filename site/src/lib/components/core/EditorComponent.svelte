@@ -1,11 +1,11 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
-    import { PUBLIC_BACKEND_HOST } from '$env/static/public';
     import ddpThemeData from "$lib/data/ddp-theme-data.json";
     import ddpLanguageConfig from "$lib/data/ddp-language-config.json";
 
     import loader from "@monaco-editor/loader";
     import type * as MonacoEditor from "monaco-editor";
+    import { getWebSocketAddr } from "$lib";
 
     export type EditorDisplaySettings = {
         initialContent: string,
@@ -220,8 +220,7 @@
 
         // connect to a websocket on the /ls endpoint
         try {
-            const ws_protocol = location.protocol === 'https:' ? "wss" : "ws"
-            ls_socket = new WebSocket(`${ws_protocol}://${PUBLIC_BACKEND_HOST}/api/ls`);
+            ls_socket = new WebSocket(`${getWebSocketAddr()}/ls`);
         }
         catch (e) {
             console.error('WebSocket (ls) Verbindungsfehler', e);
