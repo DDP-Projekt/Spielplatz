@@ -83,7 +83,7 @@
             {/snippet}
     
             {#snippet rightControls()}
-                <ImgButton onclick={copyCode} path={mdiClipboardOutline} title="Code kopieren" />
+                <ImgButton onclick={copyCode} path={mdiClipboardOutline} title="Code kopieren" toast="Code kopiert!" />
             {/snippet}
         </ControlsHeader>
 
