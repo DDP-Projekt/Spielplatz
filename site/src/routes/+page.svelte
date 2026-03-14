@@ -152,7 +152,7 @@
             {#snippet rightControls()}
                 <ExampleSelect onSelect={(code) => editor?.setValue(code) } />
                 <ImgButton onclick={shareCode} path={mdiShare} title="Code teilen" />
-                <ImgButton onclick={copyCode} path={mdiClipboardOutline} title="Code kopieren" />
+                <ImgButton onclick={copyCode} path={mdiClipboardOutline} title="Code kopieren" toast="Code kopiert!" />
                 <ImgLink href="https://github.com/DDP-Projekt/Spielplatz" path={mdiGithub} title="Spielplatz GitHub" />
 
                 <!-- id "theme-switch" affects global style in :root! -->
@@ -182,7 +182,7 @@
         <ControlsHeader>
             {#snippet leftControls()}
                 <ImgButton onclick={clearOutput} path={mdiTrashCanOutline} title="Ausgabe leeren" />
-                <ImgButton onclick={copyOutput} path={mdiClipboardOutline} title="Ausgabe kopieren" />
+                <ImgButton onclick={copyOutput} path={mdiClipboardOutline} title="Ausgabe kopieren" toast="Ausgabe kopiert!" />
                 <ImgCheckbox bind:checked={autoClear} path={mdiDeleteClockOutline} title="Automatisch leeren" offset={{x: 2, y: 0}} />
                 <ImgCheckbox bind:checked={scrollLock} path={mdiArrowVerticalLock} title="Scrollen sperren" />
             {/snippet}
